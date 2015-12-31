@@ -1,0 +1,107 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../behaviors/test-behavior.html">
+
+<dom-module id="simple-sampler">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        margin: 0 5px;
+        width: 30px;
+        height: 30px;
+      }
+      .sampler-button {
+        border: 1px solid black;
+        background-color: #ccc;
+
+        width: 30px;
+        height: 30px;
+      }
+      .active {
+        background-color: white;
+      }
+      svg {
+        position: static;
+      }
+    </style>
+
+
+    <div class="sampler-button"></div>
+    <connector-output audio-node="{{samplerModel}}"></connector-output>
+
+    <!--
+    <div class="svg-container">
+      <svg>
+        <line x1="0" y1="0" x2="30" y2="30" style="stroke: #000000"></line>
+      </svg>
+    </div>
+    -->
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      //let MyBehavior = {};
+
+      class SimpleSampler {
+
+        get behaviors() {
+          return [CustomBehaviors.TestBehavior];
+        }
+
+        beforeRegister() {
+          this.is = 'simple-sampler';
+
+          this.properties = {
+            samplerModel: {
+              type: Object
+            }
+          };
+
+          this.listeners = {
+            down: '_handleClick'
+          };
+
+        }
+
+        ready() {
+          this.button = this.$$('div');
+          this.line = this.$$('svg');
+        }
+
+        attached() {}
+
+        detached() {}
+
+        attributeChanged() {}
+
+        _handleClick (event) {
+          //console.log('bang', event);
+          if (event.target === this.button) {
+            this._trigger();
+          }
+          else if (event.target === this.line) {
+            console.log('do something with the line!');
+          }
+        }
+
+        _trigger () {
+          this.samplerModel.play(0, 0);
+          this._animate();
+          setTimeout(this._animate.bind(this), 50);
+        }
+
+        _animate () {
+          Polymer.dom(this.button).classList.toggle('active');
+        }
+
+      }
+
+      Polymer(SimpleSampler);
+    })();
+  </script>
+
+</dom-module>

@@ -1,0 +1,78 @@
+<!doctype html>
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="generator" content="Luke Anderson" />
+  <title>--_--</title>
+  <!-- Place favicon.ico in the `app/` directory -->
+
+  <!-- Chrome for Android theme color -->
+  <meta name="theme-color" content="#2E3AA1">
+
+  <!-- Web Application Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- build:css styles/main.css -->
+  <link rel="stylesheet" href="styles/main.css">
+  <!-- endbuild-->
+
+  <!-- build:js bower_components/webcomponentsjs/webcomponents-lite.min.js -->
+  <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+  <!-- endbuild -->
+
+  <!-- will be replaced with elements/elements.vulcanized.html -->
+  <link rel="import" href="elements/elements.html">
+  <!-- endreplace-->
+
+
+</head>
+
+<body unresolved class="fullbleed layout vertical">
+  <span id="browser-sync-binding"></span>
+  <template is="dom-bind" id="app">
+
+    <!--
+    <p>hey, this is where the app goes ... start testing elements here</p>
+    <div id="horizontal-container">
+      <template is="dom-repeat" items="{{sliderData}}" as="element">
+        <slider-horizontal slider-value="{{element}}"></slider-horizontal>
+        <slider-vertical slider-value="{{element}}"></slider-vertical>
+      </template>
+    </div>
+    -->
+    <div class="horizontal-line">
+      <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
+        <simple-sampler sampler-model={{sampler}}></simple-sampler>
+      </template>
+    </div>
+
+    <connector-bus bus-model="{{connectionBus}}"></connector-bus>
+
+    <div class="horizontal-line">
+      <template is="dom-repeat" items="{{audio.equalizerList}}" as="equalizer">
+        <equalizer-three equalizer-model={{equalizer}}></equalizer-three>
+      </template>
+    </div>  
+
+
+  </template>
+
+  <!-- build:js scripts/app.js -->
+  <script src="scripts/app.js"></script>
+  <!-- endbuild-->
+</body>
+
+</html>

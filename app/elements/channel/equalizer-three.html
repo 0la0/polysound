@@ -1,0 +1,109 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="equalizer-three">
+  <template>
+    <style>
+      :host {
+        display: block;
+        cursor: default;
+
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      .eq-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+
+        margin: 0 5px;
+        padding: 4px;
+        width: 140px;
+        height: 200px;
+        border: 2px solid black;
+      }
+      .eq-channel {
+        height: 160px;
+        width: 30px;
+        text-align: center;
+      }
+      p {
+        margin: 4px 0;
+        cursor: default;
+      }
+    </style>
+
+    <connector-input audio-node="{{equalizerModel}}"></connector-input>
+    <div class="eq-container">
+      <div class="eq-channel eq-channel__low">
+        <p cass="eq-label">lo</p>
+        <slider-vertical
+            slider-value={{equalizerModel.lo.gain.value}}
+            lower-bound="-40" upper-bound="40">
+        </slider-vertical>
+      </div>
+      <div class="eq-channel eq-channel__mid">
+        <p cass="eq-label">mid</p>
+        <slider-vertical
+            slider-value={{equalizerModel.mid.gain.value}}
+            lower-bound="-40" upper-bound="40">
+        </slider-vertical>
+      </div>
+      <div class="eq-channel eq-channel__hi">
+        <p cass="eq-label">hi</p>
+        <slider-vertical
+            slider-value={{equalizerModel.hi.gain.value}}
+            lower-bound="-40" upper-bound="40">
+        </slider-vertical>
+      </div>
+      <div class="eq-channel eq-channel__gain">
+        <p cass="eq-label">gain</p>
+        <slider-vertical></slider-vertical>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      let MyBehavior = {};
+
+      class Equalizer {
+
+        get behaviors() {
+          return [MyBehavior];
+        }
+
+        beforeRegister() {
+          this.is = 'equalizer-three';
+
+          this.properties = {
+            equalizerModel: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+
+        }
+
+        ready() {}
+
+        attached() {}
+
+        detached() {}
+
+        attributeChanged() {}
+
+      }
+
+      Polymer(Equalizer);
+    })();
+  </script>
+
+</dom-module>

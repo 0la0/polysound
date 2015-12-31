@@ -1,0 +1,217 @@
+<link rel='import' href='../../bower_components/polymer/polymer.html'>
+
+<dom-module id='connector-bus'>
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        cursor: default;
+      }
+      .container {
+        border: 1px solid black;
+      }
+      svg {
+        position: relative;
+        width: 100%;
+        height: 60px;
+        padding: 0;
+        margin: 0;
+      }
+    </style>
+
+    <div class='container'>
+      <svg>
+      </svg>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class ConnectorBus {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'connector-bus';
+
+          this.properties = {
+            busModel: {
+              type: Object
+            }
+          };
+
+          this.listeners = {
+            down: '_handleClick'
+          };
+
+          this.lineMap = new Map();
+        }
+
+        ready() {
+          window.addEventListener('resize', (event) => {
+            this.boundingClientRect = this.getBoundingClientRect();
+          });
+        }
+
+        attached() {
+          // this.circleOne = this.$$('#circle01');
+          // this.circleTwo = this.$$('#circle02');
+          // this.line = this.$$('line');
+          //this.busModel.setUpdateView(this._updateView.bind(this));
+          this.svgElement = this.$$('svg');
+          this.busModel.setHelperFunctions(this._viewModelHelpers());
+          setTimeout(() => {
+            this.boundingClientRect = this.getBoundingClientRect();
+          }, 0);
+        }
+
+        detached () {}
+
+        attributeChanged () {}
+
+        _viewModelHelpers () {
+          return {
+            addActiveLine: (line) => {
+              var activeLine = this._createTemporaryLine(line);
+
+              this.activeLine = activeLine;
+              Polymer.dom(this.svgElement).appendChild(this.activeLine.point1);
+              Polymer.dom(this.svgElement).appendChild(this.activeLine.point2);
+              Polymer.dom(this.svgElement).appendChild(this.activeLine.line);
+            },
+            updateActiveLine: (line) => {
+              //var line = this.busModel.currentLine;
+              if (!line) {
+                console.log('hey, no line');
+                return;
+              }
+              var xBuffer = this.boundingClientRect.left;
+              var yBuffer = this.boundingClientRect.top;
+
+              this.activeLine.point1.setAttribute('cx', line.p1.x - xBuffer);
+              this.activeLine.point1.setAttribute('cy', line.p1.y - yBuffer);
+
+              this.activeLine.point2.setAttribute('cx', line.p2.x - xBuffer);
+              this.activeLine.point2.setAttribute('cy', line.p2.y - yBuffer);
+
+              this.activeLine.line.setAttribute('x1', line.p1.x - xBuffer);
+              this.activeLine.line.setAttribute('y1', line.p1.y - yBuffer);
+
+              this.activeLine.line.setAttribute('x2', line.p2.x - xBuffer);
+              this.activeLine.line.setAttribute('y2', line.p2.y - yBuffer);
+            },
+            removeActiveLine: (line) => {
+              Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
+              Polymer.dom(this.svgElement).removeChild(this.activeLine.point2);
+              Polymer.dom(this.svgElement).removeChild(this.activeLine.line);
+              this.activeLine = null;
+            },
+            finishLine: (line, connectionKey, inputNode, outputNode) => {
+              console.log('add line to line set', line, connectionKey);
+              if (this.lineMap.has(connectionKey)) {
+                Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
+                Polymer.dom(this.svgElement).removeChild(this.activeLine.point2);
+                Polymer.dom(this.svgElement).removeChild(this.activeLine.line);
+              }
+              else {
+                this.activeLine.connectionKey = connectionKey;
+                this.activeLine.inputNode = inputNode;
+                this.activeLine.outputNode = outputNode;
+                this.lineMap.set(connectionKey, this.activeLine);
+                console.log(this.activeLine);
+                this.activeLine.point1.setAttributeNS(null, 'r', 0);
+                this.activeLine.point2.setAttributeNS(null, 'r', 0);
+              }
+              this.activeLine = null;
+              //this.activeLine.line.setAttributeNS(null, 'stroke-width', '3');
+            }
+          };
+        }
+
+        _createTemporaryLine (line) {
+          var xBuffer = this.boundingClientRect.left;
+          var yBuffer = this.boundingClientRect.top;
+          var svgNS = 'http://www.w3.org/2000/svg';
+
+          var point1 = document.createElementNS(svgNS, 'circle');
+          point1.setAttributeNS(null, 'cx', line.p1.x - xBuffer);
+          point1.setAttributeNS(null, 'cy', line.p1.y - yBuffer);
+          point1.setAttributeNS(null, 'r', 3);
+          point1.setAttributeNS(null, 'fill', 'black');
+          point1.setAttributeNS(null, 'stroke', 'none');
+
+          var point2 = document.createElementNS(svgNS, 'circle');
+          point2.setAttributeNS(null, 'cx', line.p2.x - xBuffer);
+          point2.setAttributeNS(null, 'cy', line.p2.y - yBuffer);
+          point2.setAttributeNS(null, 'r', 3);
+          point2.setAttributeNS(null, 'fill', 'black');
+          point2.setAttributeNS(null, 'stroke', 'none');
+
+          var lineElement = document.createElementNS(svgNS, 'line');
+          lineElement.setAttributeNS(null, 'x1', line.p1.x - xBuffer);
+          lineElement.setAttributeNS(null, 'y1', line.p1.y - yBuffer);
+          lineElement.setAttributeNS(null, 'x2', line.p2.x - xBuffer);
+          lineElement.setAttributeNS(null, 'y2', line.p2.y - yBuffer);
+          lineElement.setAttributeNS(null, 'stroke', 'black');
+          lineElement.setAttributeNS(null, 'stroke-width', '3');
+          lineElement.addEventListener('click', this._lineClick.bind(this), false);
+
+          return {
+            point1: point1,
+            point2: point2,
+            line: lineElement
+          };
+        }
+
+        _lineClick (event) {
+          if (!this.activeLine) {
+            var targetLine = event.target;
+            var targetValue;
+            this.lineMap.forEach((value, key) => {
+              if (value.line === targetLine) {
+                targetValue = value;
+              }
+            });
+            targetValue.point1.setAttributeNS(null, 'r', 5);
+            targetValue.point2.setAttributeNS(null, 'r', 5);
+            this.activeLine = targetValue;
+          }
+          else {
+            console.log('remove line and connection!');
+
+            Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
+            Polymer.dom(this.svgElement).removeChild(this.activeLine.point2);
+            Polymer.dom(this.svgElement).removeChild(this.activeLine.line);
+
+            var activeKey = this.activeLine.connectionKey;
+            this.activeLine.inputNode.disconnect(this.activeLine.outputNode);
+            this.activeLine = null;
+            this.lineMap.delete(activeKey);
+          }
+        }
+
+        _handleClick (event) {
+          if (event.srcElement.tagName === 'svg' && this.activeLine) {
+            this.activeLine.point1.setAttributeNS(null, 'r', 0);
+            this.activeLine.point2.setAttributeNS(null, 'r', 0);
+            this.activeLine = null;
+          }
+        }
+
+
+      }
+
+      Polymer(ConnectorBus);
+    })();
+  </script>
+
+</dom-module>

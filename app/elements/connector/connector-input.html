@@ -1,0 +1,64 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="connector-input">
+  <template>
+    <style>
+      :host {
+        --size: 15px;
+        --z-index: 2;
+
+        display: block;
+        position: absolute;
+        z-index: var(--z-index);
+
+        width: var(--size);
+        height: var(--size);
+
+        margin-left: 5px;
+        margin-top: -15px;
+        border: 1px solid black;
+      }
+    </style>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class ConnectorInput {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'connector-input';
+
+          this.properties = {
+            audioNode: {
+              type: Object
+            }
+          };
+        }
+
+        ready() {}
+
+        attached() {}
+
+        detached() {}
+
+        attributeChanged() {}
+
+        addConnection (inputInstrument) {
+          inputInstrument.connectTo(this.audioNode.getInput());
+          var connectionKey = inputInstrument.uniqueId + '' + this.audioNode.uniqueId;
+          app.connectionBus.finishLine(connectionKey, inputInstrument.getOutput(), this.audioNode.getInput());
+        }
+      }
+
+      Polymer(ConnectorInput);
+    })();
+  </script>
+
+</dom-module>
