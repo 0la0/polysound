@@ -70,24 +70,18 @@
           window.addEventListener('resize', (event) => {
             this.boundingClientRect = this.getBoundingClientRect();
           });
-          console.log('ready');
           setTimeout(() => {
             this.boundingClientRect = this.getBoundingClientRect();
-            console.log('buffer?', this.boundingClientRect);
           }, 0);
         }
 
-        attached() {
-          console.log('attached');
-
-        }
+        attached() {}
 
         detached() {}
 
         attributeChanged() {}
 
         _handleClick (event) {
-          //console.log('bang', event);
           if (event.target === this.circleTwo) {
             this.circleIsTracking = true;
           }
@@ -99,12 +93,10 @@
           }
 
           if (this.circleIsTracking) {
-            //console.log(event.detail.x, event.detail.y);
             var mouseX = event.detail.x - this.boundingClientRect.left;
             var mouseY = event.detail.y - this.boundingClientRect.top;
             this.pointTwo.x = mouseX;
             this.pointTwo.y = mouseY;
-            console.log('pointTwo:', this.pointTwo);
 
             this.circleTwo.setAttribute('cx', this.pointTwo.x);
             this.circleTwo.setAttribute('cy', this.pointTwo.y);

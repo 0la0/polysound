@@ -91,7 +91,6 @@
             updateActiveLine: (line) => {
               //var line = this.busModel.currentLine;
               if (!line) {
-                console.log('hey, no line');
                 return;
               }
               var xBuffer = this.boundingClientRect.left;
@@ -116,7 +115,6 @@
               this.activeLine = null;
             },
             finishLine: (line, connectionKey, inputNode, outputNode) => {
-              console.log('add line to line set', line, connectionKey);
               if (this.lineMap.has(connectionKey)) {
                 Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
                 Polymer.dom(this.svgElement).removeChild(this.activeLine.point2);
@@ -127,7 +125,7 @@
                 this.activeLine.inputNode = inputNode;
                 this.activeLine.outputNode = outputNode;
                 this.lineMap.set(connectionKey, this.activeLine);
-                console.log(this.activeLine);
+
                 this.activeLine.point1.setAttributeNS(null, 'r', 0);
                 this.activeLine.point2.setAttributeNS(null, 'r', 0);
               }
@@ -186,8 +184,7 @@
             this.activeLine = targetValue;
           }
           else {
-            console.log('remove line and connection!');
-
+            //remove line and connections
             Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
             Polymer.dom(this.svgElement).removeChild(this.activeLine.point2);
             Polymer.dom(this.svgElement).removeChild(this.activeLine.line);

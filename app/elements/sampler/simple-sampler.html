@@ -21,30 +21,17 @@
       .active {
         background-color: white;
       }
-      svg {
-        position: static;
-      }
     </style>
 
 
     <div class="sampler-button"></div>
     <connector-output audio-node="{{samplerModel}}"></connector-output>
 
-    <!--
-    <div class="svg-container">
-      <svg>
-        <line x1="0" y1="0" x2="30" y2="30" style="stroke: #000000"></line>
-      </svg>
-    </div>
-    -->
-
   </template>
 
   <script>
     (function() {
       'use strict';
-
-      //let MyBehavior = {};
 
       class SimpleSampler {
 
@@ -79,12 +66,11 @@
         attributeChanged() {}
 
         _handleClick (event) {
-          //console.log('bang', event);
           if (event.target === this.button) {
             this._trigger();
           }
           else if (event.target === this.line) {
-            console.log('do something with the line!');
+            //
           }
         }
 

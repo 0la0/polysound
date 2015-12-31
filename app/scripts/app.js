@@ -9,8 +9,6 @@ import ConnectionBus from './services/connectionBus.js';
   var app = document.querySelector('#app');
   app.audio = audio;
   app.connectionBus = new ConnectionBus();
-  console.log('app:', app.audio.samplerList);
-
   //app.audio.metronome.start();
 
   // Sets app default base URL
