@@ -44,15 +44,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <span id="browser-sync-binding"></span>
   <template is="dom-bind" id="app">
 
-    <!--
-    <p>hey, this is where the app goes ... start testing elements here</p>
-    <div id="horizontal-container">
-      <template is="dom-repeat" items="{{sliderData}}" as="element">
-        <slider-horizontal slider-value="{{element}}"></slider-horizontal>
-        <slider-vertical slider-value="{{element}}"></slider-vertical>
-      </template>
-    </div>
-    -->
     <div class="horizontal-line">
       <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
         <simple-sampler sampler-model={{sampler}}></simple-sampler>
@@ -65,8 +56,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <template is="dom-repeat" items="{{audio.equalizerList}}" as="equalizer">
         <equalizer-three equalizer-model={{equalizer}}></equalizer-three>
       </template>
-    </div>  
+    </div>
 
+    <paper-toast id="toast">
+      <span class="toast-hide-button" role="button" tabindex="0" onclick="app.$.toast.hide()">Ok</span>
+    </paper-toast>
 
   </template>
 
