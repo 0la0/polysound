@@ -38,8 +38,9 @@
           };
 
           this.listeners = {
-            down: '_onClick',
-            track: '_onTrack'
+            down: '_onDown',
+            track: '_onTrack',
+            tap: '_onTap'
           };
 
         }
@@ -52,7 +53,7 @@
 
         attributeChanged() {}
 
-        _onClick (event) {
+        _onDown (event) {
           app.connectionBus.createLine(event.detail.x, event.detail.y);
         }
 
@@ -73,6 +74,10 @@
           else {
             app.connectionBus.destroyLine();
           }
+        }
+
+        _onTap (event) {
+          app.connectionBus.destroyLine();
         }
 
       }

@@ -116,7 +116,6 @@
             },
             finishLine: (line, connectionKey, inputNode, outputNode) => {
               if (this.lineMap.has(connectionKey)) {
-                console.log('app toast?', app.$.toast);
                 app.$.toast.text = 'Connection already exists.';
                 app.$.toast.show();
 
