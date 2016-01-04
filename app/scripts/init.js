@@ -2,6 +2,7 @@ import AudioGraph from './audioUtil/audioGraph.js';
 import Metronome from './audioUtil/metronome.js';
 import Sampler from './audioUtil/sampler.js';
 import Equalizer from './audioUtil/equalizer.js';
+import Delay from './audioUtil/delay.js';
 import Http from './util/http.js';
 
 
@@ -20,7 +21,10 @@ var audio = {
   audioGraph: audioGraph,
   metronome: metronome,
   samplerList: samplerList,
-  equalizerList: equalizerList
+  equalizerList: equalizerList,
+  sends: {
+    delay: new Delay(audioGraph.getAudioContext(), audioGraph.wet)
+  }
 };
 
 function buildSamplers () {

@@ -1,0 +1,102 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="simple-delay">
+  <template>
+    <style>
+      :host {
+        display: block;
+        cursor: default;
+
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      .delay-button__container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+
+        border: 2px solid black;
+      }
+      .delay-button {
+        border: 1px solid grey;
+        width: 30px;
+        line-height: 30px;
+        text-align: center;
+      }
+    </style>
+
+    <connector-input
+        audio-node="{{delayModel}}"
+        connection-bus="{{connectionInput}}">>
+    </connector-input>
+    <div class="delay-container">
+      <div class="delay-button__container">
+        <div class="delay-button" delay-value="0.5">0.5</div>
+        <div class="delay-button" delay-value="1">1</div>
+        <div class="delay-button" delay-value="2">2</div>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class SimpleDelay {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'simple-delay';
+
+          this.properties = {
+            delayModel: {
+              type: Object
+            },
+            connectionInput: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+
+        attached() {
+          var delayButtons = this.getElementsByClassName('delay-button');
+          delayButtons = Array.prototype.slice.call(delayButtons);
+          delayButtons.forEach((delayButton) => {
+            let delayValue = delayButton.getAttribute('delay-value');
+            delayButton.addEventListener('click', (event) => {
+              this._setQuatization(120, delayValue);
+            }, false);
+          });
+        }
+
+        detached() {}
+
+        attributeChanged() {}
+
+        _setQuatization (tempo, delayValue) {
+          this.delayModel.setQuatization(tempo, delayValue);
+        }
+
+      }
+      Polymer(SimpleDelay);
+
+      function getDelayClickListener (element) {
+
+      }
+
+    })();
+  </script>
+
+</dom-module>

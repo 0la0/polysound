@@ -25,7 +25,10 @@
 
 
     <div class="sampler-button"></div>
-    <connector-output audio-node="{{samplerModel}}"></connector-output>
+    <connector-output
+        audio-node="{{samplerModel}}"
+        connection-bus="{{connectionBus}}">
+    </connector-output>
 
   </template>
 
@@ -44,6 +47,9 @@
 
           this.properties = {
             samplerModel: {
+              type: Object
+            },
+            connectionBus: {
               type: Object
             }
           };

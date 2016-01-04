@@ -34,9 +34,15 @@
         margin: 4px 0;
         cursor: default;
       }
+      connector-output {
+        margin-left: 5px;
+      }
     </style>
 
-    <connector-input audio-node="{{equalizerModel}}"></connector-input>
+    <connector-input
+        audio-node="{{equalizerModel}}"
+        connection-bus="{{connectionInput}}">
+    </connector-input>
     <div class="eq-container">
       <div class="eq-channel eq-channel__low">
         <p cass="eq-label">lo</p>
@@ -67,6 +73,10 @@
         </slider-vertical>
       </div>
     </div>
+    <connector-output
+        audio-node="{{equalizerModel}}"
+        connection-bus="{{connectionOutput}}">
+    </connector-output>
 
   </template>
 
@@ -87,6 +97,12 @@
 
           this.properties = {
             equalizerModel: {
+              type: Object
+            },
+            connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
               type: Object
             }
           };

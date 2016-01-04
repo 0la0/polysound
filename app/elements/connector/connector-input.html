@@ -38,6 +38,9 @@
           this.properties = {
             audioNode: {
               type: Object
+            },
+            connectionBus: {
+              type: Object
             }
           };
         }
@@ -53,7 +56,7 @@
         addConnection (inputInstrument) {
           inputInstrument.connectTo(this.audioNode.getInput());
           var connectionKey = inputInstrument.uniqueId + '' + this.audioNode.uniqueId;
-          app.connectionBus.finishLine(connectionKey, inputInstrument.getOutput(), this.audioNode.getInput());
+          this.connectionBus.finishLine(connectionKey, inputInstrument.getOutput(), this.audioNode.getInput());
         }
       }
 

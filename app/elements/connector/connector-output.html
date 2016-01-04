@@ -34,6 +34,9 @@
           this.properties = {
             audioNode: {
               type: Object
+            },
+            connectionBus: {
+              type: Object
             }
           };
 
@@ -47,14 +50,15 @@
 
         ready() {}
 
-        attached() {}
+        attached() {
+        }
 
         detached() {}
 
         attributeChanged() {}
 
         _onDown (event) {
-          app.connectionBus.createLine(event.detail.x, event.detail.y);
+          this.connectionBus.createLine(event.detail.x, event.detail.y);
         }
 
         _onTrack (event) {
@@ -62,22 +66,21 @@
             this._onEnd(event);
             return;
           }
-          app.connectionBus.moveLine(event.detail.x, event.detail.y);
+          this.connectionBus.moveLine (event.detail.x, event.detail.y);
         }
 
         _onEnd (event) {
           var endElement = event.detail.hover();
           if (endElement.tagName === 'CONNECTOR-INPUT') {
-            //app.connectionBus.finishLine();
             endElement.addConnection(this.audioNode);
           }
           else {
-            app.connectionBus.destroyLine();
+            this.connectionBus.destroyLine();
           }
         }
 
         _onTap (event) {
-          app.connectionBus.destroyLine();
+          this.connectionBus.destroyLine();
         }
 
       }

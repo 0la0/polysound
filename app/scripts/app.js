@@ -1,14 +1,20 @@
 import audio from './init.js';
 import ConnectionBus from './services/connectionBus.js';
 
-
+function connectionFactory () {
+  return new ConnectionBus();
+}
 
 (function(document) {
   'use strict';
 
   var app = document.querySelector('#app');
   app.audio = audio;
-  app.connectionBus = new ConnectionBus();
+
+  app.connectionBusses = {
+    instruments: new ConnectionBus(),
+    sends: new ConnectionBus()
+  };
   //app.audio.metronome.start();
 
   // Sets app default base URL

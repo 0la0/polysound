@@ -46,16 +46,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <div class="horizontal-line">
       <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
-        <simple-sampler sampler-model={{sampler}}></simple-sampler>
+        <simple-sampler
+            sampler-model={{sampler}}
+            connection-bus={{connectionBusses.instruments}}>
+        </simple-sampler>
       </template>
     </div>
 
-    <connector-bus bus-model="{{connectionBus}}"></connector-bus>
+    <connector-bus bus-model="{{connectionBusses.instruments}}"></connector-bus>
 
     <div class="horizontal-line">
       <template is="dom-repeat" items="{{audio.equalizerList}}" as="equalizer">
-        <equalizer-three equalizer-model={{equalizer}}></equalizer-three>
+        <equalizer-three
+          equalizer-model={{equalizer}}
+          connection-input={{connectionBusses.instruments}}
+          connection-output={{connectionBusses.sends}}>
+        </equalizer-three>
       </template>
+    </div>
+
+    <connector-bus bus-model="{{connectionBusses.sends}}"></connector-bus>
+
+    <div class="horizontal-line">
+      <simple-delay
+          delay-model={{audio.sends.delay}}
+          connection-input={{connectionBusses.sends}}>
+      </simple-delay>
     </div>
 
     <paper-toast id="toast">
