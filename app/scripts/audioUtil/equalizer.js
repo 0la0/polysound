@@ -12,7 +12,9 @@ export default class Equalizer {
     this.hi = audioContext.createBiquadFilter();
     this.hi.type = 'highshelf';
     this.hi.frequency.value = 7000;
+    this.gain = audioContext.createGain();
 
+    this.hi.connect(this.gain);
     this.mid.connect(this.hi);
     this.lo.connect(this.mid);
 
@@ -26,6 +28,7 @@ export default class Equalizer {
     this.lo.gain.value = 0;
     this.mid.gain.value = 0;
     this.hi.gain.value = 0;
+    this.gain.gain.value = 0.5;
 
     this.uniqueId = generateUniqueId();
   }
@@ -43,7 +46,7 @@ export default class Equalizer {
   }
 
   connectTo (audioNode) {
-    this.hi.connect(audioNode);
+    this.gain.connect(audioNode);
   }
 
   /**

@@ -61,7 +61,10 @@
       </div>
       <div class="eq-channel eq-channel__gain">
         <p cass="eq-label">gain</p>
-        <slider-vertical></slider-vertical>
+        <slider-vertical
+            slider-value={{equalizerModel.gain.gain.value}}
+            lower-bound="0" upper-bound="1">
+        </slider-vertical>
       </div>
     </div>
 
