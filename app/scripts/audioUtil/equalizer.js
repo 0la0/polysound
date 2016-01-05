@@ -34,7 +34,7 @@ export default class Equalizer {
   }
 
   getOutput () {
-    return this.hi;
+    return this.gain;
   }
 
   getInput () {
