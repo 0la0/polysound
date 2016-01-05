@@ -72,6 +72,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           delay-model={{audio.sends.delay}}
           connection-input={{connectionBusses.sends}}>
       </simple-delay>
+      <simple-reverb
+          reverb-model={{audio.sends.reverb}}
+          connection-input={{connectionBusses.sends}}>
+      </simple-reverb>
     </div>
 
     <paper-toast id="toast">

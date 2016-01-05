@@ -3,6 +3,7 @@ import Metronome from './audioUtil/metronome.js';
 import Sampler from './audioUtil/sampler.js';
 import Equalizer from './audioUtil/equalizer.js';
 import Delay from './audioUtil/delay.js';
+import Reverb from './audioUtil/reverb.js';
 import Http from './util/http.js';
 
 
@@ -12,7 +13,13 @@ const NUM_EQUALIZERS = 3;
 
 var audioGraph = new AudioGraph();
 var metronome = new Metronome(audioGraph.getAudioContext(), scheduleNote);
+var filePaths = [
+  'audioSamples/snare_loFi_bright.wav',
+  'audioSamples/woodClog55.wav'
+];
 var samples = [];
+var bufferPaths = ['audioSamples/matrix-reverb1.wav'];
+var buffers = [];
 
 var samplerList = buildSamplers();
 var equalizerList = buildEqualizers();
@@ -23,7 +30,8 @@ var audio = {
   samplerList: samplerList,
   equalizerList: equalizerList,
   sends: {
-    delay: new Delay(audioGraph.getAudioContext(), audioGraph.wet)
+    delay: new Delay(audioGraph.getAudioContext(), audioGraph.wet),
+    reverb: new Reverb(audioGraph.getAudioContext(), audioGraph.wet)
   }
 };
 
@@ -49,10 +57,6 @@ function buildEqualizers () {
 
 function loadSamples () {
   var audioContext = audioGraph.getAudioContext();
-  var filePaths = [
-    'audioSamples/snare_loFi_bright.wav',
-    'audioSamples/woodClog55.wav'
-  ];
 
   filePaths.forEach((path, index) => {
     Http.getAudioSample(path, audioContext)
@@ -62,12 +66,14 @@ function loadSamples () {
       });
   });
 
+  bufferPaths.forEach((path, index) => {
+    Http.getAudioSample(path, audioContext)
+      .then((response) => {
+        buffers.push(response.data);
+        audio.sends.reverb.setBuffer(response.data);
+      });
+  });
 
-  // Http.getAudioSample(path, audioContext)
-  //   .then((response) => {
-  //     samples.push(response.data);
-  //     audio.samplerList[0].setSample(response.data);
-  //   });
 }
 
 function scheduleNote(time) {

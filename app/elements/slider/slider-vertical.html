@@ -68,11 +68,13 @@
 
           window.addEventListener('resize', (event) => {
             this.boundingClientRect = this.getBoundingClientRect();
+            this._setOffsetValues();
           });
         }
 
         attached() {
           this.boundingClientRect = this.getBoundingClientRect();
+          this._setOffsetValues();
           this._valueChanged(this.sliderValue);
         }
 
@@ -81,7 +83,7 @@
         attributeChanged() {}
 
         _userEvent (event) {
-          var normalizedPosition = event.detail.y - this.boundingClientRect.top;
+          var normalizedPosition = event.detail.y - this.offsetTop;
           var normalValue = normalizedPosition / this.boundingClientRect.height;
           normalValue = Math.max(0, Math.min(normalValue, 1));
           var realValue = normalValue * this.valueRange;
@@ -96,6 +98,12 @@
           }
         }
 
+        _setOffsetValues () {
+          this.offset = {
+            left: this.offsetLeft,
+            top: this.offsetTop
+          }
+        }
 
       }
 

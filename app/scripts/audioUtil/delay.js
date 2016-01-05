@@ -1,3 +1,4 @@
+import generateUniqueId from './uniqueGenerator.js';
 
 export default class Delay {
 
@@ -17,6 +18,8 @@ export default class Delay {
     this.feedback.connect(this.input);
     this.input.connect(this.wetLevel);
     this.input.connect(this.feedback);
+
+    this.uniqueId = generateUniqueId();
   }
 
   setQuatization (tempo, delayTime) {
