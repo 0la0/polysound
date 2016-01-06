@@ -76,6 +76,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           reverb-model={{audio.sends.reverb}}
           connection-input={{connectionBusses.sends}}>
       </simple-reverb>
+      <dry-node
+          audio-model={{audio.dry}}
+          connection-input={{connectionBusses.sends}}>
+      </dry-node>
     </div>
 
     <paper-toast id="toast">

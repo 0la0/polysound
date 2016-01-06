@@ -4,6 +4,7 @@ import Sampler from './audioUtil/sampler.js';
 import Equalizer from './audioUtil/equalizer.js';
 import Delay from './audioUtil/delay.js';
 import Reverb from './audioUtil/reverb.js';
+import DryNode from './audioUtil/dryNode.js';
 import Http from './util/http.js';
 
 
@@ -32,7 +33,8 @@ var audio = {
   sends: {
     delay: new Delay(audioGraph.getAudioContext(), audioGraph.wet),
     reverb: new Reverb(audioGraph.getAudioContext(), audioGraph.wet)
-  }
+  },
+  dry: new DryNode(audioGraph.getAudioContext(), audioGraph.dry)
 };
 
 function buildSamplers () {
@@ -49,7 +51,6 @@ function buildEqualizers () {
   let eqList = [];
   for (var i = 0; i < NUM_EQUALIZERS; i++) {
     var eq = new Equalizer(audioGraph.getAudioContext());
-    eq.connectTo(audioGraph.dry);
     eqList.push(eq);
   }
   return eqList;

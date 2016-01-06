@@ -1,0 +1,93 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="dry-node">
+  <template>
+    <style>
+      :host {
+        display: block;
+        cursor: default;
+
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      .node-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+
+        margin: 0 5px;
+        padding: 4px;
+        width: 40px;
+        height: 200px;
+        border: 2px solid black;
+      }
+      .node-gain {
+        height: 160px;
+        width: 30px;
+        text-align: center;
+      }
+      p {
+        margin: 4px 0;
+        cursor: default;
+      }
+      connector-output {
+        margin-left: 5px;
+      }
+    </style>
+
+    <connector-input
+        audio-node="{{audioModel}}"
+        connection-bus="{{connectionInput}}">>
+    </connector-input>
+    <div class="node-container">
+      <div class="node-gain">
+        <p>gain</p>
+        <slider-vertical
+            slider-value={{audioModel.mainGain.gain.value}}
+            lower-bound="0" upper-bound="1">
+        </slider-vertical>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class DryNode {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'dry-node';
+
+          this.properties = {
+            audioModel: {
+              type: Object
+            },
+            connectionInput: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {}
+        detached() {}
+        attributeChanged() {}
+
+      }
+      Polymer(DryNode);
+    })();
+  </script>
+
+</dom-module>
