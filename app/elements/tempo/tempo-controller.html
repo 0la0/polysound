@@ -4,13 +4,27 @@
   <template>
     <style>
       :host {
-        display: inline-block;
-        position: relative;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+
         cursor: default;
+        width: 100%;
+        border-bottom: 1px solid black;
       }
-      #startStop {
-        width: 40px;
-        height: 40px;
+      tempo-button {
+        border: 1px solid black;
+        background: #ccc;
+        margin: 5px;
+        padding: 2px;
+      }
+      tempo-display {
+        border: 1px solid black;
+        width: 90px;
+        background: #ccc;
+        margin: 5px;
+        padding: 2px;
       }
     </style>
 

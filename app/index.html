@@ -44,9 +44,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <span id="browser-sync-binding"></span>
   <template is="dom-bind" id="app">
 
-    <div class="horizontal-line">
+    <header>
       <tempo-controller metronome="{{audio.metronome}}"></tempo-controller>
-    </div>
+    </header>
+    
 
     <div class="horizontal-line">
       <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
