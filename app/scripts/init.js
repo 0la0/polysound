@@ -82,12 +82,12 @@ function scheduleNote(time) {
     console.log('scheduleNote ', time);
 }
 
-// function testConnect () {
-//   var sampler = audio.samplerList[0];
-//   var equalizer = audio.equalizerList[0];
-//   sampler.connectTo(equalizer.lo);
-// }
+function loadConfigFiles () {
+  Http.get('config/example.json')
+    .then((resolve) => console.log(resolve.data));
+}
 
-//testConnect();
+
+loadConfigFiles();
 loadSamples();
 export default audio;

@@ -118,10 +118,10 @@ gulp.task('audio-samples', function () {
 });
 
 gulp.task('json', function () {
-  // return gulp.src(['app/api/**.json'])
-  //   .pipe(gulp.dest(dist('elements')))
-  //   .pipe(gulp.dest('.tmp/api'))
-  //   .pipe(gulp.dest(dist('api')));
+  return gulp.src(['app/config/**.json'])
+    .pipe(gulp.dest(dist('elements')))
+    .pipe(gulp.dest('.tmp/config'))
+    .pipe(gulp.dest(dist('config')));
 });
 
 // Lint JavaScript
