@@ -45,12 +45,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template is="dom-bind" id="app">
 
     <div class="horizontal-line">
+      <tempo-controller metronome="{{audio.metronome}}"></tempo-controller>
+    </div>
+
+    <div class="horizontal-line">
       <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
         <simple-sampler
             sampler-model={{sampler}}
             connection-bus={{connectionBusses.instruments}}>
         </simple-sampler>
       </template>
+      <simple-sequencer></simple-sequencer>
     </div>
 
     <connector-bus bus-model="{{connectionBusses.instruments}}"></connector-bus>

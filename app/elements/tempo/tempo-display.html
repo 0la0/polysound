@@ -1,0 +1,72 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="tempo-display">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        cursor: ew-resize;
+      }
+    </style>
+
+    <span>Tempo: </span><span>[[tempo]]</span>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class TempoDisplay {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'tempo-display';
+
+          this.properties = {
+            tempo: {
+              type: Number,
+              notify: true,
+              value: 120
+            }
+          };
+
+          this.listeners = {
+            'down': '_onDown',
+            'track': '_onTrack'
+          };
+
+        }
+
+        ready() {}
+        attached() {}
+        detached() {}
+        attributeChanged() {}
+
+        _onDown (event) {
+          this.lastTrackPostion = null;
+        }
+
+        _onTrack (event) {
+          if (!this.lastTrackPostion) {
+            this.lastTrackPostion = event.detail;
+            return;
+          }
+
+          let deltaX = event.detail.x - this.lastTrackPostion.x;
+          let adjustedTempo = this.tempo + (deltaX / 5);
+          this.tempo = Math.round(adjustedTempo);
+          this.lastTrackPostion = event.detail;
+        }
+
+      }
+
+      Polymer(TempoDisplay);
+    })();
+  </script>
+
+</dom-module>

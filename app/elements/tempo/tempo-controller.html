@@ -1,0 +1,65 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="tempo-controller">
+  <template>
+    <style>
+      :host {
+        display: inline-block;
+        position: relative;
+        cursor: default;
+      }
+      #startStop {
+        width: 40px;
+        height: 40px;
+      }
+    </style>
+
+    <tempo-button metronome="{{metronome}}"></tempo-button>
+    <tempo-display tempo="{{metronome.tempo}}"></tempo-display>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class TempoController {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'tempo-controller';
+
+          this.properties = {
+            metronome: {
+              type: Object
+            }
+          };
+
+          this.listeners = {
+
+          };
+
+        }
+
+        ready() {}
+        attached() {}
+        detached() {}
+        attributeChanged() {}
+
+        _toggleMetronome () {
+          console.log('toggle!');
+          return toggleFunction = () => {
+            console.log('toggle')
+          };
+        }
+
+      }
+
+      Polymer(TempoController);
+    })();
+  </script>
+
+</dom-module>

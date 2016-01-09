@@ -77,9 +77,10 @@ function loadSamples () {
 
 }
 
-function scheduleNote(time) {
+function scheduleNote (time) {
     //notesInQueue.push( { note: beatNumber, time: time } );
-    console.log('scheduleNote ', time);
+    //console.log('scheduleNote ', time);
+    samplerList[0].play(0, time);
 }
 
 function loadConfigFiles () {

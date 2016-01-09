@@ -1,0 +1,78 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="simple-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+      }
+    </style>
+
+    <template is="dom-repeat" items="[[sequencerData]]">
+      <span>[[item]]</span>
+    </template>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class SimpleSequencer {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'simple-sequencer';
+
+          this.properties = {
+            samplerModel: {
+              type: Object
+            },
+            connectionBus: {
+              type: Object
+            },
+            numberOfSteps: {
+              type: Number,
+              value: 16
+            },
+            sequencerData: {
+              type: Array,
+              readOnly: true,
+              notify: false,
+              value: function () {
+                var data =  [];
+                let numSteps = this.properties.numberOfSteps.value;
+                for (let i = 0; i < numSteps; i++) {
+                  data.push(i);
+                }
+                return data;
+              }
+            }
+          };
+
+          this.listeners = {
+
+          };
+
+        }
+
+        ready() {}
+        attached() {}
+        detached() {}
+        attributeChanged() {}
+
+        processTick () {
+          console.log('sampler tick');
+        }
+
+      }
+
+      Polymer(SimpleSequencer);
+    })();
+  </script>
+
+</dom-module>
