@@ -5,20 +5,49 @@
     <style>
       :host {
         display: block;
-        position: relative;
       }
-      .sequencer-header {
-        width: 30px;
-        height: 30px;
+      .sequencer-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
       }
-      .sequencer-header__active {
+      .sequencer-row__header-element {
+        min-width: 30px;
+        height: 10px;
+        border: 1px solid black;
+        margin: 4px;
+      }
+      .sequencer-row__header-element--active {
         background: #666;
       }
+
+      .sequencer-row__body-element {
+        min-width: 30px;
+        height: 20px;
+        border: 1px solid black;
+        margin: 4px;
+      }
+      .sequencer-row__body-element--active {
+        background: #aaa;
+      }
+      .sequencer-row__body-element--scheduled {
+        background: #666;
+      }
+
     </style>
 
-    <template is="dom-repeat" items="[[sequencerData]]">
-      <span class="sequencer-header">[[item]]</span>
-    </template>
+    <div class="sequencer-row">
+      <template is="dom-repeat" items="[[sequencerData]]">
+        <div class="sequencer-row__header-element"></div>
+      </template>
+    </div>
+
+    <div class="sequencer-row">
+      <template is="dom-repeat" items="[[sequencerData]]">
+        <div class="sequencer-row__body-element"></div>
+      </template>
+    </div>
+
 
   </template>
 
@@ -62,37 +91,95 @@
           };
 
           this.listeners = {
-
+            'tap': '_onTap'
           };
 
         }
 
-        ready() {
-
-        }
+        ready() {}
         attached() {
-          app.scheduler.register(this._processTick.bind(this));
+          this.schedulable = buildSchedulable.call(this);
+          app.scheduler.register(this.schedulable);
+
+          this.sequencerMatrix = Array(this.numberOfSteps).fill(false);
 
           setTimeout(() => {
-            var headerNodes = this.getElementsByClassName('sequencer-header');
+            var headerNodes = this.getElementsByClassName('sequencer-row__header-element');
             this.headerElementList = Array.prototype.slice.call(headerNodes);
-            console.log('headerList', this.headerElementList);
+
+            var bodyNodes = this.getElementsByClassName('sequencer-row__body-element');
+            this.bodyElementList = Array.prototype.slice.call(bodyNodes);
+
+            //TODO: rework to use tapIndex for column, row instead of individual listeners
+            this.bodyElementList.forEach((bodyElement, index) => {
+              bodyElement.addEventListener('click', (event) => {
+                this.sequencerMatrix[index] = !this.sequencerMatrix[index];
+                this.sequencerMatrix[index] ?
+                    bodyElement.classList.add('sequencer-row__body-element--scheduled') :
+                    bodyElement.classList.remove('sequencer-row__body-element--scheduled');
+
+              }, false);
+            });
           }, 0);
 
         }
         detached() {
-          app.scheduler.deregister(this._processTick);
+          app.scheduler.deregister(this.schedulable);
         }
         attributeChanged() {}
 
-        _processTick (beatNumber, time) {
-          console.log('process tick', beatNumber, time);
-          this.headerElementList[beatNumber]
-            .classList.toggle('sequencer-header__active');
+        _onTap (event) {
+          console.log('tap', event);
+          var tapIndex = this.bodyElementList.indexOf(event.srcElement);
+          console.log('tapIndex:', tapIndex);
         }
 
       }
       Polymer(SimpleSequencer);
+
+      //TODO: add as behavior
+      function buildSchedulable () {
+        let isReset = true;
+        return {
+          processTick: (beatNumber, time) => {
+            //let lastBeatNumber = getLastBeatNumber(beatNumber, this.numberOfSteps);
+            //console.log('last beat number:', beatNumber, lastBeatNumber);
+
+            if (this.sequencerMatrix[beatNumber]) {
+              //console.log('schedule note:', beatNumber, time);
+              app.audio.samplerList[0].play(0, time);
+            }
+          },
+          render: (beatNumber, lastBeatNumber) => {
+            this.headerElementList[beatNumber]
+              .classList.toggle('sequencer-row__header-element--active');
+            this.bodyElementList[beatNumber]
+              .classList.toggle('sequencer-row__body-element--active');
+
+            if (!isReset) {
+              this.headerElementList[lastBeatNumber]
+                .classList.toggle('sequencer-row__header-element--active');
+              this.bodyElementList[lastBeatNumber]
+                .classList.toggle('sequencer-row__body-element--active');
+            }
+            else {
+              isReset = false;
+            }
+          },
+          start: () => {
+            isReset = true;
+          },
+          stop: () => {
+            this.headerElementList.forEach((headerElement) => {
+              headerElement.classList.remove('sequencer-row__header-element--active');
+            });
+            this.bodyElementList.forEach((bodyElement) => {
+              bodyElement.classList.remove('sequencer-row__body-element--active');
+            });
+          }
+        }
+      }
+
     })();
   </script>
 

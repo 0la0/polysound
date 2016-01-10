@@ -13,7 +13,6 @@ export default class Metronome {
     this.tempo = 120.0;
     this.isRunning = false;
 
-    //TODO: change worker to es6 template
     this.timerWorker = new Worker("scripts/workers/metronomeworker.js");
 
     this.timerWorker.onmessage = (event) => {
@@ -29,9 +28,7 @@ export default class Metronome {
 
   scheduler () {
     while (this.nextNoteTime < this.audioContext.currentTime + this.scheduleAheadTime ) {
-      //var noteSchedule = (this.nextNoteTime - this.audioContext.currentTime) * 1000;
-      //console.log('noteSchedule in ms:', noteSchedule);
-      this.noteScheduler(this.nextNoteTime);
+      this.noteScheduler.masterScheduler(this.nextNoteTime);
 
       var secondsPerBeat = 60.0 / this.tempo;
       this.nextNoteTime += 0.25 * secondsPerBeat;
@@ -40,6 +37,7 @@ export default class Metronome {
 
   start () {
     if (!this.isRunning) {
+      this.noteScheduler.start();
       this.nextNoteTime = this.audioContext.currentTime;
       this.baseTime = this.nextNoteTime;
       this.timerWorker.postMessage("start");
@@ -51,6 +49,7 @@ export default class Metronome {
   }
 
   stop () {
+    this.noteScheduler.stop();
     this.timerWorker.postMessage("stop");
     this.isRunning = false;
   }

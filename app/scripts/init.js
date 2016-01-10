@@ -13,8 +13,8 @@ const NUM_SAMPLERS = 2;
 const NUM_EQUALIZERS = 3;
 
 var audioGraph = new AudioGraph();
-var scheduler = new Scheduler();
-var metronome = new Metronome(audioGraph.getAudioContext(), scheduler.masterScheduler.bind(scheduler));
+var scheduler = new Scheduler(audioGraph.getAudioContext());
+var metronome = new Metronome(audioGraph.getAudioContext(), scheduler);
 
 var filePaths = [
   'audioSamples/snare_loFi_bright.wav',
