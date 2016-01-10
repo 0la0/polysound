@@ -28,19 +28,20 @@ export default class Metronome {
   }
 
   scheduler () {
-      //change
     while (this.nextNoteTime < this.audioContext.currentTime + this.scheduleAheadTime ) {
-        this.noteScheduler(this.nextNoteTime);
+      //var noteSchedule = (this.nextNoteTime - this.audioContext.currentTime) * 1000;
+      //console.log('noteSchedule in ms:', noteSchedule);
+      this.noteScheduler(this.nextNoteTime);
 
-        var secondsPerBeat = 60.0 / this.tempo;
-        this.nextNoteTime += 0.25 * secondsPerBeat;
+      var secondsPerBeat = 60.0 / this.tempo;
+      this.nextNoteTime += 0.25 * secondsPerBeat;
     }
   }
 
   start () {
     if (!this.isRunning) {
-      //change
       this.nextNoteTime = this.audioContext.currentTime;
+      this.baseTime = this.nextNoteTime;
       this.timerWorker.postMessage("start");
       this.isRunning = true;
     }

@@ -1,4 +1,4 @@
-import audio from './init.js';
+import {audio, scheduler} from './init.js';
 import ConnectionBus from './services/connectionBus.js';
 
 function connectionFactory () {
@@ -15,7 +15,7 @@ function connectionFactory () {
     instruments: new ConnectionBus(),
     sends: new ConnectionBus()
   };
-  //app.audio.metronome.start();
+  app.scheduler = scheduler;
 
   // Sets app default base URL
   app.baseUrl = '/';

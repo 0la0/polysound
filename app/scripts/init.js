@@ -1,5 +1,6 @@
 import AudioGraph from './audioUtil/audioGraph.js';
 import Metronome from './audioUtil/metronome.js';
+import Scheduler from './audioUtil/scheduler.js';
 import Sampler from './audioUtil/sampler.js';
 import Equalizer from './audioUtil/equalizer.js';
 import Delay from './audioUtil/delay.js';
@@ -8,12 +9,13 @@ import DryNode from './audioUtil/dryNode.js';
 import Http from './util/http.js';
 
 
-
 const NUM_SAMPLERS = 2;
 const NUM_EQUALIZERS = 3;
 
 var audioGraph = new AudioGraph();
-var metronome = new Metronome(audioGraph.getAudioContext(), scheduleNote);
+var scheduler = new Scheduler();
+var metronome = new Metronome(audioGraph.getAudioContext(), scheduler.masterScheduler.bind(scheduler));
+
 var filePaths = [
   'audioSamples/snare_loFi_bright.wav',
   'audioSamples/woodClog55.wav'
@@ -89,6 +91,6 @@ function loadConfigFiles () {
 }
 
 
-loadConfigFiles();
+//loadConfigFiles();
 loadSamples();
-export default audio;
+export {audio, scheduler};

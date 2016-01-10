@@ -47,7 +47,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <header>
       <tempo-controller metronome="{{audio.metronome}}"></tempo-controller>
     </header>
-    
+
 
     <div class="horizontal-line">
       <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
@@ -56,7 +56,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             connection-bus={{connectionBusses.instruments}}>
         </simple-sampler>
       </template>
-      <simple-sequencer></simple-sequencer>
+      <simple-sequencer sequencer="[[audio.sequencer]]"></simple-sequencer>
     </div>
 
     <connector-bus bus-model="{{connectionBusses.instruments}}"></connector-bus>

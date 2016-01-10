@@ -7,10 +7,17 @@
         display: block;
         position: relative;
       }
+      .sequencer-header {
+        width: 30px;
+        height: 30px;
+      }
+      .sequencer-header__active {
+        background: #666;
+      }
     </style>
 
     <template is="dom-repeat" items="[[sequencerData]]">
-      <span>[[item]]</span>
+      <span class="sequencer-header">[[item]]</span>
     </template>
 
   </template>
@@ -60,17 +67,31 @@
 
         }
 
-        ready() {}
-        attached() {}
-        detached() {}
+        ready() {
+
+        }
+        attached() {
+          app.scheduler.register(this._processTick.bind(this));
+
+          setTimeout(() => {
+            var headerNodes = this.getElementsByClassName('sequencer-header');
+            this.headerElementList = Array.prototype.slice.call(headerNodes);
+            console.log('headerList', this.headerElementList);
+          }, 0);
+
+        }
+        detached() {
+          app.scheduler.deregister(this._processTick);
+        }
         attributeChanged() {}
 
-        processTick () {
-          console.log('sampler tick');
+        _processTick (beatNumber, time) {
+          console.log('process tick', beatNumber, time);
+          this.headerElementList[beatNumber]
+            .classList.toggle('sequencer-header__active');
         }
 
       }
-
       Polymer(SimpleSequencer);
     })();
   </script>
