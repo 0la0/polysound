@@ -39,6 +39,8 @@ var audio = {
   dry: new DryNode(audioGraph.getAudioContext(), audioGraph.dry)
 };
 
+window.sampler = audio.samplerList[0];
+
 function buildSamplers () {
   var samplerList = [];
   for (var i = 0; i < NUM_SAMPLERS; i++) {

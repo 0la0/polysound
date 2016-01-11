@@ -32,31 +32,10 @@
       .sequencer-row__body-element--scheduled {
         background: #666;
       }
-
     </style>
-    <!--
-    <div class="sequencer-row">
-      <template is="dom-repeat" items="[[sequencerData]]">
-        <div class="sequencer-row__element sequencer-row__header-element"></div>
-      </template>
-    </div>
-  -->
 
-    <div id="sequencer-header">
-
-    </div>
-    <div id="sequencer-body">
-
-    </div>
-    <!--
-    <div class="sequencer-row">
-      <template is="dom-repeat" items="[[sequencerData]]">
-        <div class="sequencer-row__element sequencer-row__body-element"></div>
-      </template>
-    </div>
-  -->
-
-
+    <div id="sequencer-header"></div>
+    <div id="sequencer-body"></div>
 
   </template>
 
@@ -107,23 +86,14 @@
 
         ready() {}
         attached() {
-          this.sequencerHeader = this.$$('#sequencer-header');
-          this.sequencerBody = this.$$('#sequencer-body');
-
           this.schedulable = buildSchedulable.call(this);
           app.scheduler.register(this.schedulable);
 
-          this.sequencerMatrix = Array(this.numberOfSteps).fill(false);
-
-          let headerClassList = ['sequencer-row__element', 'sequencer-row__header-element'];
-          let header = buildElementRow(this.numberOfSteps, headerClassList);
-          this.headerElementList = header.elementRow;
-          Polymer.dom(this.sequencerHeader).appendChild(header.rowContainer);
-
-          let bodyClassList = ['sequencer-row__element', 'sequencer-row__body-element'];
-          let body = buildElementRow(this.numberOfSteps, bodyClassList);
-          this.bodyElementList = body.elementRow;
-          Polymer.dom(this.sequencerBody).appendChild(body.rowContainer);
+          this.sequencerHeader = this.$$('#sequencer-header');
+          this.sequencerBody = this.$$('#sequencer-body');
+          this.sequencerMatrix = buildModelMatrix(12, 16);
+          this.headerElementList = buildHeader.call(this);
+          this.bodyElementMatrix = buildBody.call(this);
         }
 
         detached() {
@@ -132,15 +102,31 @@
         attributeChanged() {}
 
         _onTap (event) {
-          var tapIndex = this.bodyElementList.indexOf(event.srcElement);
-          if (tapIndex < 0) {
+          let matrixElement = {
+            hasSolution: false,
+            rowIndex: null,
+            columnIndex: null
+          };
+
+          this.bodyElementMatrix.forEach((row, index) => {
+            let tapIndex = row.indexOf(event.srcElement);
+            if (tapIndex >= 0) {
+              matrixElement.rowIndex = index;
+              matrixElement.columnIndex = tapIndex;
+              matrixElement.hasSolution = true;
+            }
+          });
+
+          if (!matrixElement.hasSolution) {
             return;
           }
+          let row = matrixElement.rowIndex;
+          let column = matrixElement.columnIndex;
 
-          this.sequencerMatrix[tapIndex] = !this.sequencerMatrix[tapIndex];
-          this.sequencerMatrix[tapIndex] ?
-              this.bodyElementList[tapIndex].classList.add('sequencer-row__body-element--scheduled') :
-              this.bodyElementList[tapIndex].classList.remove('sequencer-row__body-element--scheduled');
+          this.sequencerMatrix[row][column] = !this.sequencerMatrix[row][column];
+          this.sequencerMatrix[row][column] ?
+            this.bodyElementMatrix[row][column].classList.add('sequencer-row__body-element--scheduled') :
+            this.bodyElementMatrix[row][column].classList.remove('sequencer-row__body-element--scheduled');
         }
 
 
@@ -148,28 +134,31 @@
       }
       Polymer(SimpleSequencer);
 
-      //TODO: add as behavior
       function buildSchedulable () {
         let isReset = true;
         return {
           processTick: (beatNumber, time) => {
-            if (this.sequencerMatrix[beatNumber]) {
-              app.audio.samplerList[0].play(0, time);
-            }
+            this.sequencerMatrix.forEach((sequencerRow, sequencerIndex) => {
+              let note = sequencerIndex - 6;
+              if (sequencerRow[beatNumber]) {
+                app.audio.samplerList[0].play(note, time);
+              }
+            });
           },
           render: (beatNumber, lastBeatNumber) => {
-            this.headerElementList[beatNumber]
-              .classList.toggle('sequencer-row__header-element--active');
-            this.bodyElementList[beatNumber]
-              .classList.toggle('sequencer-row__body-element--active');
-
+            this.headerElementList[beatNumber].classList.toggle('sequencer-row__header-element--active');
             if (!isReset) {
-              this.headerElementList[lastBeatNumber]
-                .classList.toggle('sequencer-row__header-element--active');
-              this.bodyElementList[lastBeatNumber]
-                .classList.toggle('sequencer-row__body-element--active');
+              this.headerElementList[lastBeatNumber].classList.toggle('sequencer-row__header-element--active');
             }
-            else {
+
+            this.bodyElementMatrix.forEach((elementRow) => {
+              elementRow[beatNumber].classList.toggle('sequencer-row__body-element--active');
+              if (!isReset) {
+                elementRow[lastBeatNumber].classList.toggle('sequencer-row__body-element--active');
+              }
+            });
+
+            if (isReset) {
               isReset = false;
             }
           },
@@ -180,8 +169,8 @@
             this.headerElementList.forEach((headerElement) => {
               headerElement.classList.remove('sequencer-row__header-element--active');
             });
-            this.bodyElementList.forEach((bodyElement) => {
-              bodyElement.classList.remove('sequencer-row__body-element--active');
+            this.bodyElementMatrix.forEach((elementRow) => {
+              elementRow.forEach(element => element.classList.remove('sequencer-row__body-element--active'));
             });
           }
         }
@@ -203,6 +192,33 @@
           rowContainer: rowContainer,
           elementRow: rowElements
         };
+      }
+
+      function buildModelMatrix (numRows, numColumns) {
+        let matrix = [];
+        for (let i = 0; i < numRows; i++) {
+          matrix.push(Array(numColumns).fill(false));
+        }
+        return matrix;
+      }
+
+      function buildHeader () {
+        let headerClassList = ['sequencer-row__element', 'sequencer-row__header-element'];
+        let header = buildElementRow(this.numberOfSteps, headerClassList);
+        Polymer.dom(this.sequencerHeader).appendChild(header.rowContainer);
+        return header.elementRow;
+      }
+
+      function buildBody () {
+        let bodyElementMatrix = [];
+        for (let i = 0; i < 12; i++) {
+          let bodyClassList = ['sequencer-row__element', 'sequencer-row__body-element'];
+          let body = buildElementRow(this.numberOfSteps, bodyClassList);
+          let bodyElementList = body.elementRow;
+          Polymer.dom(this.sequencerBody).appendChild(body.rowContainer);
+          bodyElementMatrix.push(bodyElementList);
+        }
+        return bodyElementMatrix;
       }
 
     })();
