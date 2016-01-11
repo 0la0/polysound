@@ -27,7 +27,7 @@ export default class Metronome {
   }
 
   scheduler () {
-    while (this.nextNoteTime < this.audioContext.currentTime + this.scheduleAheadTime ) {
+    if (this.nextNoteTime < this.audioContext.currentTime + this.scheduleAheadTime ) {
       this.noteScheduler.masterScheduler(this.nextNoteTime);
 
       var secondsPerBeat = 60.0 / this.tempo;
