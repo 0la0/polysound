@@ -5,6 +5,8 @@
     <style>
       :host {
         display: block;
+        border-right: 1px solid black;
+        border-top: 1px solid black;
       }
       .sequencer-row {
         display: flex;
@@ -12,9 +14,10 @@
         flex-wrap: nowrap;
       }
       .sequencer-row__element {
-        min-width: 30px;
-        border: 1px solid black;
-        margin: 4px;
+        min-width: 20px;
+        border-bottom: 1px solid black;
+        border-left: 1px solid black;
+        margin: 0;
       }
       .sequencer-row__header-element {
         height: 10px;
@@ -128,8 +131,6 @@
             this.bodyElementMatrix[row][column].classList.add('sequencer-row__body-element--scheduled') :
             this.bodyElementMatrix[row][column].classList.remove('sequencer-row__body-element--scheduled');
         }
-
-
 
       }
       Polymer(SimpleSequencer);

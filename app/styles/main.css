@@ -17,7 +17,7 @@ body {
   padding: 0;
   font-weight: 300;
   position: relative;
-  
+
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -33,7 +33,7 @@ a, a:visited, a:hover, a:active {
 .horizontal-line {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: flex-start;
 }
 
@@ -42,4 +42,11 @@ header {
   border-bottom: 1px solid black;
   background: #666;
   margin-bottom: 10px;
+}
+
+#instrument-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
 }
