@@ -5,6 +5,24 @@
     <style>
       :host {
         display: block;
+      }
+      .sequencer {
+
+      }
+      .sequencer-header {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-between;
+
+        background-color: #999;
+      }
+      .sequencer-header__name {
+        font-style: italic;
+      }
+      .sequencer-header__toggle {
+        cursor: pointer;
+      }
+      .sequencer-container {
         border-right: 1px solid black;
         border-top: 1px solid black;
       }
@@ -26,6 +44,9 @@
         background: #666;
       }
 
+      .sequencer-body--collapsed {
+        display: none;
+      }
       .sequencer-row__body-element {
         height: 20px;
       }
@@ -37,8 +58,16 @@
       }
     </style>
 
-    <div id="sequencer-header"></div>
-    <div id="sequencer-body"></div>
+    <div class="sequencer">
+      <div class="sequencer-header">
+        <div class="sequencer-header__name">Sequencer Name</div>
+        <div id="toggle" class="sequencer-header__toggle">toggle</div>
+      </div>
+      <div class="sequencer-container">
+        <div id="sequencer-header"></div>
+        <div id="sequencer-body"></div>
+      </div>
+    </div>
 
   </template>
 
@@ -56,28 +85,9 @@
           this.is = 'simple-sequencer';
 
           this.properties = {
-            samplerModel: {
-              type: Object
-            },
-            connectionBus: {
-              type: Object
-            },
             numberOfSteps: {
               type: Number,
               value: 16
-            },
-            sequencerData: {
-              type: Array,
-              readOnly: true,
-              notify: false,
-              value: function () {
-                var data =  [];
-                let numSteps = this.properties.numberOfSteps.value;
-                for (let i = 0; i < numSteps; i++) {
-                  data.push(i);
-                }
-                return data;
-              }
             }
           };
 
@@ -97,6 +107,18 @@
           this.sequencerMatrix = buildModelMatrix(12, 16);
           this.headerElementList = buildHeader.call(this);
           this.bodyElementMatrix = buildBody.call(this);
+
+          this.toggle = this.$$('#toggle');
+          this.toggle.isToggled = false;
+          this.toggle.addEventListener('click', (event) => {
+            this.toggle.isToggled = !this.toggle.isToggled;
+            if (this.toggle.isToggled) {
+              this.sequencerBody.classList.add('sequencer-body--collapsed');
+            }
+            else {
+              this.sequencerBody.classList.remove('sequencer-body--collapsed');
+            }
+          }, false);
         }
 
         detached() {
