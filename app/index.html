@@ -93,7 +93,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </section>
 
       <section id="right">
-        <simple-sequencer></simple-sequencer>
+        <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
+          <simple-sequencer instrument="{{sampler}}"></simple-sequencer>
+        </template>
       </section>
 
     </section>

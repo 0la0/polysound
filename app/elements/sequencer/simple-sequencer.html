@@ -5,6 +5,7 @@
     <style>
       :host {
         display: block;
+        margin: 5px;
       }
       .sequencer {
 
@@ -85,6 +86,9 @@
           this.is = 'simple-sequencer';
 
           this.properties = {
+            instrument: {
+              type: Object
+            },
             numberOfSteps: {
               type: Number,
               value: 16
@@ -164,7 +168,7 @@
             this.sequencerMatrix.forEach((sequencerRow, sequencerIndex) => {
               let note = sequencerIndex - 6;
               if (sequencerRow[beatNumber]) {
-                app.audio.samplerList[0].play(note, time);
+                this.instrument.play(note, time);
               }
             });
           },
