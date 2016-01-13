@@ -59,6 +59,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 connection-bus={{connectionBusses.instruments}}>
             </simple-sampler>
           </template>
+          <template is="dom-repeat" items="{{audio.synthList}}" as="synth">
+            <simple-sampler
+                sampler-model={{synth}}
+                connection-bus={{connectionBusses.instruments}}>
+            </simple-sampler>
+          </template>
         </div>
 
         <connector-bus bus-model="{{connectionBusses.instruments}}"></connector-bus>
@@ -95,6 +101,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <section id="right">
         <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
           <simple-sequencer instrument="{{sampler}}"></simple-sequencer>
+        </template>
+        <template is="dom-repeat" items="{{audio.synthList}}" as="synth">
+          <simple-sequencer instrument="{{synth}}"></simple-sequencer>
         </template>
       </section>
 

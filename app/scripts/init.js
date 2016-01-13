@@ -2,13 +2,14 @@ import AudioGraph from './audioUtil/audioGraph.js';
 import Metronome from './audioUtil/metronome.js';
 import Scheduler from './audioUtil/scheduler.js';
 import Sampler from './audioUtil/sampler.js';
+import Synth from './audioUtil/synth.js';
 import Equalizer from './audioUtil/equalizer.js';
 import Delay from './audioUtil/delay.js';
 import Reverb from './audioUtil/reverb.js';
 import DryNode from './audioUtil/dryNode.js';
 import Http from './util/http.js';
 
-
+const NUM_SYNTHS = 1;
 const NUM_SAMPLERS = 2;
 const NUM_EQUALIZERS = 3;
 
@@ -25,12 +26,14 @@ var bufferPaths = ['audioSamples/matrix-reverb1.wav'];
 var buffers = [];
 
 var samplerList = buildSamplers();
+var synthList = buildSynths();
 var equalizerList = buildEqualizers();
 
 var audio = {
   audioGraph: audioGraph,
   metronome: metronome,
   samplerList: samplerList,
+  synthList: synthList,
   equalizerList: equalizerList,
   sends: {
     delay: new Delay(audioGraph.getAudioContext(), audioGraph.wet),
@@ -39,16 +42,24 @@ var audio = {
   dry: new DryNode(audioGraph.getAudioContext(), audioGraph.dry)
 };
 
-window.sampler = audio.samplerList[0];
+//window.audio = audio;
 
 function buildSamplers () {
   var samplerList = [];
   for (var i = 0; i < NUM_SAMPLERS; i++) {
     var sampler = new Sampler(audioGraph.getAudioContext());
-    //sampler.connectTo(audioGraph.dry);
     samplerList.push(sampler);
   }
   return samplerList;
+}
+
+function buildSynths () {
+  var synthList = [];
+  for (var i = 0; i < NUM_SYNTHS; i++) {
+    var synth = new Synth(audioGraph.getAudioContext());
+    synthList.push(synth);
+  }
+  return synthList;
 }
 
 function buildEqualizers () {
