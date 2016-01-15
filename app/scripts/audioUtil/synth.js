@@ -1,5 +1,5 @@
 import BaseInstrument from './baseInstrument.js';
-//import generateUniqueId from './uniqueGenerator.js';
+import adsrBuilder from './adsr.js';
 
 export default class Synth extends BaseInstrument {
 
@@ -7,19 +7,16 @@ export default class Synth extends BaseInstrument {
     super(audioContext);
   }
 
-  play (pitch, schedule, duration) {
-    if (duration === undefined) {
-      duration = 0.1;
-    }
+  play (pitch, schedule) {
+    let sampleLength = this.attack + this.sustain + this.release;
+    let adsr = adsrBuilder(this.audioContext, this.input, schedule, this.attack, this.sustain, this.release);
 
-    var osc = this.audioContext.createOscillator();
-    osc.connect(this.input);
-
-    var frequency = this.baseFreq * Math.pow(this.semitoneRatio, pitch);
+    let osc = this.audioContext.createOscillator();
+    osc.connect(adsr);
     osc.type = 'sine'; //sine, square, sawtooth, triangle
-    osc.frequency.value = frequency;
+    osc.frequency.value = this.baseFreq * Math.pow(this.semitoneRatio, pitch);
     osc.start(schedule);
-    osc.stop(schedule + duration);
+    osc.stop(schedule + sampleLength);
   }
 
 }

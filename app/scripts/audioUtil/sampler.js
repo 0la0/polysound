@@ -1,4 +1,5 @@
 import BaseInstrument from './baseInstrument.js';
+import adsrBuilder from './adsr.js';
 
 export default class Sampler extends BaseInstrument {
 
@@ -11,13 +12,11 @@ export default class Sampler extends BaseInstrument {
   }
 
   play (pitch, schedule) {
-    var source = this.audioContext.createBufferSource();
-  	source.buffer = this.sample;
-  	if (pitch) {
-  		source.playbackRate.value = Math.pow(this.semitoneRatio, pitch);
-  	}
-  	source.connect(this.input);
-  	source.start(schedule);
+    let adsr = adsrBuilder(this.audioContext, this.input, schedule, this.attack, this.sustain, this.release);
+    let source = this.audioContext.createBufferSource();
+    source.buffer = this.sample;
+    source.connect(adsr);
+    source.start(schedule);
   }
 
 }
