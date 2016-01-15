@@ -1,19 +1,9 @@
-import generateUniqueId from './uniqueGenerator.js';
+import BaseInstrument from './baseInstrument.js';
 
-export default class Sampler {
+export default class Sampler extends BaseInstrument {
 
-  constructor (audioContext, output, sample) {
-    this.audioContext = audioContext;
-    this.semitoneRatio = Math.pow(2, 1/12);
-  	this.input = this.audioContext.createGain();
-
-    if (output) {
-      this.connectTo(output);
-    }
-    if (sample) {
-      this.setSample(sample);
-    }
-    this.uniqueId = generateUniqueId();
+  constructor (audioContext) {
+    super (audioContext);
   }
 
   setSample (sample) {
@@ -28,14 +18,6 @@ export default class Sampler {
   	}
   	source.connect(this.input);
   	source.start(schedule);
-  }
-
-  getOutput () {
-    return this.input;
-  }
-
-  connectTo (outputNode) {
-      this.input.connect(outputNode);
   }
 
 }
