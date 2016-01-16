@@ -28,12 +28,10 @@
     (function() {
       'use strict';
 
-      let MyBehavior = {};
-
       class SliderHorizontal {
 
         get behaviors() {
-          return [MyBehavior];
+          return [];
         }
 
         beforeRegister() {
@@ -43,7 +41,16 @@
             sliderValue: {
               type: Number,
               notify: true,
+              value: 0.5,
               observer: '_valueChanged'
+            },
+            lowerBound: {
+              type: Number,
+              value: 0
+            },
+            upperBound: {
+              type: Number,
+              value: 1
             }
           };
 
@@ -56,6 +63,7 @@
 
         ready() {
           this.tracker = this.$$('#tracker');
+          this.valueRange = this.upperBound - this.lowerBound;
 
           window.addEventListener('resize', (event) => {
             this.boundingClientRect = this.getBoundingClientRect();
@@ -72,19 +80,20 @@
         attributeChanged() {}
 
         _userEvent (event) {
-          var normalizedPosition = event.detail.x - this.boundingClientRect.left;
-          var newValue = normalizedPosition / this.boundingClientRect.width;
-
-          newValue = Math.max(0, Math.min(newValue, 1));
-          this.sliderValue = newValue;
+          let normalizedPosition = event.detail.sourceEvent.pageX - this.offsetLeft;
+          let normalValue = normalizedPosition / this.boundingClientRect.width;
+          normalValue = Math.max(0, Math.min(normalValue, 1));
+          let realValue = normalValue * this.valueRange;
+          this.sliderValue = realValue;
         }
 
         _valueChanged (newValue) {
-          var percentString = 'width: ' + (newValue * 100) + '%';
+          var normalValue = (newValue - this.lowerBound) / this.valueRange;
           if (this.tracker) {
-            this.tracker.style.cssText = percentString;
+            this.tracker.style.width = (normalValue * 100) + '%';
           }
         }
+
 
       }
 

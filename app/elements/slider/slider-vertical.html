@@ -28,12 +28,10 @@
     (function() {
       'use strict';
 
-      let MyBehavior = {};
-
       class SliderVertical {
 
         get behaviors() {
-          return [MyBehavior];
+          return [];
         }
 
         beforeRegister() {
@@ -43,6 +41,7 @@
             sliderValue: {
               type: Number,
               notify: true,
+              value: 0.5,
               observer: '_valueChanged'
             },
             lowerBound: {
@@ -68,13 +67,11 @@
 
           window.addEventListener('resize', (event) => {
             this.boundingClientRect = this.getBoundingClientRect();
-            this._setOffsetValues();
           });
         }
 
         attached() {
           this.boundingClientRect = this.getBoundingClientRect();
-          this._setOffsetValues();
           this._valueChanged(this.sliderValue);
         }
 
@@ -83,10 +80,10 @@
         attributeChanged() {}
 
         _userEvent (event) {
-          var normalizedPosition = event.detail.y - this.offsetTop;
-          var normalValue = normalizedPosition / this.boundingClientRect.height;
+          let normalizedPosition = event.detail.sourceEvent.pageY - this.offsetTop;
+          let normalValue = normalizedPosition / this.boundingClientRect.height;
           normalValue = Math.max(0, Math.min(normalValue, 1));
-          var realValue = normalValue * this.valueRange;
+          let realValue = normalValue * this.valueRange;
           this.sliderValue = this.upperBound - realValue;
         }
 
@@ -94,14 +91,7 @@
           var normalValue = (newValue - this.lowerBound) / this.valueRange;
           var percentString = 'height: ' + (normalValue * 100) + '%';
           if (this.tracker) {
-            this.tracker.style.cssText = percentString;
-          }
-        }
-
-        _setOffsetValues () {
-          this.offset = {
-            left: this.offsetLeft,
-            top: this.offsetTop
+            this.tracker.style.height = (normalValue * 100) + '%';
           }
         }
 
