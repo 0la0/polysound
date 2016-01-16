@@ -1,4 +1,4 @@
-import generateUniqueId from './uniqueGenerator.js';
+import generateUniqueId from '../util/uniqueGenerator.js';
 
 export default class Delay {
 

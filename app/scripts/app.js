@@ -1,5 +1,5 @@
 import {audio, scheduler} from './init.js';
-import ConnectionBus from './services/connectionBus.js';
+import ConnectionBus from './connector/connectionBus.js';
 
 function connectionFactory () {
   return new ConnectionBus();

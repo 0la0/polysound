@@ -1,5 +1,5 @@
 import BaseInstrument from './baseInstrument.js';
-import adsrBuilder from './adsr.js';
+import adsrBuilder from '../util/adsr.js';
 
 export default class Synth extends BaseInstrument {
 
