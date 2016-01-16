@@ -33,25 +33,33 @@
 
       <div class="adsr__row">
         <p class="adsr__label">A</p>
-        <slider-horizontal lower-bound="0" upper-bound="1">
+        <slider-horizontal
+          slider-value="{{adsrModel.attack}}"
+          lower-bound="0.001" upper-bound="1">
         </slider-horizontal>
       </div>
 
       <div class="adsr__row">
         <p class="adsr__label">D</p>
-        <slider-horizontal lower-bound="0" upper-bound="1">
+        <slider-horizontal
+          slider-value="{{adsrModel.decay}}"
+          lower-bound="0.001" upper-bound="1">
         </slider-horizontal>
       </div>
 
       <div class="adsr__row">
         <p class="adsr__label">S</p>
-        <slider-horizontal lower-bound="0" upper-bound="1">
+        <slider-horizontal
+          slider-value="{{adsrModel.sustain}}"
+          lower-bound="0.001" upper-bound="1">
         </slider-horizontal>
       </div>
 
       <div class="adsr__row">
         <p class="adsr__label">R</p>
-        <slider-horizontal lower-bound="0" upper-bound="1">
+        <slider-horizontal
+          slider-value="{{adsrModel.release}}"
+          lower-bound="0.001" upper-bound="1">
         </slider-horizontal>
       </div>
 
@@ -73,8 +81,14 @@
           this.is = 'simple-adsr';
 
           this.properties = {
-            samplerModel: {
-              type: Object
+            adsrModel: {
+              type: Object,
+              value: {
+                attack: 0.1,
+                decay: 0.1,
+                sustain: 0.1,
+                release: 0.1
+              }
             }
           };
 

@@ -8,11 +8,11 @@ export default class Synth extends BaseInstrument {
   }
 
   play (pitch, schedule) {
-    let sampleLength = this.attack + this.sustain + this.release;
-    let adsr = adsrBuilder(this.audioContext, this.input, schedule, this.attack, this.sustain, this.release);
+    let sampleLength = this.adsr.attack + this.adsr.sustain + this.adsr.release;
+    let adsrEnvelope = adsrBuilder(this.audioContext, this.input, schedule, this.adsr);
 
     let osc = this.audioContext.createOscillator();
-    osc.connect(adsr);
+    osc.connect(adsrEnvelope);
     osc.type = 'sine'; //sine, square, sawtooth, triangle
     osc.frequency.value = this.baseFreq * Math.pow(this.semitoneRatio, pitch);
     osc.start(schedule);

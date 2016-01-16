@@ -9,9 +9,13 @@ export default class BaseInstrument {
   	this.baseFreq = 440;
     this.uniqueId = generateUniqueId();
 
-    this.attack = 0.1;
-    this.sustain = 0.5; //=> 500ms
-    this.release = 0.1;
+    // 0.5 => 500ms
+    this.adsr = {
+      attack: 0.01,
+      decay: 0.02,
+      sustain: 0.5,
+      release: 0.1
+    };
   }
 
   getOutput () {
@@ -23,19 +27,21 @@ export default class BaseInstrument {
   }
 
   setAttack (attack) {
-    this.attack = attack;
+    this.adsr.attack = attack;
   }
 
   setDecay (decay) {
-    this.decay = decay;
+    this.adsr.decay = decay;
+  }
+
+  setSustain (sustain) {
+    this.adsr.sustain = sustain;
   }
 
   setRelease (release) {
-    this.release = release;
+    this.adsr.release = release;
   }
 
-  play (pitch, schedule) {
-
-  }
+  //play (pitch, schedule) {}
 
 }
