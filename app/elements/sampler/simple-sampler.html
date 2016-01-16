@@ -7,9 +7,19 @@
       :host {
         display: block;
         position: relative;
-        margin: 0 5px;
-        width: 30px;
-        height: 30px;
+        border: 1px solid black;
+      }
+      .sampler {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+      }
+      .sampler-left {
+        width: 80px;
+        border-right: 1px solid black;
+      }
+      .sampler-name {
+        border-bottom: 1px solid black;
       }
       .sampler-button {
         border: 1px solid black;
@@ -18,13 +28,29 @@
         width: 30px;
         height: 30px;
       }
-      .active {
+      .sampler-button--active {
         background-color: white;
       }
+
+      .sampler-right {
+
+      }
+
+
+
     </style>
 
 
-    <div class="sampler-button"></div>
+    <section class="sampler">
+      <section class="sampler-left">
+        <p class="sampler-name">Label Here</p>
+        <div class="sampler-button"></div>
+      </section>
+      <section class="sampler-right">
+        <simple-adsr></simple-adsr>
+      </section>
+    </section>
+
     <connector-output
         audio-node="{{samplerModel}}"
         connection-bus="{{connectionBus}}">
@@ -87,7 +113,7 @@
         }
 
         _animate () {
-          Polymer.dom(this.button).classList.toggle('active');
+          Polymer.dom(this.button).classList.toggle('sampler-button--active');
         }
 
       }

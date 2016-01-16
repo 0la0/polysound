@@ -6,9 +6,8 @@
       :host {
         display: block;
         position: relative;
-        margin-top: 40px;
         width: 100%;
-        height: 50px;
+        height: 100%;
         border: 2px solid black;
         cursor: default;
       }
@@ -80,7 +79,7 @@
         attributeChanged() {}
 
         _userEvent (event) {
-          let normalizedPosition = event.detail.sourceEvent.pageX - this.offsetLeft;
+          let normalizedPosition = event.detail.sourceEvent.pageX - this.boundingClientRect.left;
           let normalValue = normalizedPosition / this.boundingClientRect.width;
           normalValue = Math.max(0, Math.min(normalValue, 1));
           let realValue = normalValue * this.valueRange;

@@ -1,0 +1,94 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../behaviors/test-behavior.html">
+
+<dom-module id="simple-adsr">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 120px;
+      }
+      .adsr {
+
+      }
+      .adsr__row {
+        display: flex;
+        flex-flow: wrap;
+        flex-wrap: nowrap;
+        position: relative;
+
+        height: 10px;
+        margin: 6px 0;
+      }
+      .adsr__label {
+        margin: 0;
+        width: 30px;
+        line-height: 10px;
+        text-align: center;
+      }
+    </style>
+
+    <section class="adsr">
+
+      <div class="adsr__row">
+        <p class="adsr__label">A</p>
+        <slider-horizontal lower-bound="0" upper-bound="1">
+        </slider-horizontal>
+      </div>
+
+      <div class="adsr__row">
+        <p class="adsr__label">D</p>
+        <slider-horizontal lower-bound="0" upper-bound="1">
+        </slider-horizontal>
+      </div>
+
+      <div class="adsr__row">
+        <p class="adsr__label">S</p>
+        <slider-horizontal lower-bound="0" upper-bound="1">
+        </slider-horizontal>
+      </div>
+
+      <div class="adsr__row">
+        <p class="adsr__label">R</p>
+        <slider-horizontal lower-bound="0" upper-bound="1">
+        </slider-horizontal>
+      </div>
+
+    </section>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class SimpleAdsr {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'simple-adsr';
+
+          this.properties = {
+            samplerModel: {
+              type: Object
+            }
+          };
+
+        }
+
+        ready() {}
+        attached() {}
+        detached() {}
+        attributeChanged() {}
+
+      }
+
+      Polymer(SimpleAdsr);
+    })();
+  </script>
+
+</dom-module>
