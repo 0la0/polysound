@@ -1,0 +1,95 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../behaviors/test-behavior.html">
+
+<dom-module id="sample-visualizer">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        border: 1px solid black;
+      }
+      canvas {
+        background-color: #ffffff;
+        width: 120px;
+        height: 40px;
+      }
+    </style>
+
+    <canvas></canvas>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class SampleVisualizer {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'sample-visualizer';
+
+          this.properties = {
+            bufferSource: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+
+        }
+
+        ready() {
+          this.pollCount = 0;
+          this._pollForBuffer();
+        }
+        attached() {
+          this.cvs = this.$$('canvas');
+          this.cvs.width = 120;
+          this.cvs.height = 40;
+          this.g2d = this.cvs.getContext('2d');
+          this.g2d.halfHeight = 20;
+          this.g2d.strokeStyle = "#000000";
+          this.g2d.lineWidth = 2;
+        }
+        detached() {}
+        attributeChanged() {}
+
+        _pollForBuffer () {
+          //remove when sampler and synth are separated
+          //and creat a public method on this element that can be called
+          //when samples are loaded
+          this.pollCount++;
+          if (!this.bufferSource.hasSample && this.pollCount < 10) {
+            setTimeout(this._pollForBuffer.bind(this), 200);
+          }
+          else if (this.pollCount >= 10) {
+            return;
+          }
+          else {
+            this.bufferSource.getWaveform(200, this._renderCallback.bind(this));
+          }
+        }
+
+        _renderCallback (freqList, min, max) {
+          let halfHeight = this.g2d.halfHeight;
+          this.g2d.beginPath();
+          this.g2d.moveTo(0, freqList[0] + halfHeight);
+          for (let i = 1; i < freqList.length; i++) {
+            let yValue = freqList[i] * 15 + halfHeight;
+            this.g2d.lineTo(i, yValue);
+          }
+          this.g2d.stroke();
+        }
+
+      }
+
+      Polymer(SampleVisualizer);
+    })();
+  </script>
+
+</dom-module>
