@@ -60,10 +60,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             </simple-sampler>
           </template>
           <template is="dom-repeat" items="{{audio.synthList}}" as="synth">
-            <simple-sampler
-                sampler-model={{synth}}
+            <simple-synth
+                synth-model={{synth}}
                 connection-bus={{connectionBusses.instruments}}>
-            </simple-sampler>
+            </simple-synth>
           </template>
         </div>
 

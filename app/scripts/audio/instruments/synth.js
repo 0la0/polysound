@@ -5,6 +5,13 @@ export default class Synth extends BaseInstrument {
 
   constructor (audioContext) {
     super(audioContext);
+    this.oscilators = {
+      SINE: 'sine',
+      SQUARE: 'square',
+      SAWTOOTH: 'sawtooth',
+      TRIANGLE: 'triangle'
+    };
+    this.setOscilator('SINE');
   }
 
   play (pitch, schedule) {
@@ -13,10 +20,14 @@ export default class Synth extends BaseInstrument {
 
     let osc = this.audioContext.createOscillator();
     osc.connect(adsrEnvelope);
-    osc.type = 'sine'; //sine, square, sawtooth, triangle
+    osc.type = this.activeOscilator;
     osc.frequency.value = this.baseFreq * Math.pow(this.semitoneRatio, pitch);
     osc.start(schedule);
     osc.stop(schedule + sampleLength);
+  }
+
+  setOscilator (type) {
+    this.activeOscilator = this.oscilators[type] || this.oscilators.SINE;
   }
 
 }

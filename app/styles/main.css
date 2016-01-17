@@ -23,6 +23,7 @@ body {
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  cursor: default;
 }
 
 a, a:visited, a:hover, a:active {
@@ -35,6 +36,7 @@ a, a:visited, a:hover, a:active {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: flex-start;
+  align-items: stretch;
 }
 
 header {
