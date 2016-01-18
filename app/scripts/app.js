@@ -12,6 +12,7 @@ function connectionFactory () {
   app.audio = audio;
 
   app.connectionBusses = {
+    drivers: new ConnectionBus(),
     instruments: new ConnectionBus(),
     sends: new ConnectionBus()
   };

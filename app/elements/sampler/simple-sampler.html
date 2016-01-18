@@ -32,14 +32,13 @@
         background-color: white;
       }
 
-      .sampler-right {
-
-      }
-
-
-
+      .sampler-right {}
     </style>
 
+    <driver-input
+        audio-node="{{samplerModel}}"
+        connection-bus="{{connectionInput}}">
+    </driver-input>
 
     <section class="sampler">
       <section class="sampler-left">
@@ -54,7 +53,7 @@
 
     <connector-output
         audio-node="{{samplerModel}}"
-        connection-bus="{{connectionBus}}">
+        connection-bus="{{connectionOutput}}">
     </connector-output>
 
   </template>
@@ -76,7 +75,13 @@
             samplerModel: {
               type: Object
             },
-            connectionBus: {
+            // connectionBus: {
+            //   type: Object
+            // },
+            connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
               type: Object
             }
           };

@@ -1,0 +1,67 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="driver-input">
+  <template>
+    <style>
+      :host {
+        --size: 15px;
+        --z-index: 2;
+
+        display: block;
+        position: absolute;
+        z-index: var(--z-index);
+
+        width: var(--size);
+        height: var(--size);
+
+        margin-left: 5px;
+        margin-top: -15px;
+        border: 1px solid black;
+      }
+    </style>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class DriverInput {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'driver-input';
+
+          this.properties = {
+            audioNode: {
+              type: Object
+            },
+            connectionBus: {
+              type: Object
+            }
+          };
+        }
+
+        ready() {}
+
+        attached() {}
+
+        detached() {}
+
+        attributeChanged() {}
+
+        addConnection (inputInstrument) {
+          inputInstrument.connectTo(this.audioNode);
+          var connectionKey = inputInstrument.uniqueId + '' + this.audioNode.uniqueId;
+          this.connectionBus.finishLine(connectionKey, inputInstrument, this.audioNode);
+        }
+      }
+
+      Polymer(DriverInput);
+    })();
+  </script>
+
+</dom-module>

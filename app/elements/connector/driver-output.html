@@ -1,0 +1,92 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="driver-output">
+  <template>
+    <style>
+      :host {
+        --size: 15px;
+        --z-index: 2;
+
+        display: block;
+        position: absolute;
+        z-index: var(--z-index);
+        width: var(--size);
+        height: var(--size);
+        border: 1px solid black;
+      }
+    </style>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class DriverOutput {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'driver-output';
+
+          this.properties = {
+            driverModel: {
+              type: Object
+            },
+            connectionBus: {
+              type: Object
+            }
+          };
+
+          this.listeners = {
+            down: '_onDown',
+            track: '_onTrack',
+            tap: '_onTap'
+          };
+
+        }
+
+        ready() {}
+
+        attached() {
+        }
+
+        detached() {}
+
+        attributeChanged() {}
+
+        _onDown (event) {
+          this.connectionBus.createLine(event.detail.sourceEvent.pageX, event.detail.sourceEvent.pageY);
+        }
+
+        _onTrack (event) {
+          if (event.detail.state === 'end') {
+            this._onEnd(event);
+            return;
+          }
+          this.connectionBus.moveLine(event.detail.sourceEvent.pageX, event.detail.sourceEvent.pageY);
+        }
+
+        _onEnd (event) {
+          var endElement = event.detail.hover();
+          if (endElement.tagName === 'DRIVER-INPUT') {
+            endElement.addConnection(this.driverModel);
+          }
+          else {
+            this.connectionBus.destroyLine();
+          }
+        }
+
+        _onTap (event) {
+          this.connectionBus.destroyLine();
+        }
+
+      }
+
+      Polymer(DriverOutput);
+    })();
+  </script>
+
+</dom-module>

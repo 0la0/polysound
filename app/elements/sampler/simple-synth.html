@@ -53,6 +53,10 @@
 
     </style>
 
+    <driver-input
+        audio-node="{{synthModel}}"
+        connection-bus="{{connectionInput}}">
+    </driver-input>
 
     <section class="synth">
       <section class="synth-left">
@@ -72,7 +76,7 @@
 
     <connector-output
         audio-node="{{synthModel}}"
-        connection-bus="{{connectionBus}}">
+        connection-bus="{{connectionOutput}}">
     </connector-output>
 
   </template>
@@ -94,7 +98,10 @@
             synthModel: {
               type: Object
             },
-            connectionBus: {
+            connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
               type: Object
             }
           };

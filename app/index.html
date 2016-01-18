@@ -54,15 +54,30 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <div class="horizontal-line">
           <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
+            <simple-sequencer connection-output={{connectionBusses.drivers}}>
+            </simple-sequencer>
+          </template>
+          <template is="dom-repeat" items="{{audio.synthList}}" as="synth">
+            <simple-sequencer connection-output={{connectionBusses.drivers}}>
+            </simple-sequencer>
+          </template>
+        </div>
+
+        <connector-bus bus-model="{{connectionBusses.drivers}}"></connector-bus>
+
+        <div class="horizontal-line">
+          <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
             <simple-sampler
                 sampler-model={{sampler}}
-                connection-bus={{connectionBusses.instruments}}>
+                connection-input={{connectionBusses.drivers}}
+                connection-output={{connectionBusses.instruments}}>
             </simple-sampler>
           </template>
           <template is="dom-repeat" items="{{audio.synthList}}" as="synth">
             <simple-synth
                 synth-model={{synth}}
-                connection-bus={{connectionBusses.instruments}}>
+                connection-input={{connectionBusses.drivers}}
+                connection-output={{connectionBusses.instruments}}>
             </simple-synth>
           </template>
         </div>
@@ -99,12 +114,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </section>
 
       <section id="right">
-        <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
-          <simple-sequencer instrument="{{sampler}}"></simple-sequencer>
-        </template>
-        <template is="dom-repeat" items="{{audio.synthList}}" as="synth">
-          <simple-sequencer instrument="{{synth}}"></simple-sequencer>
-        </template>
       </section>
 
     </section>

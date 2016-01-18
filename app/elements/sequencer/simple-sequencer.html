@@ -5,10 +5,11 @@
     <style>
       :host {
         display: block;
-        margin: 5px;
       }
       .sequencer {
-
+        width: 337px;
+        margin-top: 5px;
+        margin-right: 5px;
       }
       .sequencer-header {
         display: flex;
@@ -70,6 +71,11 @@
       </div>
     </div>
 
+    <driver-output
+        driver-model="{{connectionModel}}"
+        connection-bus="{{connectionOutput}}">
+    </driver-output>
+
   </template>
 
   <script>
@@ -86,12 +92,12 @@
           this.is = 'simple-sequencer';
 
           this.properties = {
-            instrument: {
-              type: Object
-            },
             numberOfSteps: {
               type: Number,
               value: 16
+            },
+            connectionOutput: {
+              type: Object
             }
           };
 
@@ -101,8 +107,13 @@
 
         }
 
-        ready() {}
+        ready() {
+
+        }
         attached() {
+          this.connectionModel = generateConnectionModel.call(this);
+          this.instrumentSet = new Set();
+
           this.schedulable = buildSchedulable.call(this);
           app.scheduler.register(this.schedulable);
 
@@ -168,7 +179,10 @@
             this.sequencerMatrix.forEach((sequencerRow, sequencerIndex) => {
               let note = sequencerIndex - 6;
               if (sequencerRow[beatNumber]) {
-                this.instrument.play(note, time);
+                //this.instrument.play(note, time);
+                this.instrumentSet.forEach((instrument) => {
+                  instrument.play(note, time);
+                });
               }
             });
           },
@@ -246,6 +260,22 @@
           bodyElementMatrix.push(bodyElementList);
         }
         return bodyElementMatrix;
+      }
+
+      function generateConnectionModel () {
+        return {
+          disconnect: (instrument) => {
+            this.instrumentSet.delete(instrument);
+          },
+          connectTo: (instrument) => {
+            this.instrumentSet.add(instrument);
+          },
+          uniqueId: Math.random() * Math.pow(2, 32 - 1) >>> 0
+        };
+      }
+
+      function generateUniqueId () {
+        return Math.random() * Math.pow(2, 32 - 1) >>> 0;
       }
 
     })();
