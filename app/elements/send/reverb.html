@@ -46,6 +46,10 @@
         </slider-vertical>
       </div>
     </div>
+    <connector-output
+        audio-node="{{reverbModel}}"
+        connection-bus="{{connectionOutput}}">>
+    </connector-output>
 
   </template>
 
@@ -67,6 +71,9 @@
               type: Object
             },
             connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
               type: Object
             }
           };

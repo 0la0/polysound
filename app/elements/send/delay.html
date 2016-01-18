@@ -14,6 +14,7 @@
         justify-content: space-between;
 
         border: 2px solid black;
+        height: 208px;
       }
       .delay-button {
         border: 1px solid grey;
@@ -34,6 +35,10 @@
         <div class="delay-button" delay-value="2">2</div>
       </div>
     </div>
+    <connector-output
+        audio-node="{{delayModel}}"
+        connection-bus="{{connectionOutput}}">>
+    </connector-output>
 
   </template>
 
@@ -55,6 +60,9 @@
               type: Object
             },
             connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
               type: Object
             }
           };

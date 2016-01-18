@@ -29,6 +29,7 @@ var buffers = [];
 var samplerList = buildSamplers();
 var synthList = buildSynths();
 var equalizerList = buildEqualizers();
+var lastEqualizerList = buildLastEqualizers();
 var driverFactory = new DriverFactory(audioGraph.getAudioContext());
 
 var audio = {
@@ -37,11 +38,12 @@ var audio = {
   samplerList: samplerList,
   synthList: synthList,
   equalizerList: equalizerList,
+  lastEqualizerList: lastEqualizerList,
   sends: {
-    delay: new Delay(audioGraph.getAudioContext(), audioGraph.wet),
-    reverb: new Reverb(audioGraph.getAudioContext(), audioGraph.wet)
+    delay: new Delay(audioGraph.getAudioContext()),
+    reverb: new Reverb(audioGraph.getAudioContext())
   },
-  dry: new DryNode(audioGraph.getAudioContext(), audioGraph.dry),
+  //dry: new DryNode(audioGraph.getAudioContext(), audioGraph.dry),
   driverFactory: driverFactory,
   driverList: []
 };
@@ -70,6 +72,16 @@ function buildEqualizers () {
   let eqList = [];
   for (var i = 0; i < NUM_EQUALIZERS; i++) {
     var eq = new Equalizer(audioGraph.getAudioContext());
+    eqList.push(eq);
+  }
+  return eqList;
+}
+
+function buildLastEqualizers () {
+  let eqList = [];
+  for (var i = 0; i < NUM_EQUALIZERS; i++) {
+    var eq = new Equalizer(audioGraph.getAudioContext());
+    eq.connectTo(audioGraph.masterCompressor);
     eqList.push(eq);
   }
   return eqList;

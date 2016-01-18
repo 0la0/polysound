@@ -14,7 +14,8 @@ function connectionFactory () {
   app.connectionBusses = {
     drivers: new ConnectionBus(),
     instruments: new ConnectionBus(),
-    sends: new ConnectionBus()
+    effects1: new ConnectionBus(),
+    effects2: new ConnectionBus()
   };
   app.scheduler = scheduler;
 

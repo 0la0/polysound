@@ -1,14 +1,13 @@
-import generateUniqueId from '../util/uniqueGenerator.js';
+import BaseEffect from './BaseEffect.js';
+//import generateUniqueId from '../util/uniqueGenerator.js';
 
-export default class Reverb {
+export default class Reverb extends BaseEffect {
 
-  constructor (audioContext, output, buffer) {
-    this.input = audioContext.createConvolver();
-    this.mainGain = audioContext.createGain();
-    this.mainGain.connect(output);
+  constructor (audioContext, buffer) {
+    super(audioContext);
+    this.input = this.audioContext.createConvolver();
     this.input.connect(this.mainGain);
 
-    this.uniqueId = generateUniqueId();
     if (buffer) {
       this.setBuffer(buffer);
     }
@@ -18,8 +17,8 @@ export default class Reverb {
     this.input.buffer = buffer;
   }
 
-  getInput () {
-    return this.input;
-  }
+  // getInput () {
+  //   return this.input;
+  // }
 
 }

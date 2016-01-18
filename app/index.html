@@ -96,26 +96,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <equalizer-three
               equalizer-model={{equalizer}}
               connection-input={{connectionBusses.instruments}}
-              connection-output={{connectionBusses.sends}}>
+              connection-output={{connectionBusses.effects1}}>
             </equalizer-three>
           </template>
         </div>
 
-        <connector-bus bus-model="{{connectionBusses.sends}}"></connector-bus>
+        <connector-bus bus-model="{{connectionBusses.effects1}}"></connector-bus>
 
         <div class="horizontal-line">
           <simple-delay
               delay-model={{audio.sends.delay}}
-              connection-input={{connectionBusses.sends}}>
+              connection-input={{connectionBusses.effects1}}
+              connection-output={{connectionBusses.effects2}}>
           </simple-delay>
           <simple-reverb
               reverb-model={{audio.sends.reverb}}
-              connection-input={{connectionBusses.sends}}>
+              connection-input={{connectionBusses.effects1}}
+              connection-output={{connectionBusses.effects2}}>
           </simple-reverb>
-          <dry-node
-              audio-model={{audio.dry}}
-              connection-input={{connectionBusses.sends}}>
-          </dry-node>
+        </div>
+
+        <connector-bus bus-model="{{connectionBusses.effects2}}"></connector-bus>
+
+        <div class="horizontal-line">
+          <template is="dom-repeat" items="{{audio.lastEqualizerList}}" as="equalizer">
+            <equalizer-three
+              equalizer-model={{equalizer}}
+              connection-input={{connectionBusses.effects2}}>
+            </equalizer-three>
+          </template>
         </div>
 
       </section>

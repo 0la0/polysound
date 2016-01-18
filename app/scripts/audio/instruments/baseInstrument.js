@@ -23,7 +23,7 @@ export default class BaseInstrument {
   }
 
   connectTo (outputNode) {
-      this.input.connect(outputNode);
+    this.input.connect(outputNode);
   }
 
   setAttack (attack) {
@@ -41,7 +41,5 @@ export default class BaseInstrument {
   setRelease (release) {
     this.adsr.release = release;
   }
-
-  //play (pitch, schedule) {}
 
 }

@@ -1,25 +1,23 @@
-import generateUniqueId from '../util/uniqueGenerator.js';
+import BaseEffect from './BaseEffect.js';
+//import generateUniqueId from '../util/uniqueGenerator.js';
 
-export default class Delay {
+export default class Delay extends BaseEffect {
 
-  constructor (context, output) {
-    this.input = context.createDelay();
-    this.feedback = context.createGain();
-    this.wetLevel = context.createGain();
+  constructor (audioContext) {
+    super(audioContext);
+
+    this.input = this.audioContext.createDelay();
+    this.feedback = this.audioContext.createGain();
+    this.wetLevel = this.audioContext.createGain();
 
     this.input.delayTime.value = 0.25; //250 ms delay
     this.feedback.gain.value = 0.85;
     this.wetLevel.gain.value = 0.80;
 
-    this.mainGain = context.createGain();
-
-    this.mainGain.connect(output);
     this.wetLevel.connect(this.mainGain);
     this.feedback.connect(this.input);
     this.input.connect(this.wetLevel);
     this.input.connect(this.feedback);
-
-    this.uniqueId = generateUniqueId();
   }
 
   setQuatization (tempo, delayTime) {
@@ -29,8 +27,5 @@ export default class Delay {
   	//this.feedback.gain.value = temp;
   }
 
-  getInput () {
-    return this.input;
-  }
 
 }
