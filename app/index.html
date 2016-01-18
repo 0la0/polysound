@@ -52,7 +52,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       <section id="left">
 
-        <div class="horizontal-line">
+        <driver-factory factory-model="{{audio.driverFactory}}"></driver-factory>
+        <div class="horizontal-line" id="driver-container">
+          <template is="dom-repeat" items="{{audio.driverList}}" as="driver">
+            <simple-sequencer connection-output={{connectionBusses.drivers}}>
+            </simple-sequencer>
+          </template>
+          <!--
           <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
             <simple-sequencer connection-output={{connectionBusses.drivers}}>
             </simple-sequencer>
@@ -61,6 +67,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <simple-sequencer connection-output={{connectionBusses.drivers}}>
             </simple-sequencer>
           </template>
+          -->
         </div>
 
         <connector-bus bus-model="{{connectionBusses.drivers}}"></connector-bus>

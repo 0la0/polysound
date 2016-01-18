@@ -1,0 +1,66 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="driver-factory">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+      }
+      .factory-button {}
+    </style>
+
+    <div class="factory-button">Click to create sequencer</div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class DriverFactory {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'driver-factory';
+
+          this.properties = {
+            factoryModel: {
+              type: Object
+            }
+          };
+
+          this.listeners = {
+            'tap': '_onTap'
+          };
+
+        }
+
+        ready() {}
+        attached() {
+          this.driverContainer = document.getElementById('driver-container');
+        }
+        detached() {}
+        attributeChanged() {}
+
+        _onTap (event) {
+          let sequencer = buildSequencer();
+          Polymer.dom(this.driverContainer).appendChild(sequencer);
+        }
+
+      }
+      Polymer(DriverFactory);
+
+      function buildSequencer () {
+        let samplerElement = document.createElement('simple-sequencer');
+        samplerElement.connectionOutput = app.connectionBusses.drivers;
+        return samplerElement;
+      }
+
+    })();
+  </script>
+
+</dom-module>
