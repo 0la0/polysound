@@ -1,12 +1,8 @@
 import AudioGraph from './audio/util/audioGraph.js';
 import Metronome from './audio/util/metronome.js';
 import Scheduler from './audio/util/scheduler.js';
-import Sampler from './audio/instruments/sampler.js';
-import Synth from './audio/instruments/synth.js';
-import Equalizer from './audio/effects/equalizer.js';
-import Delay from './audio/effects/delay.js';
-import Reverb from './audio/effects/reverb.js';
-import DryNode from './audio/effects/dryNode.js';
+import InstrumentFactory from './audio/instruments/instrumentFactory.js';
+import EffectFactory from './audio/effects/effectFactory.js';
 import DriverFactory from './audio/drivers/driverFactory.js';
 import Http from './util/http.js';
 
@@ -17,6 +13,8 @@ const NUM_EQUALIZERS = 3;
 var audioGraph = new AudioGraph();
 var scheduler = new Scheduler(audioGraph.getAudioContext());
 var metronome = new Metronome(audioGraph.getAudioContext(), scheduler);
+var effectFactory = new EffectFactory(audioGraph.getAudioContext());
+var instrumentFactory = new InstrumentFactory(audioGraph.getAudioContext());
 
 var filePaths = [
   'audioSamples/snare_loFi_bright.wav',
@@ -40,10 +38,10 @@ var audio = {
   equalizerList: equalizerList,
   lastEqualizerList: lastEqualizerList,
   sends: {
-    delay: new Delay(audioGraph.getAudioContext()),
-    reverb: new Reverb(audioGraph.getAudioContext())
+    delay: effectFactory.createDelay(),
+    reverb: effectFactory.createReverb()
   },
-  //dry: new DryNode(audioGraph.getAudioContext(), audioGraph.dry),
+  tempEqualizer: effectFactory.createEqualizer(),
   driverFactory: driverFactory,
   driverList: []
 };
@@ -53,7 +51,7 @@ var audio = {
 function buildSamplers () {
   var samplerList = [];
   for (var i = 0; i < NUM_SAMPLERS; i++) {
-    var sampler = new Sampler(audioGraph.getAudioContext());
+    let sampler = instrumentFactory.createSampler();
     samplerList.push(sampler);
   }
   return samplerList;
@@ -62,7 +60,7 @@ function buildSamplers () {
 function buildSynths () {
   var synthList = [];
   for (var i = 0; i < NUM_SYNTHS; i++) {
-    var synth = new Synth(audioGraph.getAudioContext());
+    let synth = instrumentFactory.createSynth();
     synthList.push(synth);
   }
   return synthList;
@@ -71,7 +69,7 @@ function buildSynths () {
 function buildEqualizers () {
   let eqList = [];
   for (var i = 0; i < NUM_EQUALIZERS; i++) {
-    var eq = new Equalizer(audioGraph.getAudioContext());
+    let eq = effectFactory.createEqualizer();
     eqList.push(eq);
   }
   return eqList;
@@ -80,7 +78,7 @@ function buildEqualizers () {
 function buildLastEqualizers () {
   let eqList = [];
   for (var i = 0; i < NUM_EQUALIZERS; i++) {
-    var eq = new Equalizer(audioGraph.getAudioContext());
+    let eq = effectFactory.createEqualizer();
     eq.connectTo(audioGraph.masterCompressor);
     eqList.push(eq);
   }
@@ -106,12 +104,6 @@ function loadSamples () {
       });
   });
 
-}
-
-function scheduleNote (time) {
-    //notesInQueue.push( { note: beatNumber, time: time } );
-    //console.log('scheduleNote ', time);
-    samplerList[0].play(0, time);
 }
 
 function loadConfigFiles () {

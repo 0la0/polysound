@@ -114,6 +114,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               connection-input={{connectionBusses.effects1}}
               connection-output={{connectionBusses.effects2}}>
           </simple-reverb>
+          <equalizer-three
+            equalizer-model={{audio.tempEqualizer}}
+            connection-input={{connectionBusses.effects1}}
+            connection-output={{connectionBusses.effects2}}>
+          </equalizer-three>
         </div>
 
         <connector-bus bus-model="{{connectionBusses.effects2}}"></connector-bus>

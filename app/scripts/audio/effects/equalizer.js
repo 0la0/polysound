@@ -18,12 +18,12 @@ export default class Equalizer {
     this.mid.connect(this.hi);
     this.lo.connect(this.mid);
 
-    if (input) {
-      this.setInput(input);
-    }
-    if (outputList) {
-      outputList.forEach((outputNode) => this.setOutput(outputNode));
-    }
+    // if (input) {
+    //   this.setInput(input);
+    // }
+    // if (outputList) {
+    //   outputList.forEach((outputNode) => this.setOutput(outputNode));
+    // }
 
     this.lo.gain.value = 0;
     this.mid.gain.value = 0;
@@ -48,9 +48,5 @@ export default class Equalizer {
   connectTo (audioNode) {
     this.gain.connect(audioNode);
   }
-
-  /**
-   *  helper methods for frequencies?
-   */
 
 }
