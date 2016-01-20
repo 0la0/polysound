@@ -107,7 +107,12 @@
 
         ready() {}
 
-        attached() {}
+        attached() {
+          let outputElement = this.$$('connector-output');
+          if (!this.connectionOutput) {
+            Polymer.dom(this.root).removeChild(outputElement);
+          }
+        }
 
         detached() {}
 

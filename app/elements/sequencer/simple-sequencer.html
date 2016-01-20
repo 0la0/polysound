@@ -179,7 +179,6 @@
             this.sequencerMatrix.forEach((sequencerRow, sequencerIndex) => {
               let note = sequencerIndex - 6;
               if (sequencerRow[beatNumber]) {
-                //this.instrument.play(note, time);
                 this.instrumentSet.forEach((instrument) => {
                   instrument.play(note, time);
                 });
@@ -262,6 +261,7 @@
         return bodyElementMatrix;
       }
 
+      //TODO: make this available to all drivers
       function generateConnectionModel () {
         return {
           disconnect: (instrument) => {
@@ -272,10 +272,6 @@
           },
           uniqueId: Math.random() * Math.pow(2, 32 - 1) >>> 0
         };
-      }
-
-      function generateUniqueId () {
-        return Math.random() * Math.pow(2, 32 - 1) >>> 0;
       }
 
     })();

@@ -1,0 +1,88 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="custom-grainulator">
+  <template>
+    <style>
+      :host {
+        display: block;
+        width: 200px;
+
+        border: 1px solid black;
+      }
+      .grainulator-header {
+        background-color: #999;
+        width: 100%;
+      }
+      .grainulator-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: stretch;
+
+        height: 20px;
+      }
+      label {
+        width: 50%;
+      }
+    </style>
+
+    <div class="grainulator">
+      <div class="grainulator-header">Grainulator Name</div>
+      <div class="grainulator-row">
+        <label>Position</label>
+        <slider-horizontal
+          lower-bound="0" upper-bound="1">
+        </slider-horizontal>
+      </div>
+
+      <div class="grainulator-row">
+        <label>Spread</label>
+        <slider-horizontal
+          lower-bound="0" upper-bound="1">
+        </slider-horizontal>
+      </div>
+
+    </div>
+
+    <driver-output
+        driver-model="{{connectionModel}}"
+        connection-bus="{{connectionOutput}}">
+    </driver-output>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class CustomGrainulator {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'custom-grainulator';
+
+          this.properties = {
+            connectionOutput: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+
+        }
+
+        ready() {}
+        attached() {}
+        detached() {}
+        attributeChanged() {}
+      }
+      Polymer(CustomGrainulator);
+
+    })();
+  </script>
+
+</dom-module>

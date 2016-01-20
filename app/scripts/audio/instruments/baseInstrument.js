@@ -12,7 +12,7 @@ export default class BaseInstrument {
     // 0.5 => 500ms
     this.adsr = {
       attack: 0.01,
-      decay: 0.02,
+      decay: 0.0,
       sustain: 0.5,
       release: 0.1
     };
@@ -40,6 +40,11 @@ export default class BaseInstrument {
 
   setRelease (release) {
     this.adsr.release = release;
+  }
+
+  getPlayLength () {
+    return Object.keys(this.adsr)
+      .reduce((sum, key) => sum + this.adsr[key], 0);
   }
 
 }

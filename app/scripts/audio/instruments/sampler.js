@@ -13,13 +13,17 @@ export default class Sampler extends BaseInstrument {
     this.hasSample = true;
   }
 
-  play (pitch, schedule) {
+  play (pitch, schedule, samplePosition) {
     let adsrEnvelope = adsrBuilder(this.audioContext, this.input, schedule, this.adsr);
     let source = this.audioContext.createBufferSource();
     source.buffer = this.sample;
     source.connect(adsrEnvelope);
     source.playbackRate.value = Math.pow(this.semitoneRatio, pitch);
-    source.start(schedule);
+
+    if (!samplePosition) {
+      samplePosition = 0;
+    }
+    source.start(schedule, samplePosition, this.getPlayLength());
   }
 
   getWaveform (canvasWidth, cb) {
