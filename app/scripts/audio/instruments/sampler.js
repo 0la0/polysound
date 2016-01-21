@@ -14,6 +14,9 @@ export default class Sampler extends BaseInstrument {
   }
 
   play (pitch, schedule, samplePosition) {
+    if (!schedule) {
+      schedule = this.audioContext.currentTime;
+    }
     let adsrEnvelope = adsrBuilder(this.audioContext, this.input, schedule, this.adsr);
     let source = this.audioContext.createBufferSource();
     source.buffer = this.sample;
