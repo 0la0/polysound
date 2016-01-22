@@ -83,11 +83,12 @@
           let normalValue = normalizedPosition / this.boundingClientRect.width;
           normalValue = Math.max(0, Math.min(normalValue, 1));
           let realValue = normalValue * this.valueRange;
-          this.sliderValue = realValue;
+          this.sliderValue = realValue + this.lowerBound;
         }
 
         _valueChanged (newValue) {
           var normalValue = (newValue - this.lowerBound) / this.valueRange;
+          console.log('setting normal value as:', normalValue, newValue)
           if (this.tracker) {
             this.tracker.style.width = (normalValue * 100) + '%';
           }

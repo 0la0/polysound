@@ -47,4 +47,8 @@ export default class Sampler extends BaseInstrument {
     cb(peaks);
   }
 
+  getDuration () {
+    return this.sample.duration;
+  }
+
 }

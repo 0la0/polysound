@@ -56,7 +56,32 @@
       <div class="grainulator-row">
         <label>Spread</label>
         <slider-horizontal
+          slider-value={{spread}}
           lower-bound="0" upper-bound="1">
+        </slider-horizontal>
+      </div>
+
+      <div class="grainulator-row">
+        <label>Loop Time</label>
+        <slider-horizontal
+          slider-value={{loopTime}}
+          lower-bound="0.01" upper-bound="1">
+        </slider-horizontal>
+      </div>
+
+      <div class="grainulator-row">
+        <label>Num Voices</label>
+        <slider-horizontal
+          slider-value={{numVoices}}
+          lower-bound="1" upper-bound="6">
+        </slider-horizontal>
+      </div>
+
+      <div class="grainulator-row">
+        <label>Pitch</label>
+        <slider-horizontal
+          slider-value={{pitch}}
+          lower-bound="-12" upper-bound="12">
         </slider-horizontal>
       </div>
 
@@ -87,10 +112,24 @@
               type: Object
             },
             position: {
-              type: Number
+              type: Number,
+              value: 0.1
             },
             spread: {
-              type: Number
+              type: Number,
+              value: 0
+            },
+            loopTime: {
+              type: Number,
+              value: 0.5
+            },
+            numVoices: {
+              type: Number,
+              value: 0
+            },
+            pitch: {
+              type: Number,
+              value: 0
             }
           };
 
@@ -102,7 +141,6 @@
           this.connectionModel = CustomBehaviors.ConnectionGenerator.call(this);
           this.instrumentSet = new Set();
 
-          this.isOn = false;
           this.button = this.$$('#button');
           this.isOn = false;
           this.button.addEventListener('click', (event) => {
@@ -120,18 +158,32 @@
         attributeChanged() {}
 
         _grainLoop () {
-
           this.instrumentSet.forEach((instrument) => {
-            instrument.play(0, 0, this.position);
+            for (let i = 0; i < this.numVoices; i++) {
+              let position = getPosition(this.position, instrument.getDuration(), this.spread);
+              let pitch = Math.round(this.pitch);
+              instrument.play(pitch, 0, position);
+            }
           });
 
           if (this.isOn) {
-            setTimeout(this._grainLoop.bind(this), 30);
+            let timeOut = this.loopTime * 1000;
+            setTimeout(this._grainLoop.bind(this), timeOut);
           }
-          
+
         }
       }
       Polymer(CustomGrainulator);
+
+      function getPosition (normalPosition, duration, spreadUpperBound) {
+        let spread = getPosNeg() * spreadUpperBound * Math.random();
+        let position = (normalPosition * duration) + spread;
+        return Math.max(0, Math.min(position, duration));
+      }
+
+      function getPosNeg () {
+        return Math.random() < 0.5 ? -1 : 1;
+      }
 
     })();
   </script>

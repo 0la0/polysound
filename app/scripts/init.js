@@ -7,7 +7,7 @@ import DriverFactory from './audio/drivers/driverFactory.js';
 import Http from './util/http.js';
 
 const NUM_SYNTHS = 1;
-const NUM_SAMPLERS = 2;
+const NUM_SAMPLERS = 3;
 const NUM_EQUALIZERS = 3;
 
 var audioGraph = new AudioGraph();
@@ -18,7 +18,8 @@ var instrumentFactory = new InstrumentFactory(audioGraph.getAudioContext());
 
 var filePaths = [
   'audioSamples/snare_loFi_bright.wav',
-  'audioSamples/woodClog55.wav'
+  'audioSamples/woodClog55.wav',
+  'audioSamples/drakeVoice.wav'
 ];
 var samples = [];
 var bufferPaths = ['audioSamples/matrix-reverb1.wav'];
