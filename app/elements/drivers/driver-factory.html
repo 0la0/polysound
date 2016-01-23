@@ -46,7 +46,7 @@
 
         ready() {}
         attached() {
-          this.driverContainer = document.getElementById('driver-container');
+          this.driverContainer = Polymer.dom(this.parent).querySelector('#driver-container');
         }
         detached() {}
         attributeChanged() {}
@@ -54,28 +54,16 @@
         _onTap (event) {
           let targetElement = event.detail.sourceEvent.target
           let targetValue = targetElement.getAttribute('value');
-          if (targetValue && elementFactory[targetValue]) {
-            let driverElement = elementFactory[targetValue]();
+          if (targetValue) {
+            let driverElement = document.createElement('driver-container');
+            driverElement.connectionOutput = app.connectionBusses.drivers;
+            driverElement.driverType = targetValue;
             Polymer.dom(this.driverContainer).appendChild(driverElement);
           }
         }
 
       }
       Polymer(DriverFactory);
-
-      let elementFactory = {
-        sequencer: () => {
-          let samplerElement = document.createElement('simple-sequencer');
-          samplerElement.connectionOutput = app.connectionBusses.drivers;
-          return samplerElement;
-        },
-        grainulator: () => {
-          let grainElement = document.createElement('custom-grainulator');
-          grainElement.connectionOutput = app.connectionBusses.drivers;
-          return grainElement;
-        }
-      };
-
 
     })();
   </script>

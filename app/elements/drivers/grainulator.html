@@ -1,5 +1,4 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../behaviors/test-behavior.html">
 
 <dom-module id="custom-grainulator">
   <template>
@@ -87,10 +86,6 @@
 
     </div>
 
-    <driver-output
-        driver-model="{{connectionModel}}"
-        connection-bus="{{connectionOutput}}">
-    </driver-output>
 
   </template>
 
@@ -108,7 +103,7 @@
           this.is = 'custom-grainulator';
 
           this.properties = {
-            connectionOutput: {
+            instrumentSet: {
               type: Object
             },
             position: {
@@ -138,10 +133,7 @@
 
         ready() {}
         attached() {
-          this.connectionModel = CustomBehaviors.ConnectionGenerator.call(this);
-          this.instrumentSet = new Set();
-
-          this.button = this.$$('#button');
+          this.button = this.$.button;
           this.isOn = false;
           this.button.addEventListener('click', (event) => {
             this.isOn = !this.isOn;

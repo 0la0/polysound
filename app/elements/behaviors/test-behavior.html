@@ -18,16 +18,4 @@ CustomBehaviors.TestBehavior = {
 
 };
 
-CustomBehaviors.ConnectionGenerator = function () {
-  return {
-    disconnect: (instrument) => {
-      this.instrumentSet.delete(instrument);
-    },
-    connectTo: (instrument) => {
-      this.instrumentSet.add(instrument);
-    },
-    uniqueId: Math.random() * Math.pow(2, 32 - 1) >>> 0
-  };
-};
-
 </script>

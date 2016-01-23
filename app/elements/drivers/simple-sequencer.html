@@ -1,5 +1,4 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../behaviors/test-behavior.html">
 
 <dom-module id="simple-sequencer">
   <template>
@@ -72,10 +71,6 @@
       </div>
     </div>
 
-    <driver-output
-        driver-model="{{connectionModel}}"
-        connection-bus="{{connectionOutput}}">
-    </driver-output>
 
   </template>
 
@@ -97,7 +92,7 @@
               type: Number,
               value: 16
             },
-            connectionOutput: {
+            instrumentSet: {
               type: Object
             }
           };
@@ -112,10 +107,6 @@
 
         }
         attached() {
-          //this.connectionModel = generateConnectionModel.call(this);
-          this.connectionModel = CustomBehaviors.ConnectionGenerator.call(this);
-          this.instrumentSet = new Set();
-
           this.schedulable = buildSchedulable.call(this);
           app.scheduler.register(this.schedulable);
 
@@ -125,7 +116,7 @@
           this.headerElementList = buildHeader.call(this);
           this.bodyElementMatrix = buildBody.call(this);
 
-          this.toggle = this.$$('#toggle');
+          this.toggle = this.$.toggle;
           this.toggle.isToggled = false;
           this.toggle.addEventListener('click', (event) => {
             this.toggle.isToggled = !this.toggle.isToggled;
