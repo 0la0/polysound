@@ -7,10 +7,15 @@
         display: block;
         position: relative;
       }
-      .factory-button {}
+      .factory-container {
+        border: 1px solid black;
+      }
     </style>
 
-    <div class="factory-button">Click to create sequencer</div>
+    <div class="factory-container">
+      <div class="factory-option" value="sequencer">sequencer</div>
+      <div class="factory-option" value="grainulator">gainulator</div>
+    </div>
 
   </template>
 
@@ -47,18 +52,30 @@
         attributeChanged() {}
 
         _onTap (event) {
-          let sequencer = buildSequencer();
-          Polymer.dom(this.driverContainer).appendChild(sequencer);
+          let targetElement = event.detail.sourceEvent.target
+          let targetValue = targetElement.getAttribute('value');
+          if (targetValue && elementFactory[targetValue]) {
+            let driverElement = elementFactory[targetValue]();
+            Polymer.dom(this.driverContainer).appendChild(driverElement);
+          }
         }
 
       }
       Polymer(DriverFactory);
 
-      function buildSequencer () {
-        let samplerElement = document.createElement('simple-sequencer');
-        samplerElement.connectionOutput = app.connectionBusses.drivers;
-        return samplerElement;
-      }
+      let elementFactory = {
+        sequencer: () => {
+          let samplerElement = document.createElement('simple-sequencer');
+          samplerElement.connectionOutput = app.connectionBusses.drivers;
+          return samplerElement;
+        },
+        grainulator: () => {
+          let grainElement = document.createElement('custom-grainulator');
+          grainElement.connectionOutput = app.connectionBusses.drivers;
+          return grainElement;
+        }
+      };
+
 
     })();
   </script>
