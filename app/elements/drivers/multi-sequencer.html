@@ -1,0 +1,261 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="multi-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .sequencer {
+        width: 337px;
+        margin-top: 5px;
+        margin-right: 5px;
+      }
+      .sequencer-header {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-between;
+
+        background-color: #999;
+      }
+      .sequencer-header__name {
+        font-style: italic;
+      }
+      .sequencer-header__toggle {
+        cursor: pointer;
+      }
+      .sequencer-container {
+        border-right: 1px solid black;
+        border-top: 1px solid black;
+      }
+      .sequencer-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+      }
+      .sequencer-row__element {
+        min-width: 20px;
+        border-bottom: 1px solid black;
+        border-left: 1px solid black;
+        margin: 0;
+      }
+      .sequencer-row__header-element {
+        height: 10px;
+      }
+      .sequencer-row__header-element--active {
+        background: #666;
+      }
+
+      .sequencer-body--collapsed {
+        display: none;
+      }
+      .sequencer-row__body-element {
+        height: 20px;
+      }
+      .sequencer-row__body-element--active {
+        background: #aaa;
+      }
+      .sequencer-row__body-element--scheduled {
+        background: #666;
+      }
+    </style>
+
+    <div class="sequencer">
+      <div class="sequencer-header">
+        <div class="sequencer-header__name">Multi Sequencer Name</div>
+        <div id="toggle" class="sequencer-header__toggle">toggle</div>
+      </div>
+      <div class="sequencer-container">
+        <div id="sequencer-header"></div>
+        <div id="sequencer-body"></div>
+      </div>
+    </div>
+
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class MultiSequencer {
+
+        get behaviors() {
+          return [];
+        }
+
+        beforeRegister() {
+          this.is = 'multi-sequencer';
+
+          this.properties = {
+            numberOfSteps: {
+              type: Number,
+              value: 16
+            },
+            instrumentList: {
+              type: Array
+            }
+          };
+
+          this.listeners = {
+            'tap': '_onTap'
+          };
+
+        }
+
+        ready() {
+
+        }
+        attached() {
+          this.schedulable = buildSchedulable.call(this);
+          app.scheduler.register(this.schedulable);
+
+          this.sequencerHeader = this.$$('#sequencer-header');
+          this.sequencerBody = this.$$('#sequencer-body');
+          this.sequencerMatrix = buildModelMatrix(5, 16);
+          this.headerElementList = buildHeader.call(this);
+          this.bodyElementMatrix = buildBody.call(this, 5);
+
+          this.toggle = this.$.toggle;
+          this.toggle.isToggled = false;
+          this.toggle.addEventListener('click', (event) => {
+            this.toggle.isToggled = !this.toggle.isToggled;
+            if (this.toggle.isToggled) {
+              this.sequencerBody.classList.add('sequencer-body--collapsed');
+            }
+            else {
+              this.sequencerBody.classList.remove('sequencer-body--collapsed');
+            }
+          }, false);
+        }
+
+        detached() {
+          app.scheduler.deregister(this.schedulable);
+        }
+        attributeChanged() {}
+
+        _onTap (event) {
+          let matrixElement = {
+            hasSolution: false,
+            rowIndex: null,
+            columnIndex: null
+          };
+
+          this.bodyElementMatrix.forEach((row, index) => {
+            let tapIndex = row.indexOf(event.srcElement);
+            if (tapIndex >= 0) {
+              matrixElement.rowIndex = index;
+              matrixElement.columnIndex = tapIndex;
+              matrixElement.hasSolution = true;
+            }
+          });
+
+          if (!matrixElement.hasSolution) {
+            return;
+          }
+          let row = matrixElement.rowIndex;
+          let column = matrixElement.columnIndex;
+
+          this.sequencerMatrix[row][column] = !this.sequencerMatrix[row][column];
+          this.sequencerMatrix[row][column] ?
+            this.bodyElementMatrix[row][column].classList.add('sequencer-row__body-element--scheduled') :
+            this.bodyElementMatrix[row][column].classList.remove('sequencer-row__body-element--scheduled');
+        }
+
+      }
+      Polymer(MultiSequencer);
+
+      //TODO: refactor all the below such that it can share functionality with simple-sequencer
+      function buildSchedulable () {
+        let isReset = true;
+        return {
+          processTick: (beatNumber, time) => {
+            this.sequencerMatrix.forEach((sequencerRow, sequencerIndex) => {
+              if (sequencerRow[beatNumber]) {
+                this.instrumentList[sequencerIndex].forEach((instrument) => {
+                  instrument.play(0, time);
+                });
+              }
+            });
+          },
+          render: (beatNumber, lastBeatNumber) => {
+            this.headerElementList[beatNumber].classList.toggle('sequencer-row__header-element--active');
+            if (!isReset) {
+              this.headerElementList[lastBeatNumber].classList.toggle('sequencer-row__header-element--active');
+            }
+
+            this.bodyElementMatrix.forEach((elementRow) => {
+              elementRow[beatNumber].classList.toggle('sequencer-row__body-element--active');
+              if (!isReset) {
+                elementRow[lastBeatNumber].classList.toggle('sequencer-row__body-element--active');
+              }
+            });
+
+            if (isReset) {
+              isReset = false;
+            }
+          },
+          start: () => {
+            isReset = true;
+          },
+          stop: () => {
+            this.headerElementList.forEach((headerElement) => {
+              headerElement.classList.remove('sequencer-row__header-element--active');
+            });
+            this.bodyElementMatrix.forEach((elementRow) => {
+              elementRow.forEach(element => element.classList.remove('sequencer-row__body-element--active'));
+            });
+          }
+        }
+      }
+
+      function buildElementRow (numberOfSteps, cssClassList) {
+        let rowElements = [];
+        let rowContainer = document.createElement('div');
+        rowContainer.classList.add('sequencer-row');
+
+        for (let i = 0; i < numberOfSteps; i++) {
+          let divElement = document.createElement('div');
+          cssClassList.forEach(cssClass => divElement.classList.add(cssClass));
+          rowElements.push(divElement);
+          rowContainer.appendChild(divElement);
+        }
+
+        return {
+          rowContainer: rowContainer,
+          elementRow: rowElements
+        };
+      }
+
+      function buildModelMatrix (numRows, numColumns) {
+        let matrix = [];
+        for (let i = 0; i < numRows; i++) {
+          matrix.push(Array(numColumns).fill(false));
+        }
+        return matrix;
+      }
+
+      function buildHeader () {
+        let headerClassList = ['sequencer-row__element', 'sequencer-row__header-element'];
+        let header = buildElementRow(this.numberOfSteps, headerClassList);
+        Polymer.dom(this.sequencerHeader).appendChild(header.rowContainer);
+        return header.elementRow;
+      }
+
+      function buildBody (numRows) {
+        let bodyElementMatrix = [];
+        for (let i = 0; i < numRows; i++) {
+          let bodyClassList = ['sequencer-row__element', 'sequencer-row__body-element'];
+          let body = buildElementRow(this.numberOfSteps, bodyClassList);
+          let bodyElementList = body.elementRow;
+          Polymer.dom(this.sequencerBody).appendChild(body.rowContainer);
+          bodyElementMatrix.push(bodyElementList);
+        }
+        return bodyElementMatrix;
+      }
+
+
+    })();
+  </script>
+
+</dom-module>

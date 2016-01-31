@@ -13,14 +13,18 @@
         height: 100%;
         overflow-y: scroll;
       }
+      #driverOutputContainer {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+      }
+      driver-output {
+        margin: 0 5px;
+      }
     </style>
 
     <div class="driver-column" id="container"></div>
-
-    <driver-output
-        driver-model="{{connectionModel}}"
-        connection-bus="{{connectionOutput}}">
-    </driver-output>
+    <div id="driverOutputContainer"></div>
 
   </template>
 
@@ -54,31 +58,34 @@
 
         ready() {}
         attached() {
-          this.container = this.$.container;
-          this.connectionModel = createConnection.call(this);
-          this.instrumentSet = new Set();
+          let parentContainer = this.$.container;
+          let driverOutputContainer = this.$.driverOutputContainer;
 
           var driverElement;
           if (this.driverType === 'sequencer') {
-            driverElement = DriverFactory.createSequencer(this.instrumentSet);
+            driverElement = DriverFactory.createSequencer(driverOutputContainer, this.connectionOutput);
+          }
+          else if (this.driverType === 'multiSequencer') {
+            const NUM_CHANNELS = 5;
+            driverElement = DriverFactory.createMultiSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
           }
           else if (this.driverType === 'grainulator') {
-            driverElement = DriverFactory.createGrainulator(this.instrumentSet);
+            driverElement = DriverFactory.createGrainulator(driverOutputContainer, this.connectionOutput);
           }
-          Polymer.dom(this.container).appendChild(driverElement);
+          Polymer.dom(parentContainer).appendChild(driverElement);
         }
         detached() {}
         attributeChanged() {}
       }
       Polymer(DriverContainer);
 
-      function createConnection () {
+      function createConnection (instrumentSet) {
         return {
           disconnect: (instrument) => {
-            this.instrumentSet.delete(instrument);
+            instrumentSet.delete(instrument);
           },
           connectTo: (instrument) => {
-            this.instrumentSet.add(instrument);
+            instrumentSet.add(instrument);
           },
           uniqueId: Math.random() * Math.pow(2, 32 - 1) >>> 0
         };
@@ -86,15 +93,56 @@
 
       class DriverFactory {
 
-        static createSequencer (instrumentSet) {
+        static createSequencer (driverOutputContainer, connectionOutput) {
+          let instrumentSet = new Set();
+          let connectionModel = createConnection(instrumentSet);
+
           let samplerElement = document.createElement('simple-sequencer');
           samplerElement.instrumentSet = instrumentSet;
+
+          let driverOut = document.createElement('driver-output');
+          driverOut.driverModel = connectionModel;
+          driverOut.connectionBus = connectionOutput;
+          Polymer.dom(driverOutputContainer).appendChild(driverOut);
+
           return samplerElement;
         }
 
-        static createGrainulator (instrumentSet) {
+        static createMultiSequencer (numChannels, driverOutputContainer, connectionOutput) {
+          let instrumentList = [];
+          let connectionList = [];
+
+          for (let i = 0; i < numChannels; i++) {
+            let instrumentSet = new Set();
+            let connectionModel = createConnection(instrumentSet);
+            instrumentList.push(instrumentSet);
+            connectionList.push(connectionModel);
+          }
+
+          let samplerElement = document.createElement('multi-sequencer');
+          samplerElement.instrumentList = instrumentList;
+
+          for (let i = 0; i < numChannels; i++) {
+            let driverOut = document.createElement('driver-output');
+            driverOut.driverModel = connectionList[i];
+            driverOut.connectionBus = connectionOutput;
+            Polymer.dom(driverOutputContainer).appendChild(driverOut);
+          }
+          return samplerElement;
+        }
+
+        static createGrainulator (driverOutputContainer, connectionOutput) {
+          let instrumentSet = new Set();
+          let connectionModel = createConnection(instrumentSet);
+
           let grainElement = document.createElement('custom-grainulator');
           grainElement.instrumentSet = instrumentSet;
+
+          let driverOut = document.createElement('driver-output');
+          driverOut.driverModel = connectionModel;
+          driverOut.connectionBus = connectionOutput;
+          Polymer.dom(driverOutputContainer).appendChild(driverOut);
+
           return grainElement;
         }
 
