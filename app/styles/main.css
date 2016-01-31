@@ -57,7 +57,7 @@ header {
   height: 287px;
 }
 
-#instrument-container {
+#main-area {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;

@@ -15,6 +15,7 @@ var scheduler = new Scheduler(audioGraph.getAudioContext());
 var metronome = new Metronome(audioGraph.getAudioContext(), scheduler);
 var effectFactory = new EffectFactory(audioGraph.getAudioContext());
 var instrumentFactory = new InstrumentFactory(audioGraph.getAudioContext());
+var driverFactory = new DriverFactory(audioGraph.getAudioContext());
 
 var filePaths = [
   'audioSamples/snare_loFi_bright.wav',
@@ -23,28 +24,20 @@ var filePaths = [
 ];
 var samples = [];
 var bufferPaths = ['audioSamples/matrix-reverb1.wav'];
-var buffers = [];
 
 var samplerList = buildSamplers();
 var synthList = buildSynths();
-var equalizerList = buildEqualizers();
 var lastEqualizerList = buildLastEqualizers();
-var driverFactory = new DriverFactory(audioGraph.getAudioContext());
+
 
 var audio = {
   audioGraph: audioGraph,
   metronome: metronome,
   samplerList: samplerList,
   synthList: synthList,
-  equalizerList: equalizerList,
   lastEqualizerList: lastEqualizerList,
-  sends: {
-    delay: effectFactory.createDelay(),
-    reverb: effectFactory.createReverb()
-  },
-  tempEqualizer: effectFactory.createEqualizer(),
   driverFactory: driverFactory,
-  driverList: []
+  effectFactory: effectFactory
 };
 
 //window.audio = audio;
@@ -65,15 +58,6 @@ function buildSynths () {
     synthList.push(synth);
   }
   return synthList;
-}
-
-function buildEqualizers () {
-  let eqList = [];
-  for (var i = 0; i < NUM_EQUALIZERS; i++) {
-    let eq = effectFactory.createEqualizer();
-    eqList.push(eq);
-  }
-  return eqList;
 }
 
 function buildLastEqualizers () {
@@ -100,8 +84,7 @@ function loadSamples () {
   bufferPaths.forEach((path, index) => {
     Http.getAudioSample(path, audioContext)
       .then((response) => {
-        buffers.push(response.data);
-        audio.sends.reverb.setBuffer(response.data);
+        effectFactory.addReverbBuffer(path, response.data);
       });
   });
 

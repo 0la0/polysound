@@ -1,0 +1,95 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="effect-factory">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .factory-container {
+        border: 1px solid black;
+      }
+    </style>
+
+    <div class="factory-container">
+      <div class="factory-option" value="equalizer">equalizer</div>
+      <div class="factory-option" value="delay">delay</div>
+      <div class="factory-option" value="reverb">reverb</div>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class EffectFactory {
+
+        beforeRegister() {
+          this.is = 'effect-factory';
+
+          this.properties = {
+            factoryModel: {
+              type: Object
+            },
+            connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
+              type: Object
+            },
+            effectContainer: {
+              type: String
+            }
+          };
+
+          this.listeners = {
+            'tap': '_onTap'
+          };
+
+        }
+
+        ready() {}
+        attached() {
+          this.effectContainer = Polymer.dom(this.parent).querySelector('#' + this.effectContainer);
+        }
+        detached() {}
+        attributeChanged() {}
+
+        _onTap (event) {
+          let targetElement = event.detail.sourceEvent.target
+          let targetValue = targetElement.getAttribute('value');
+          if (targetValue) {
+            let effectElement = ElementFactory[targetValue](this.factoryModel);
+            effectElement.connectionInput = this.connectionInput;
+            effectElement.connectionOutput = this.connectionOutput;
+            Polymer.dom(this.effectContainer).appendChild(effectElement);
+          }
+        }
+
+      }
+      Polymer(EffectFactory);
+
+      let ElementFactory = {
+        equalizer: (effectFactory) => {
+          let equalizerElement = document.createElement('equalizer-three');
+          equalizerElement.equalizerModel = effectFactory.createEqualizer();
+          return equalizerElement;
+        },
+        delay: (effectFactory) => {
+          let delayElement = document.createElement('simple-delay');
+          delayElement.delayModel = effectFactory.createDelay()
+          return delayElement;
+        },
+        reverb: (effectFactory) => {
+          let reverbElement = document.createElement('simple-reverb');
+          reverbElement.reverbModel = effectFactory.createReverb();
+          return reverbElement;
+        }
+      };
+
+
+    })();
+  </script>
+
+</dom-module>

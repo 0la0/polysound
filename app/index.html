@@ -48,15 +48,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <tempo-controller metronome="{{audio.metronome}}"></tempo-controller>
     </header>
 
-    <section id="instrument-container">
+    <section id="main-area">
 
       <section id="left">
 
-        <driver-factory factory-model="{{audio.driverFactory}}"></driver-factory>
-        <div class="horizontal-line" id="driver-container"></div>
+        <!-- TOP ROW: INSTRUMENT DRIVERS -->
+        <div class="horizontal-line">
+          <driver-factory factory-model="{{audio.driverFactory}}"></driver-factory>
+          <div class="horizontal-line" id="driver-container"></div>
+        </div>
 
         <connector-bus bus-model="{{connectionBusses.drivers}}"></connector-bus>
 
+        <!-- SECOND ROW: INSTRUMENTS -->
         <div class="horizontal-line">
           <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
             <simple-sampler
@@ -76,38 +80,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <connector-bus bus-model="{{connectionBusses.instruments}}"></connector-bus>
 
-        <div class="horizontal-line effects-line">
-          <template is="dom-repeat" items="{{audio.equalizerList}}" as="equalizer">
-            <equalizer-three
-              equalizer-model={{equalizer}}
-              connection-input={{connectionBusses.instruments}}
-              connection-output={{connectionBusses.effects1}}>
-            </equalizer-three>
-          </template>
+        <!-- THIRD ROW: EFFECTS ONE -->
+        <div class="horizontal-line">
+          <effect-factory
+            factory-model="{{audio.effectFactory}}"
+            connection-input={{connectionBusses.instruments}}
+            connection-output={{connectionBusses.effects1}}
+            effect-container="effect-container-01">
+          </effect-factory>
+          <div class="horizontal-line effects-line" id="effect-container-01"></div>
         </div>
+
 
         <connector-bus bus-model="{{connectionBusses.effects1}}"></connector-bus>
 
-        <div class="horizontal-line effects-line">
-          <simple-delay
-              delay-model={{audio.sends.delay}}
-              connection-input={{connectionBusses.effects1}}
-              connection-output={{connectionBusses.effects2}}>
-          </simple-delay>
-          <simple-reverb
-              reverb-model={{audio.sends.reverb}}
-              connection-input={{connectionBusses.effects1}}
-              connection-output={{connectionBusses.effects2}}>
-          </simple-reverb>
-          <equalizer-three
-            equalizer-model={{audio.tempEqualizer}}
+        <!-- FOURTH ROW: EFFECTS TWO -->
+        <div class="horizontal-line">
+          <effect-factory
+            factory-model="{{audio.effectFactory}}"
             connection-input={{connectionBusses.effects1}}
-            connection-output={{connectionBusses.effects2}}>
-          </equalizer-three>
+            connection-output={{connectionBusses.effects2}}
+            effect-container="effect-container-02">
+          </effect-factory>
+          <div class="horizontal-line effects-line" id="effect-container-02"></div>
         </div>
+        
 
         <connector-bus bus-model="{{connectionBusses.effects2}}"></connector-bus>
 
+        <!-- FIFTH ROW: MASTER OUTS -->
         <div class="horizontal-line effects-line">
           <template is="dom-repeat" items="{{audio.lastEqualizerList}}" as="equalizer">
             <equalizer-three

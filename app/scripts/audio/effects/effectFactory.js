@@ -6,6 +6,7 @@ export default class EffectFactory {
 
   constructor (audioContext) {
     this.audioContext = audioContext;
+    this.reverbBufferMap = new Map();
   }
 
   createEqualizer () {
@@ -16,8 +17,15 @@ export default class EffectFactory {
     return new Delay(this.audioContext);
   }
 
-  createReverb () {
-    return new Reverb(this.audioContext);
+  createReverb (bufferName) {
+    if (!bufferName) {
+      bufferName = Array.from(this.reverbBufferMap.keys())[0];
+    }
+    return new Reverb(this.audioContext, this.reverbBufferMap.get(bufferName));
+  }
+
+  addReverbBuffer (bufferName, buffer) {
+    this.reverbBufferMap.set(bufferName, buffer);
   }
 
 }
