@@ -5,28 +5,21 @@
     <style>
       :host {
         display: block;
-        cursor: default;
+        margin: 0 5px;
+        height: 100%;
       }
       .reverb-container {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: space-between;
-
-        margin: 0 5px;
-        padding: 4px;
-        width: 40px;
-        height: 200px;
-        border: 2px solid black;
+        border: 1px solid black;
+        height: 100%;
+      }
+      .reverb-header {
+        background-color: #999;
+        border-bottom: 1px solid black;
       }
       .reverb-gain {
-        height: 160px;
-        width: 30px;
-        text-align: center;
-      }
-      p {
-        margin: 4px 0;
-        cursor: default;
+        height: 110px;
+        width: 20px;
+        margin: 10px auto;
       }
       connector-output {
         margin-left: 5px;
@@ -38,8 +31,8 @@
         connection-bus="{{connectionInput}}">>
     </connector-input>
     <div class="reverb-container">
+      <p class="reverb-header">Reverb</p>
       <div class="reverb-gain">
-        <p>gain</p>
         <slider-vertical
             slider-value={{reverbModel.mainGain.gain.value}}
             lower-bound="0" upper-bound="1">

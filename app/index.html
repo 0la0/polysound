@@ -76,7 +76,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <connector-bus bus-model="{{connectionBusses.instruments}}"></connector-bus>
 
-        <div class="horizontal-line">
+        <div class="horizontal-line effects-line">
           <template is="dom-repeat" items="{{audio.equalizerList}}" as="equalizer">
             <equalizer-three
               equalizer-model={{equalizer}}
@@ -88,7 +88,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <connector-bus bus-model="{{connectionBusses.effects1}}"></connector-bus>
 
-        <div class="horizontal-line">
+        <div class="horizontal-line effects-line">
           <simple-delay
               delay-model={{audio.sends.delay}}
               connection-input={{connectionBusses.effects1}}
@@ -108,7 +108,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <connector-bus bus-model="{{connectionBusses.effects2}}"></connector-bus>
 
-        <div class="horizontal-line">
+        <div class="horizontal-line effects-line">
           <template is="dom-repeat" items="{{audio.lastEqualizerList}}" as="equalizer">
             <equalizer-three
               equalizer-model={{equalizer}}

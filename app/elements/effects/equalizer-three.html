@@ -5,28 +5,29 @@
     <style>
       :host {
         display: block;
-        cursor: default;
+        margin: 0 5px;
+        height: 100%;
       }
       .eq-container {
+        width: 110px;
+        border: 1px solid black;
+        height: 100%;
+      }
+      .eq-header {
+        background-color: #999;
+        border-bottom: 1px solid black;
+      }
+      .eq-channel__container {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
-        justify-content: space-between;
-
-        margin: 0 5px;
-        padding: 4px;
-        width: 140px;
-        height: 200px;
-        border: 2px solid black;
+        justify-content: space-around;
+        font-size: 11px;
       }
-      .eq-channel {
-        height: 160px;
-        width: 30px;
+      .eq-channel__column {
+        height: 110px;
+        width: 20px;
         text-align: center;
-      }
-      p {
-        margin: 4px 0;
-        cursor: default;
       }
       connector-output {
         margin-left: 5px;
@@ -37,36 +38,48 @@
         audio-node="{{equalizerModel}}"
         connection-bus="{{connectionInput}}">
     </connector-input>
+
     <div class="eq-container">
-      <div class="eq-channel eq-channel__low">
-        <p class="eq-label">lo</p>
-        <slider-vertical
-            slider-value={{equalizerModel.lo.gain.value}}
-            lower-bound="-40" upper-bound="40">
-        </slider-vertical>
+      <div class="eq-header">Equalizer</div>
+
+      <div class="eq-channel__container">
+
+        <div class="eq-channel__column">
+          <p class="eq-label">lo</p>
+          <slider-vertical
+              slider-value={{equalizerModel.lo.gain.value}}
+              lower-bound="-40" upper-bound="40">
+          </slider-vertical>
+        </div>
+
+        <div class="eq-channel__column">
+          <p class="eq-label">mid</p>
+          <slider-vertical
+              slider-value={{equalizerModel.mid.gain.value}}
+              lower-bound="-40" upper-bound="40">
+          </slider-vertical>
+        </div>
+
+        <div class="eq-channel__column">
+          <p class="eq-label">hi</p>
+          <slider-vertical
+              slider-value={{equalizerModel.hi.gain.value}}
+              lower-bound="-40" upper-bound="40">
+          </slider-vertical>
+        </div>
+
+        <div class="eq-channel__column">
+          <p class="eq-label">gain</p>
+          <slider-vertical
+              slider-value={{equalizerModel.gain.gain.value}}
+              lower-bound="0" upper-bound="1">
+          </slider-vertical>
+        </div>
+
       </div>
-      <div class="eq-channel eq-channel__mid">
-        <p class="eq-label">mid</p>
-        <slider-vertical
-            slider-value={{equalizerModel.mid.gain.value}}
-            lower-bound="-40" upper-bound="40">
-        </slider-vertical>
-      </div>
-      <div class="eq-channel eq-channel__hi">
-        <p class="eq-label">hi</p>
-        <slider-vertical
-            slider-value={{equalizerModel.hi.gain.value}}
-            lower-bound="-40" upper-bound="40">
-        </slider-vertical>
-      </div>
-      <div class="eq-channel eq-channel__gain">
-        <p class="eq-label">gain</p>
-        <slider-vertical
-            slider-value={{equalizerModel.gain.gain.value}}
-            lower-bound="0" upper-bound="1">
-        </slider-vertical>
-      </div>
+
     </div>
+
     <connector-output
         audio-node="{{equalizerModel}}"
         connection-bus="{{connectionOutput}}">
@@ -78,12 +91,10 @@
     (function() {
       'use strict';
 
-      let MyBehavior = {};
-
       class Equalizer {
 
         get behaviors() {
-          return [MyBehavior];
+          return [];
         }
 
         beforeRegister() {
@@ -102,22 +113,17 @@
           };
 
           this.listeners = {};
-
         }
 
         ready() {}
-
         attached() {
           let outputElement = this.$$('connector-output');
           if (!this.connectionOutput) {
             Polymer.dom(this.root).removeChild(outputElement);
           }
         }
-
         detached() {}
-
         attributeChanged() {}
-
       }
 
       Polymer(Equalizer);

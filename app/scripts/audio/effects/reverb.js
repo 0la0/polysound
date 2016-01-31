@@ -1,5 +1,4 @@
 import BaseEffect from './BaseEffect.js';
-//import generateUniqueId from '../util/uniqueGenerator.js';
 
 export default class Reverb extends BaseEffect {
 
@@ -16,9 +15,5 @@ export default class Reverb extends BaseEffect {
   setBuffer (buffer) {
     this.input.buffer = buffer;
   }
-
-  // getInput () {
-  //   return this.input;
-  // }
 
 }

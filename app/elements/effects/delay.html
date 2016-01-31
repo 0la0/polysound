@@ -5,29 +5,36 @@
     <style>
       :host {
         display: block;
-        margin: 0 10px;
-        padding: 0 4px;
-        border: 1px solid black;
+        margin: 0 5px;
+        height: 100%;
       }
       .delay-container {
-        height: 212px;
+        width: 120px;
+        height: 100%;
+        border: 1px solid black;
+      }
+      .delay-container--header {
+        background-color: #999;
+        border-bottom: 1px solid black;
+        margin-bottom: 6px;
       }
       .delay-container__button-row {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
-        border: 2px solid black;
+        justify-content: center;
       }
       .delay-button {
         border: 1px solid grey;
-        width: 30px;
         text-align: center;
+        flex-grow: 1;
       }
       .delay-button--active {
         background-color: #fff;
       }
       slider-horizontal {
         height: 20px;
+        width: 97%;
       }
     </style>
 
@@ -37,7 +44,7 @@
     </connector-input>
 
     <div class="delay-container">
-
+      <p class="delay-container--header">Delay</p>
       <p>Quatization:</p>
       <div class="delay-container__button-row" id="delayButtons">
         <div class="delay-button" delay-value="0.5">0.5x</div>

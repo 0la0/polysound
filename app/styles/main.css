@@ -40,8 +40,10 @@ a, a:visited, a:hover, a:active {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: flex-start;
-  /*align-items: stretch;*/
-  /*position: relative;*/
+}
+
+.effects-line {
+  height: 170px;
 }
 
 header {
