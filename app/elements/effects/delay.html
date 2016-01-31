@@ -5,22 +5,29 @@
     <style>
       :host {
         display: block;
-        cursor: default;
+        margin: 0 10px;
+        padding: 0 4px;
+        border: 1px solid black;
       }
-      .delay-button__container {
+      .delay-container {
+        height: 212px;
+      }
+      .delay-container__button-row {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
-        justify-content: space-between;
-
         border: 2px solid black;
-        height: 208px;
       }
       .delay-button {
         border: 1px solid grey;
         width: 30px;
-        line-height: 30px;
         text-align: center;
+      }
+      .delay-button--active {
+        background-color: #fff;
+      }
+      slider-horizontal {
+        height: 20px;
       }
     </style>
 
@@ -28,13 +35,30 @@
         audio-node="{{delayModel}}"
         connection-bus="{{connectionInput}}">>
     </connector-input>
+
     <div class="delay-container">
-      <div class="delay-button__container">
-        <div class="delay-button" delay-value="0.5">0.5</div>
-        <div class="delay-button" delay-value="1">1</div>
-        <div class="delay-button" delay-value="2">2</div>
+
+      <p>Quatization:</p>
+      <div class="delay-container__button-row" id="delayButtons">
+        <div class="delay-button" delay-value="0.5">0.5x</div>
+        <div class="delay-button" delay-value="1">1x</div>
+        <div class="delay-button" delay-value="2">2x</div>
       </div>
+
+      <p>Feedback:</p>
+      <slider-horizontal
+        slider-value="{{delayModel.feedback.gain.value}}"
+        lower-bound="0" upper-bound="1">
+      </slider-horizontal>
+
+      <p>Wet Level:</p>
+      <slider-horizontal
+        slider-value="{{delayModel.wetLevel.gain.value}}"
+        lower-bound="0" upper-bound="1">
+      </slider-horizontal>
+
     </div>
+
     <connector-output
         audio-node="{{delayModel}}"
         connection-bus="{{connectionOutput}}">>
@@ -75,28 +99,38 @@
         attached() {
           var delayButtons = this.getElementsByClassName('delay-button');
           delayButtons = Array.prototype.slice.call(delayButtons);
-          delayButtons.forEach((delayButton) => {
-            let delayValue = delayButton.getAttribute('delay-value');
-            delayButton.addEventListener('click', (event) => {
-              this._setQuatization(120, delayValue);
-            }, false);
-          });
+
+          this.$.delayButtons.addEventListener('click', (event) => {
+            let targetElement = event.srcElement;
+            if (delayButtons.some(btn => btn === targetElement)) {
+              this._setQuatization(120, targetElement, delayButtons);
+            }
+          }, false);
+
+          //set initial value:
+          this._setQuatization(120, delayButtons[1], delayButtons);
         }
 
         detached() {}
 
         attributeChanged() {}
 
-        _setQuatization (tempo, delayValue) {
+        _setQuatization (tempo, targetElement, delayButtons) {
+          let delayValue = targetElement.getAttribute('delay-value');
           this.delayModel.setQuatization(tempo, delayValue);
+
+          delayButtons.forEach((delayButton) => {
+            if (delayButton === targetElement) {
+              delayButton.classList.add('delay-button--active');
+            }
+            else {
+              delayButton.classList.remove('delay-button--active');
+            }
+          });
         }
 
       }
       Polymer(SimpleDelay);
-
-      function getDelayClickListener (element) {
-
-      }
 
     })();
   </script>

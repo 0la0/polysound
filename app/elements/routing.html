@@ -19,9 +19,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
 
     // Routes
-    // page('*', scrollToTop, closeDrawer, function(ctx, next) {
-    //   next();
-    // });
+    page('*', (ctx, next) => {
+      document.body.scrollTop = 0;
+      next();
+    });
 
     page('/', function() {
       app.route = 'main';
