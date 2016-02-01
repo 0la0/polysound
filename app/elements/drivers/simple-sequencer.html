@@ -6,71 +6,25 @@
       :host {
         display: block;
       }
-      .sequencer {
-        width: 337px;
-        margin-top: 5px;
-        margin-right: 5px;
-      }
-      .sequencer-header {
-        display: flex;
-        flex-flow: row;
-        justify-content: space-between;
-
-        background-color: #999;
-      }
-      .sequencer-header__name {
-        font-style: italic;
-      }
-      .sequencer-header__toggle {
-        cursor: pointer;
-      }
-      .sequencer-container {
-        border-right: 1px solid black;
-        border-top: 1px solid black;
-      }
-      .sequencer-row {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-      }
-      .sequencer-row__element {
-        min-width: 20px;
-        border-bottom: 1px solid black;
-        border-left: 1px solid black;
-        margin: 0;
-      }
-      .sequencer-row__header-element {
-        height: 10px;
-      }
-      .sequencer-row__header-element--active {
-        background: #666;
-      }
-
-      .sequencer-body--collapsed {
-        display: none;
-      }
-      .sequencer-row__body-element {
-        height: 20px;
-      }
-      .sequencer-row__body-element--active {
-        background: #aaa;
-      }
-      .sequencer-row__body-element--scheduled {
-        background: #666;
-      }
     </style>
 
-    <div class="sequencer">
-      <div class="sequencer-header">
-        <div class="sequencer-header__name">Sequencer Name</div>
-        <div id="toggle" class="sequencer-header__toggle">toggle</div>
-      </div>
-      <div class="sequencer-container">
-        <div id="sequencer-header"></div>
-        <div id="sequencer-body"></div>
-      </div>
-    </div>
+    <div class="matrix-list">
 
+      <sequencer-matrix
+        class="matrix"
+        number-of-steps="16"
+        number-of-rows="12"
+        clip-manager="{{clipManager}}">
+      </sequencer-matrix>
+
+      <sequencer-matrix
+        class="matrix"
+        number-of-steps="16"
+        number-of-rows="12"
+        clip-manager="{{clipManager}}">
+      </sequencer-matrix>
+
+    </div>
 
   </template>
 
@@ -80,98 +34,50 @@
 
       class SimpleSequencer {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'simple-sequencer';
 
           this.properties = {
-            numberOfSteps: {
-              type: Number,
-              value: 16
-            },
             instrumentSet: {
               type: Object
             }
           };
 
-          this.listeners = {
-            'tap': '_onTap'
-          };
+          this.listeners = {};
 
         }
 
-        ready() {
-
-        }
+        ready() {}
         attached() {
+          this.isReset = true;
           this.schedulable = buildSchedulable.call(this);
           app.scheduler.register(this.schedulable);
 
-          this.sequencerHeader = this.$$('#sequencer-header');
-          this.sequencerBody = this.$$('#sequencer-body');
-          this.sequencerMatrix = buildModelMatrix(12, 16);
-          this.headerElementList = buildHeader.call(this);
-          this.bodyElementMatrix = buildBody.call(this);
+          let matrixNodeList = this.getElementsByClassName('matrix');
+          this.matrixList = Array.prototype.slice.call(matrixNodeList);
+          this.activeIndex = 0;
 
-          this.toggle = this.$.toggle;
-          this.toggle.isToggled = false;
-          this.toggle.addEventListener('click', (event) => {
-            this.toggle.isToggled = !this.toggle.isToggled;
-            if (this.toggle.isToggled) {
-              this.sequencerBody.classList.add('sequencer-body--collapsed');
-            }
-            else {
-              this.sequencerBody.classList.remove('sequencer-body--collapsed');
-            }
-          }, false);
+          this.clipManager = buildClipManager(this.matrixList, (activeIndex) => {
+            this.activeIndex = activeIndex;
+            this.isReset = true;
+          });
+
         }
 
         detached() {
           app.scheduler.deregister(this.schedulable);
         }
         attributeChanged() {}
-
-        _onTap (event) {
-          let matrixElement = {
-            hasSolution: false,
-            rowIndex: null,
-            columnIndex: null
-          };
-
-          this.bodyElementMatrix.forEach((row, index) => {
-            let tapIndex = row.indexOf(event.srcElement);
-            if (tapIndex >= 0) {
-              matrixElement.rowIndex = index;
-              matrixElement.columnIndex = tapIndex;
-              matrixElement.hasSolution = true;
-            }
-          });
-
-          if (!matrixElement.hasSolution) {
-            return;
-          }
-          let row = matrixElement.rowIndex;
-          let column = matrixElement.columnIndex;
-
-          this.sequencerMatrix[row][column] = !this.sequencerMatrix[row][column];
-          this.sequencerMatrix[row][column] ?
-            this.bodyElementMatrix[row][column].classList.add('sequencer-row__body-element--scheduled') :
-            this.bodyElementMatrix[row][column].classList.remove('sequencer-row__body-element--scheduled');
-        }
-
       }
       Polymer(SimpleSequencer);
 
       function buildSchedulable () {
-        let isReset = true;
         return {
           processTick: (beatNumber, time) => {
-            this.sequencerMatrix.forEach((sequencerRow, sequencerIndex) => {
-              let note = sequencerIndex - 6;
-              if (sequencerRow[beatNumber]) {
+            let columnData = this.matrixList[this.activeIndex].getColumnValueList(beatNumber);
+            columnData.forEach( (matrixElement, index) => {
+              let note = index - 6;
+              if (matrixElement) {
                 this.instrumentSet.forEach((instrument) => {
                   instrument.play(note, time);
                 });
@@ -179,79 +85,32 @@
             });
           },
           render: (beatNumber, lastBeatNumber) => {
-            this.headerElementList[beatNumber].classList.toggle('sequencer-row__header-element--active');
-            if (!isReset) {
-              this.headerElementList[lastBeatNumber].classList.toggle('sequencer-row__header-element--active');
-            }
+            this.matrixList[this.activeIndex].render(beatNumber, lastBeatNumber, this.isReset);
 
-            this.bodyElementMatrix.forEach((elementRow) => {
-              elementRow[beatNumber].classList.toggle('sequencer-row__body-element--active');
-              if (!isReset) {
-                elementRow[lastBeatNumber].classList.toggle('sequencer-row__body-element--active');
-              }
-            });
-
-            if (isReset) {
-              isReset = false;
+            if (this.isReset) {
+              this.isReset = false;
             }
           },
           start: () => {
-            isReset = true;
+            this.isReset = true;
           },
           stop: () => {
-            this.headerElementList.forEach((headerElement) => {
-              headerElement.classList.remove('sequencer-row__header-element--active');
-            });
-            this.bodyElementMatrix.forEach((elementRow) => {
-              elementRow.forEach(element => element.classList.remove('sequencer-row__body-element--active'));
-            });
+            this.matrixList[this.activeIndex].stop();
           }
         }
       }
 
-      function buildElementRow (numberOfSteps, cssClassList) {
-        let rowElements = [];
-        let rowContainer = document.createElement('div');
-        rowContainer.classList.add('sequencer-row');
-
-        for (let i = 0; i < numberOfSteps; i++) {
-          let divElement = document.createElement('div');
-          cssClassList.forEach(cssClass => divElement.classList.add(cssClass));
-          rowElements.push(divElement);
-          rowContainer.appendChild(divElement);
-        }
-
+      function buildClipManager (matrixList, setActiveIndex) {
         return {
-          rowContainer: rowContainer,
-          elementRow: rowElements
+          queueActive: (matrixElement) => {
+            let activeIndex = matrixList.indexOf(matrixElement);
+            setActiveIndex(activeIndex);
+            matrixList.forEach( (matrix) => {
+              matrix.setAsInactive();
+              matrix.stop();
+            });
+          }
         };
-      }
-
-      function buildModelMatrix (numRows, numColumns) {
-        let matrix = [];
-        for (let i = 0; i < numRows; i++) {
-          matrix.push(Array(numColumns).fill(false));
-        }
-        return matrix;
-      }
-
-      function buildHeader () {
-        let headerClassList = ['sequencer-row__element', 'sequencer-row__header-element'];
-        let header = buildElementRow(this.numberOfSteps, headerClassList);
-        Polymer.dom(this.sequencerHeader).appendChild(header.rowContainer);
-        return header.elementRow;
-      }
-
-      function buildBody () {
-        let bodyElementMatrix = [];
-        for (let i = 0; i < 12; i++) {
-          let bodyClassList = ['sequencer-row__element', 'sequencer-row__body-element'];
-          let body = buildElementRow(this.numberOfSteps, bodyClassList);
-          let bodyElementList = body.elementRow;
-          Polymer.dom(this.sequencerBody).appendChild(body.rowContainer);
-          bodyElementMatrix.push(bodyElementList);
-        }
-        return bodyElementMatrix;
       }
 
 
