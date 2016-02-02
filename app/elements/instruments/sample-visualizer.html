@@ -60,11 +60,12 @@
         attributeChanged() {}
 
         _pollForBuffer () {
-          //remove when sampler and synth are separated
+          //TODO: remove when sampler and synth are separated
           //and creat a public method on this element that can be called
           //when samples are loaded
           this.pollCount++;
-          if (!this.bufferSource.hasSample && this.pollCount < 10) {
+          if (!this.bufferSource || !this.bufferSource.hasSample && this.pollCount < 10) {
+            console.warn('sampler visualizer waiting on for buffer');
             setTimeout(this._pollForBuffer.bind(this), 200);
           }
           else if (this.pollCount >= 10) {

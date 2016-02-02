@@ -68,20 +68,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- SECOND ROW: INSTRUMENTS -->
         <div class="horizontal-line">
-          <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
-            <simple-sampler
-                sampler-model={{sampler}}
-                connection-input={{connectionBusses.drivers}}
-                connection-output={{connectionBusses.instruments}}>
-            </simple-sampler>
-          </template>
-          <template is="dom-repeat" items="{{audio.synthList}}" as="synth">
-            <simple-synth
-                synth-model={{synth}}
-                connection-input={{connectionBusses.drivers}}
-                connection-output={{connectionBusses.instruments}}>
-            </simple-synth>
-          </template>
+          <!--
+          <instrument-factory factory-model="{{audio.instrumentFactory}}"></instrument-instrument>
+          -->
+          <instrument-factory
+            factory-model="{{audio.instrumentFactory}}"
+            connection-input={{connectionBusses.drivers}}
+            connection-output={{connectionBusses.instruments}}
+            instrument-container="instrument-container">
+          </instrument-factory>
+
+          <div class="horizontal-line" id="instrument-container">
+
+            <template is="dom-repeat" items="{{audio.samplerList}}" as="sampler">
+              <simple-sampler
+                  sampler-model={{sampler}}
+                  connection-input={{connectionBusses.drivers}}
+                  connection-output={{connectionBusses.instruments}}>
+              </simple-sampler>
+            </template>
+
+            <template is="dom-repeat" items="{{audio.synthList}}" as="synth">
+              <simple-synth
+                  synth-model={{synth}}
+                  connection-input={{connectionBusses.drivers}}
+                  connection-output={{connectionBusses.instruments}}>
+              </simple-synth>
+            </template>
+
+          </div>
+
         </div>
 
         <connector-bus bus-model="{{connectionBusses.instruments}}"></connector-bus>

@@ -30,7 +30,8 @@ let audio = {
   synthList: synthList,
   lastEqualizerList: lastEqualizerList,
   driverFactory: driverFactory,
-  effectFactory: effectFactory
+  effectFactory: effectFactory,
+  instrumentFactory: instrumentFactory
 };
 //window.audio = audio;
 
