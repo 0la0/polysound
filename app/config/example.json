@@ -1,4 +1,10 @@
 {
-  "hello": "world",
-  "foo": "bar"
+  "sampleList": [
+    "audioSamples/snare_loFi_bright.wav",
+    "audioSamples/woodClog55.wav",
+    "audioSamples/drakeVoice.wav"
+  ],
+  "reverbBufferList": [
+    "audioSamples/matrix-reverb1.wav"
+  ]
 }

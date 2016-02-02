@@ -6,31 +6,24 @@ import EffectFactory from './audio/effects/effectFactory.js';
 import DriverFactory from './audio/drivers/driverFactory.js';
 import Http from './util/http.js';
 
+const CONFIG_FILE_PATH = 'config/example.json';
 const NUM_SYNTHS = 1;
 const NUM_SAMPLERS = 3;
 const NUM_EQUALIZERS = 3;
 
-var audioGraph = new AudioGraph();
-var scheduler = new Scheduler(audioGraph.getAudioContext());
-var metronome = new Metronome(audioGraph.getAudioContext(), scheduler);
-var effectFactory = new EffectFactory(audioGraph.getAudioContext());
-var instrumentFactory = new InstrumentFactory(audioGraph.getAudioContext());
-var driverFactory = new DriverFactory(audioGraph.getAudioContext());
+let audioGraph = new AudioGraph();
+let scheduler = new Scheduler(audioGraph.getAudioContext());
+let metronome = new Metronome(audioGraph.getAudioContext(), scheduler);
+let effectFactory = new EffectFactory(audioGraph.getAudioContext());
+let instrumentFactory = new InstrumentFactory(audioGraph.getAudioContext());
+let driverFactory = new DriverFactory(audioGraph.getAudioContext());
 
-var filePaths = [
-  'audioSamples/snare_loFi_bright.wav',
-  'audioSamples/woodClog55.wav',
-  'audioSamples/drakeVoice.wav'
-];
-var samples = [];
-var bufferPaths = ['audioSamples/matrix-reverb1.wav'];
+let samples = [];
+let samplerList = buildSamplers();
+let synthList = buildSynths();
+let lastEqualizerList = buildLastEqualizers();
 
-var samplerList = buildSamplers();
-var synthList = buildSynths();
-var lastEqualizerList = buildLastEqualizers();
-
-
-var audio = {
+let audio = {
   audioGraph: audioGraph,
   metronome: metronome,
   samplerList: samplerList,
@@ -39,7 +32,6 @@ var audio = {
   driverFactory: driverFactory,
   effectFactory: effectFactory
 };
-
 //window.audio = audio;
 
 function buildSamplers () {
@@ -70,32 +62,39 @@ function buildLastEqualizers () {
   return eqList;
 }
 
-function loadSamples () {
-  var audioContext = audioGraph.getAudioContext();
-
-  filePaths.forEach((path, index) => {
-    Http.getAudioSample(path, audioContext)
+function loadAudioSamples(fileList, audioContext) {
+  fileList.forEach((filePath, index) => {
+    Http.getAudioSample(filePath, audioContext)
       .then((response) => {
-        samples.push(response.data);
+        samples.push(response.data); //refactor to not be global
         audio.samplerList[index].setSample(response.data);
       });
   });
+}
 
-  bufferPaths.forEach((path, index) => {
-    Http.getAudioSample(path, audioContext)
+function loadReverbBuffers(fileList, audioContext) {
+  fileList.forEach((filePath) => {
+    Http.getAudioSample(filePath, audioContext)
       .then((response) => {
-        effectFactory.addReverbBuffer(path, response.data);
+        effectFactory.addReverbBuffer(filePath, response.data);
       });
   });
-
 }
 
-function loadConfigFiles () {
-  Http.get('config/example.json')
-    .then((resolve) => console.log(resolve.data));
+function loadConfigFiles (configFilePath, audioContext) {
+  Http.get(configFilePath)
+    .then((resolve) => {
+      let samplePathList = resolve.data.sampleList;
+      let reverbBufferList = resolve.data.reverbBufferList;
+      loadAudioSamples(samplePathList, audioContext);
+      loadReverbBuffers(reverbBufferList, audioContext);
+    })
+    .catch((error) => {
+      console.log('loadConfigFiles error:', error);
+    });
 }
 
+loadConfigFiles(CONFIG_FILE_PATH, audioGraph.getAudioContext());
 
-//loadConfigFiles();
-loadSamples();
+
 export {audio, scheduler};
