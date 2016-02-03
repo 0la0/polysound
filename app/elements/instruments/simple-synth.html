@@ -28,6 +28,10 @@
         width: 30px;
         height: 30px;
       }
+      .slider-container {
+        height: 10px;
+        width: 95%;
+      }
       .synth-button--active {
         background-color: white;
       }
@@ -61,7 +65,12 @@
     <section class="synth">
       <section class="synth-left">
         <p class="synth-name">Synth Label</p>
-        <div class="synth-button"></div>
+        <div class="synth-button" id="triggerButton"></div>
+        <div class="slider-container">
+          <slider-horizontal
+            slider-value="{{baseFrequency}}"
+            lower-bound="220" upper-bound="660">
+        </slider-horizontal>
       </section>
       <section class="synth-right">
         <section class="synth-selection">
@@ -87,10 +96,6 @@
 
       class SimpleSynth {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'simple-synth';
 
@@ -103,6 +108,12 @@
             },
             connectionOutput: {
               type: Object
+            },
+            baseFrequency: {
+              type: Number,
+              value: 440,
+              notify: true,
+              observer: '_onBaseFrequencyChange'
             }
           };
 
@@ -112,26 +123,19 @@
 
         }
 
-        ready() {
-          this.button = this.$$('div');
-          this.line = this.$$('svg');
-
+        ready() {}
+        attached() {
           let oscilatorNodes = this.getElementsByClassName('synth-selector');
           this.oscilatorSelectors = Array.prototype.slice.call(oscilatorNodes);
+          this.synthIsOn = false;
         }
-
-        attached() {}
-
         detached() {}
-
-        attributeChanged() {}
+        attributeChanged(attrName, oldVal, newVal) {}
 
         _handleClick (event) {
-          if (event.target === this.button) {
-            this._trigger();
-          }
-          else if (event.target === this.line) {
-            //
+          if (event.target === this.$.triggerButton) {
+            this.synthIsOn = !this.synthIsOn;
+            this._trigger(this.synthIsOn);
           }
           else if (this.oscilatorSelectors.some(element => element === event.target)) {
             this.oscilatorSelectors.forEach((selector) => {
@@ -147,19 +151,26 @@
           }
         }
 
-        _trigger () {
-          this.synthModel.play(0, 0);
-          this._animate();
-          setTimeout(this._animate.bind(this), 50);
+        _trigger (synthIsOn) {
+          if (synthIsOn) {
+            this.synthModel.start();
+            Polymer.dom(this.$.triggerButton).classList.add('synth-button--active');
+          }
+          else {
+            this.synthModel.stop();
+            Polymer.dom(this.$.triggerButton).classList.remove('synth-button--active');
+          }
         }
 
-        _animate () {
-          Polymer.dom(this.button).classList.toggle('synth-button--active');
+        _onBaseFrequencyChange (newValue) {
+          if (this.synthModel) {
+            this.synthModel.setBaseFrequency(newValue);
+          }
         }
 
       }
-
       Polymer(SimpleSynth);
+
     })();
   </script>
 

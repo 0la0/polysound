@@ -28,6 +28,10 @@
         width: 30px;
         height: 30px;
       }
+      .slider-container {
+        height: 10px;
+        width: 95%;
+      }
       .sampler-button--active {
         background-color: white;
       }
@@ -43,7 +47,13 @@
     <section class="sampler">
       <section class="sampler-left">
         <p class="sampler-name">Sampler Label</p>
-        <div class="sampler-button"></div>
+        <div class="sampler-button" id="triggerButton"></div>
+        <div class="slider-container">
+          <slider-horizontal
+            slider-value="{{samplerModel.baseNote}}"
+            lower-bound="-12" upper-bound="12">
+        </slider-horizontal>
+        </div>
       </section>
       <section class="sampler-right">
         <sample-visualizer buffer-source={{samplerModel}}></sample-visualizer>
@@ -64,10 +74,6 @@
 
       class SimpleSampler {
 
-        get behaviors() {
-          return [CustomBehaviors.TestBehavior];
-        }
-
         beforeRegister() {
           this.is = 'simple-sampler';
 
@@ -75,9 +81,6 @@
             samplerModel: {
               type: Object
             },
-            // connectionBus: {
-            //   type: Object
-            // },
             connectionInput: {
               type: Object
             },
@@ -92,23 +95,14 @@
 
         }
 
-        ready() {
-          this.button = this.$$('div');
-          this.line = this.$$('svg');
-        }
-
+        ready() {}
         attached() {}
-
         detached() {}
-
         attributeChanged() {}
 
         _handleClick (event) {
-          if (event.target === this.button) {
+          if (event.target === this.$.triggerButton) {
             this._trigger();
-          }
-          else if (event.target === this.line) {
-            //
           }
         }
 
@@ -119,7 +113,7 @@
         }
 
         _animate () {
-          Polymer.dom(this.button).classList.toggle('sampler-button--active');
+          Polymer.dom(this.$.triggerButton).classList.toggle('sampler-button--active');
         }
 
       }

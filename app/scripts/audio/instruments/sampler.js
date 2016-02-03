@@ -6,6 +6,7 @@ export default class Sampler extends BaseInstrument {
   constructor (audioContext) {
     super (audioContext);
     this.hasSample = false;
+    this.baseNote = 0;
   }
 
   setSample (sample) {
@@ -21,6 +22,7 @@ export default class Sampler extends BaseInstrument {
     let source = this.audioContext.createBufferSource();
     source.buffer = this.sample;
     source.connect(adsrEnvelope);
+    pitch += Math.round(this.baseNote);
     source.playbackRate.value = Math.pow(this.semitoneRatio, pitch);
 
     if (!samplePosition) {

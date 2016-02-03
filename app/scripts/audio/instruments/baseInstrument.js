@@ -6,7 +6,6 @@ export default class BaseInstrument {
     this.audioContext = audioContext;
     this.input = this.audioContext.createGain();
     this.semitoneRatio = Math.pow(2, 1/12);
-  	this.baseFreq = 440;
     this.uniqueId = generateUniqueId();
 
     // 0.5 => 500ms
