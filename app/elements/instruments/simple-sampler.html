@@ -52,8 +52,10 @@
           <slider-horizontal
             slider-value="{{samplerModel.baseNote}}"
             lower-bound="-12" upper-bound="12">
-        </slider-horizontal>
+          </slider-horizontal>
         </div>
+        <sampler-loader parent-event-handler="{{samplerLoader}}">
+        </sampler-loader>
       </section>
       <section class="sampler-right">
         <sample-visualizer buffer-source={{samplerModel}}></sample-visualizer>
@@ -96,7 +98,16 @@
         }
 
         ready() {}
-        attached() {}
+        attached() {
+          this.samplerVisualizer = this.$$('sample-visualizer');
+          this.samplerLoader = {
+            newSample: (samplePath) => {
+              let sample = app.audio.sampleMap.get(samplePath);
+              this.samplerModel.setSample(sample);
+              this.samplerVisualizer.render();
+            }
+          };
+        }
         detached() {}
         attributeChanged() {}
 

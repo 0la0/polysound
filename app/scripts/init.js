@@ -17,41 +17,21 @@ let metronome = new Metronome(audioGraph.getAudioContext(), scheduler);
 let effectFactory = new EffectFactory(audioGraph.getAudioContext());
 let instrumentFactory = new InstrumentFactory(audioGraph.getAudioContext());
 let driverFactory = new DriverFactory(audioGraph.getAudioContext());
+let sampleMap = new Map();
 
-let samples = [];
-let samplerList = buildSamplers();
-let synthList = buildSynths();
+let sampleList = [];
 let lastEqualizerList = buildLastEqualizers();
 
 let audio = {
   audioGraph: audioGraph,
   metronome: metronome,
-  samplerList: samplerList,
-  synthList: synthList,
+  sampleMap: sampleMap,
   lastEqualizerList: lastEqualizerList,
   driverFactory: driverFactory,
   effectFactory: effectFactory,
   instrumentFactory: instrumentFactory
 };
 //window.audio = audio;
-
-function buildSamplers () {
-  var samplerList = [];
-  for (var i = 0; i < NUM_SAMPLERS; i++) {
-    let sampler = instrumentFactory.createSampler();
-    samplerList.push(sampler);
-  }
-  return samplerList;
-}
-
-function buildSynths () {
-  var synthList = [];
-  for (var i = 0; i < NUM_SYNTHS; i++) {
-    let synth = instrumentFactory.createSynth();
-    synthList.push(synth);
-  }
-  return synthList;
-}
 
 function buildLastEqualizers () {
   let eqList = [];
@@ -67,8 +47,7 @@ function loadAudioSamples(fileList, audioContext) {
   fileList.forEach((filePath, index) => {
     Http.getAudioSample(filePath, audioContext)
       .then((response) => {
-        samples.push(response.data); //refactor to not be global
-        audio.samplerList[index].setSample(response.data);
+        sampleMap.set(filePath, response.data);
       });
   });
 }

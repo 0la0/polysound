@@ -1,0 +1,89 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="sampler-loader">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+      }
+      .sampler-loader {}
+      .sampler-loader__label {
+        line-height: 36px;
+      }
+      .sampler-loader__dropdown {
+        display: none;
+        z-index: 0;
+      }
+      .sampler-loader__dropdown--active {
+        display: block;
+        position: absolute;
+        z-index: 5;
+      }
+      .sampler-loader__dropdown-element {
+        background-color: white;
+        border: 1px solid black;
+      }
+    </style>
+
+    <div class="samper-loader">
+      <p class="sampler-loader__label">load</p>
+      <div class="sampler-loader__dropdown" id="dropdown">
+        <template is="dom-repeat" items="{{samplerItems}}" as="sample">
+          <p class="sampler-loader__dropdown-element" id="{{sample}}"> {{sample}} </p>
+        </template>
+      </div>
+    </div>
+
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class SamplerLoader {
+
+        beforeRegister() {
+          this.is = 'sampler-loader';
+
+          this.properties = {
+            parentEventHandler: {
+              type: Object
+            }
+          };
+
+          this.listeners = {
+            down: '_handleClick'
+          };
+
+        }
+
+        ready() {}
+        attached() {
+          this.dropdownIsShown = false;
+          this.samplerItems = Array.from(app.audio.sampleMap.keys());
+        }
+        detached() {}
+        attributeChanged() {}
+
+        _handleClick (event) {
+          this.dropdownIsShown = !this.dropdownIsShown;
+          if (this.dropdownIsShown) {
+            this.$.dropdown.classList.add('sampler-loader__dropdown--active');
+          }
+          else {
+            this.$.dropdown.classList.remove('sampler-loader__dropdown--active');
+            let srcElement = event.detail.sourceEvent.srcElement;
+            if (srcElement.id) {
+              this.parentEventHandler.newSample(srcElement.id);
+            }
+          }
+        }
+      }
+      Polymer(SamplerLoader);
+
+    })();
+  </script>
+
+</dom-module>

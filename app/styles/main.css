@@ -46,6 +46,10 @@ a, a:visited, a:hover, a:active {
   height: 170px;
 }
 
+.instrument-line {
+  height: 115px;
+}
+
 header {
   width: 100%;
   border-bottom: 1px solid black;

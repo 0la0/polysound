@@ -26,10 +26,6 @@
 
       class SampleVisualizer {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'sample-visualizer';
 
@@ -40,40 +36,25 @@
           };
 
           this.listeners = {};
-
         }
 
-        ready() {
-          this.pollCount = 0;
-          this._pollForBuffer();
-        }
+        ready() {}
         attached() {
           this.cvs = this.$$('canvas');
           this.cvs.width = 120;
           this.cvs.height = 40;
           this.g2d = this.cvs.getContext('2d');
           this.g2d.halfHeight = 20;
-          this.g2d.strokeStyle = "#000000";
+          this.g2d.strokeStyle = "black";
           this.g2d.lineWidth = 2;
+          this.g2d.fillStyle = "white";
         }
         detached() {}
         attributeChanged() {}
 
-        _pollForBuffer () {
-          //TODO: remove when sampler and synth are separated
-          //and creat a public method on this element that can be called
-          //when samples are loaded
-          this.pollCount++;
-          if (!this.bufferSource || !this.bufferSource.hasSample && this.pollCount < 10) {
-            console.warn('sampler visualizer waiting on for buffer');
-            setTimeout(this._pollForBuffer.bind(this), 200);
-          }
-          else if (this.pollCount >= 10) {
-            return;
-          }
-          else {
-            this.bufferSource.getWaveform(200, this._renderCallback.bind(this));
-          }
+        render () {
+          this.g2d.fillRect(0, 0, this.cvs.width, this.cvs.height);
+          this.bufferSource.getWaveform(200, this._renderCallback.bind(this));
         }
 
         _renderCallback (freqList, min, max) {
