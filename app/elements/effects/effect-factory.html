@@ -15,6 +15,7 @@
       <div class="factory-option" value="equalizer">equalizer</div>
       <div class="factory-option" value="delay">delay</div>
       <div class="factory-option" value="reverb">reverb</div>
+      <div class="factory-option" value="compressor">compressor</div>
     </div>
 
   </template>
@@ -85,6 +86,11 @@
           let reverbElement = document.createElement('simple-reverb');
           reverbElement.reverbModel = effectFactory.createReverb();
           return reverbElement;
+        },
+        compressor: (effectFactory) => {
+          let compressorElement = document.createElement('simple-compressor');
+          compressorElement.compressorModel = effectFactory.createCompressor();
+          return compressorElement;
         }
       };
 

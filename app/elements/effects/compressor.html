@@ -1,0 +1,151 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="simple-compressor">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 0 5px;
+        height: 100%;
+      }
+      .compressor-container {
+        width: 130px;
+        border: 1px solid black;
+        height: 100%;
+      }
+      .compressor-header {
+        background-color: #999;
+        border-bottom: 1px solid black;
+      }
+
+      .compressor-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        position: relative;
+
+        height: 15px;
+        margin: 6px 0;
+      }
+      .compressor-row__label {
+        margin: 0;
+        width: 80px;
+        text-align: center;
+      }
+      .compressor-row__slider {}
+      connector-output {
+        margin-left: 5px;
+      }
+    </style>
+
+    <connector-input
+        audio-node="{{compressorModel}}"
+        connection-bus="{{connectionInput}}">
+    </connector-input>
+
+    <div class="compressor-container">
+      <div class="compressor-header">Compressor</div>
+
+      <div class="compressor-channel__container">
+
+        <div class="compressor-row">
+          <p class="compressor-row__label">thresh</p>
+          <slider-horizontal
+              class="compressor-row__slider"
+              slider-value={{compressorModel.input.threshold.value}}
+              lower-bound="-100" upper-bound="0">
+          </slider-horizontal>
+        </div>
+
+        <div class="compressor-row">
+          <p class="compressor-row__label">knee</p>
+          <slider-horizontal
+              class="compressor-row__slider"
+              slider-value={{compressorModel.input.knee.value}}
+              lower-bound="0" upper-bound="50">
+          </slider-horizontal>
+        </div>
+
+        <div class="compressor-row">
+          <p class="compressor-row__label">ratio</p>
+          <slider-horizontal
+              class="compressor-row__slider"
+              slider-value={{compressorModel.input.ratio.value}}
+              lower-bound="0" upper-bound="36">
+          </slider-horizontal>
+        </div>
+
+        <div class="compressor-row">
+          <p class="compressor-row__label">reduc</p>
+          <slider-horizontal
+              class="compressor-row__slider"
+              slider-value={{compressorModel.input.reduction.value}}
+              lower-bound="-40" upper-bound="40">
+          </slider-horizontal>
+        </div>
+
+        <div class="compressor-row">
+          <p class="compressor-row__label">att</p>
+          <slider-horizontal
+              class="compressor-row__slider"
+              slider-value={{compressorModel.input.attack.value}}
+              lower-bound="0" upper-bound="0.5">
+          </slider-horizontal>
+        </div>
+
+        <div class="compressor-row">
+          <p class="compressor-row__label">rel</p>
+          <slider-horizontal
+              class="compressor-row__slider"
+              slider-value={{compressorModel.input.release.value}}
+              lower-bound="0" upper-bound="0.5">
+          </slider-horizontal>
+        </div>
+
+
+      </div>
+
+    </div>
+
+    <connector-output
+        audio-node="{{compressorModel}}"
+        connection-bus="{{connectionOutput}}">
+    </connector-output>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class Compressor {
+
+        beforeRegister() {
+          this.is = 'simple-compressor';
+
+          this.properties = {
+            compressorModel: {
+              type: Object
+            },
+            connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {}
+        detached() {}
+        attributeChanged() {}
+      }
+
+      Polymer(Compressor);
+    })();
+  </script>
+
+</dom-module>

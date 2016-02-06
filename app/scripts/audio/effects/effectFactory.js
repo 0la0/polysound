@@ -1,6 +1,7 @@
 import Equalizer from './equalizer.js';
 import Delay from './delay.js';
 import Reverb from './reverb.js';
+import Compressor from './compressor.js';
 
 export default class EffectFactory {
 
@@ -26,6 +27,10 @@ export default class EffectFactory {
 
   addReverbBuffer (bufferName, buffer) {
     this.reverbBufferMap.set(bufferName, buffer);
+  }
+
+  createCompressor () {
+    return new Compressor(this.audioContext);
   }
 
 }
