@@ -1,0 +1,101 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="microphone-input">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        border: 1px solid black;
+      }
+      .input-node {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+
+        height: 115px;
+      }
+      .input-node__left {
+        border: 1px solid black;
+      }
+      .input-button {
+        width: 30px;
+        height: 30px;
+        border: 1px solid black;
+        background-color: #ccc;
+      }
+      .input-button--active {
+        background-color: white;
+      }
+      .input-node__right {}
+    </style>
+
+    <section class="input-node">
+      <section class="input-node__left">
+        <div class="input-button" id="inputButton"></div>
+      </section>
+      <section class="input-node__right"></section>
+    </section>
+
+    <connector-output
+        audio-node="{{inputModel}}"
+        connection-bus="{{connectionOutput}}">
+    </connector-output>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class MicrophoneInput {
+
+        beforeRegister() {
+          this.is = 'microphone-input';
+
+          this.properties = {
+            inputModel: {
+              type: Object
+            },
+            connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
+              type: Object
+            }
+          };
+
+          this.listeners = {
+            down: '_handleClick'
+          };
+
+        }
+
+        ready() {}
+        attached() {
+          this.inputIsActive = false;
+        }
+        detached() {}
+        attributeChanged() {}
+
+        _handleClick (event) {
+          if (event.detail.sourceEvent.srcElement === this.$.inputButton) {
+            this.inputIsActive = !this.inputIsActive;
+            if (this.inputIsActive) {
+              this.$.inputButton.classList.add('input-button--active');
+              this.inputModel.start();
+            }
+            else {
+              this.$.inputButton.classList.remove('input-button--active');
+              this.inputModel.stop();
+            }
+          }
+        }
+
+      }
+      Polymer(MicrophoneInput);
+
+    })();
+  </script>
+
+</dom-module>

@@ -1,5 +1,6 @@
 import Sampler from './sampler.js';
 import Synth from './synth.js';
+import InputNode from './inputNode.js';
 
 export default class InstrumentFactory {
 
@@ -8,13 +9,15 @@ export default class InstrumentFactory {
   }
 
   createSynth () {
-    var synth = new Synth(this.audioContext);
-    return synth;
+    return new Synth(this.audioContext);
   }
 
   createSampler (outputNode) {
-    var sampler = new Sampler(this.audioContext, outputNode);
-    return sampler;
+    return new Sampler(this.audioContext, outputNode);
+  }
+
+  createInputNode () {
+    return new InputNode(this.audioContext);
   }
 
 }
