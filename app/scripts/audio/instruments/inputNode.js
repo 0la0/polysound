@@ -13,7 +13,6 @@ export default class InputNode extends BaseInstrument {
     super (audioContext);
     this.inputSource = null;
     this.recordingScriptNode = null;
-    this.resetRecordingData();
   }
 
   turnOnInput () {
@@ -38,27 +37,23 @@ export default class InputNode extends BaseInstrument {
     this.recordingData = {
       sampleRate: this.audioContext.sampleRate,
       bufferSize: Math.pow(2, 11),
-      recordingLength: 0,
-      leftChannelData: [],
-      rightChannelData: []
+      length: 0,
+      leftChannel: [],
+      rightChannel: []
     }
   }
 
   startRecording () {
     this.resetRecordingData();
-
     //ScriptProcessor is deprecated, and will be replaced by Audio Workers
     this.recordingScriptNode = this.audioContext.createScriptProcessor(this.recordingData.bufferSize, 2, 2);
 
     this.recordingScriptNode.onaudioprocess = (event) => {
-      // let left = event.inputBuffer.getChannelData(0);
-      // let right = event.inputBuffer.getChannelData(1);
-
-      this.recordingData.leftChannelData.push(
+      this.recordingData.leftChannel.push(
         new Float32Array(event.inputBuffer.getChannelData(0)));
-      this.recordingData.rightChannelData.push(
+      this.recordingData.rightChannel.push(
         new Float32Array(event.inputBuffer.getChannelData(1)));
-      this.recordingData.recordingLength += this.recordingData.bufferSize;
+      this.recordingData.length += this.recordingData.bufferSize;
     }
 
     this.inputSource.connect(this.recordingScriptNode);
@@ -70,9 +65,9 @@ export default class InputNode extends BaseInstrument {
     this.recordingScriptNode.disconnect(this.audioContext.destination);
     this.recordingScriptNode = null;
 
-    let leftChannelData = createChannelBuffer(this.recordingData.recordingLength, this.recordingData.leftChannelData);
-    let rightChannelData = createChannelBuffer(this.recordingData.recordingLength, this.recordingData.rightChannelData);
-    let audioBuffer = this.audioContext.createBuffer(2, this.recordingData.recordingLength, this.recordingData.sampleRate);
+    let leftChannelData = createChannelBuffer(this.recordingData.length, this.recordingData.leftChannel);
+    let rightChannelData = createChannelBuffer(this.recordingData.length, this.recordingData.rightChannel);
+    let audioBuffer = this.audioContext.createBuffer(2, this.recordingData.length, this.recordingData.sampleRate);
     audioBuffer.getChannelData(0).set(leftChannelData);
     audioBuffer.getChannelData(1).set(rightChannelData);
 
