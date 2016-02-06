@@ -32,7 +32,10 @@
 
     <section class="input-node">
       <section class="input-node__left">
+        <p>Toggle Input</p>
         <div class="input-button" id="inputButton"></div>
+        <p>Record Input</p>
+        <div class="input-button" id="recordButton"></div>
       </section>
       <section class="input-node__right"></section>
     </section>
@@ -73,27 +76,60 @@
 
         ready() {}
         attached() {
-          this.inputIsActive = false;
+          this.buttonEvents = buildButtonEvents.call(this);
         }
         detached() {}
         attributeChanged() {}
 
         _handleClick (event) {
-          if (event.detail.sourceEvent.srcElement === this.$.inputButton) {
-            this.inputIsActive = !this.inputIsActive;
-            if (this.inputIsActive) {
-              this.$.inputButton.classList.add('input-button--active');
-              this.inputModel.start();
-            }
-            else {
-              this.$.inputButton.classList.remove('input-button--active');
-              this.inputModel.stop();
-            }
+          let targetId = event.detail.sourceEvent.srcElement.id;
+          if (this.buttonEvents[targetId]) {
+            this.buttonEvents[targetId]();
           }
         }
 
       }
       Polymer(MicrophoneInput);
+
+      function buildButtonEvents () {
+        let inputIsActive = false;
+        let recordIsActive = false;
+
+        return {
+          inputButton: () => {
+            inputIsActive = !inputIsActive;
+            if (inputIsActive) {
+              this.$.inputButton.classList.add('input-button--active');
+              this.inputModel.turnOnInput();
+            }
+            else {
+              if (recordIsActive) {
+                recordIsActive = false;
+                this.$.recordButton.classList.remove('input-button--active');
+                this.inputModel.stopRecording();
+              }
+
+              this.$.inputButton.classList.remove('input-button--active');
+              this.inputModel.turnOffInput();
+            }
+          },
+          recordButton: () => {
+            if (inputIsActive) {
+              recordIsActive = !recordIsActive;
+              if (recordIsActive) {
+                this.$.recordButton.classList.add('input-button--active');
+                this.inputModel.startRecording();
+              }
+              else {
+                this.$.recordButton.classList.remove('input-button--active');
+                this.inputModel.stopRecording();
+              }
+            }
+          }
+        };
+        
+      }
+
 
     })();
   </script>
