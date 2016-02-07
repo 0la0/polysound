@@ -1,6 +1,7 @@
 import Sampler from './sampler.js';
 import Synth from './synth.js';
 import InputNode from './inputNode.js';
+import WhiteNoise from './whiteNoise.js';
 
 export default class InstrumentFactory {
 
@@ -18,6 +19,10 @@ export default class InstrumentFactory {
 
   createInputNode () {
     return new InputNode(this.audioContext);
+  }
+
+  createWhiteNoiseNode () {
+    return new WhiteNoise(this.audioContext);
   }
 
 }

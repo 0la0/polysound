@@ -14,6 +14,7 @@
     <div class="factory-container">
       <div class="factory-option" value="sampler">sampler</div>
       <div class="factory-option" value="synth">synth</div>
+      <div class="factory-option" value="noise">white noise</div>
       <div class="factory-option" value="input">input</div>
     </div>
 
@@ -84,6 +85,11 @@
           let inputElement = document.createElement('microphone-input');
           inputElement.inputModel = instrumentFactory.createInputNode();
           return inputElement;
+        },
+        noise: (instrumentFactory) => {
+          let noiseElement = document.createElement('white-noise');
+          noiseElement.noiseModel = instrumentFactory.createWhiteNoiseNode();
+          return noiseElement;
         }
       };
 

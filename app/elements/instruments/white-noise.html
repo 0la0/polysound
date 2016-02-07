@@ -1,0 +1,139 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">\
+
+<dom-module id="white-noise">
+  <template>
+    <style>
+    :host {
+      display: block;
+      position: relative;
+      border: 1px solid black;
+    }
+    .noise {
+      display: flex;
+      flex-flow: row;
+      flex-wrap: nowrap;
+    }
+    .noise-left {
+      width: 80px;
+      border-right: 1px solid black;
+    }
+    .noise-name {
+      border-bottom: 1px solid black;
+    }
+    .noise-button {
+      border: 1px solid black;
+      background-color: #ccc;
+
+      width: 30px;
+      height: 30px;
+    }
+    .noise-container {
+      height: 10px;
+      width: 95%;
+    }
+    .noise-button--active {
+      background-color: white;
+    }
+    .noise-right {}
+    </style>
+
+    <driver-input
+        audio-node="{{noiseModel}}"
+        connection-bus="{{connectionInput}}">
+    </driver-input>
+
+    <section class="noise">
+      <section class="noise-left">
+        <p class="noise-name">White Noise</p>
+        <div class="noise-button" id="triggerButton"></div>
+        <div class="noise-container">
+          <slider-horizontal
+            slider-value="{{baseFrequency}}"
+            lower-bound="-1200" upper-bound="1200">
+          </slider-horizontal>
+        </div>
+      </section>
+      <section class="noise-right">
+        <sample-visualizer buffer-source={{noiseModel}}></sample-visualizer>
+        <simple-adsr adsr-model="{{noiseModel.adsr}}"></simple-adsr>
+      </section>
+    </section>
+
+    <connector-output
+        audio-node="{{noiseModel}}"
+        connection-bus="{{connectionOutput}}">
+    </connector-output>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class WhiteNoise {
+
+        beforeRegister() {
+          this.is = 'white-noise';
+
+          this.properties = {
+            noiseModel: {
+              type: Object
+            },
+            connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
+              type: Object
+            },
+            baseFrequency: {
+              type: Number,
+              value: 0,
+              notify: true,
+              observer: '_onBaseFrequencyChange'
+            }
+          };
+
+          this.listeners = {
+            down: '_handleClick'
+          };
+        }
+
+        ready() {}
+        attached() {
+          this.synthIsOn = false;
+          setTimeout(() => { this.$$('sample-visualizer').render(); }, 0);
+        }
+        detached() {}
+        attributeChanged() {}
+
+        _handleClick (event) {
+          if (event.target === this.$.triggerButton) {
+            this.synthIsOn = !this.synthIsOn;
+            this._trigger(this.synthIsOn);
+          }
+        }
+
+        _trigger (synthIsOn) {
+          if (synthIsOn) {
+            this.noiseModel.start();
+            Polymer.dom(this.$.triggerButton).classList.add('noise-button--active');
+          }
+          else {
+            this.noiseModel.stop();
+            Polymer.dom(this.$.triggerButton).classList.remove('noise-button--active');
+          }
+        }
+
+        _onBaseFrequencyChange (newValue) {
+          if (this.noiseModel) {
+            this.noiseModel.setDetuneValue(newValue);
+          }
+        }
+
+      }
+      Polymer(WhiteNoise);
+
+    })();
+  </script>
+
+</dom-module>
