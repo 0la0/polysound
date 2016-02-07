@@ -2,6 +2,7 @@ import Equalizer from './equalizer.js';
 import Delay from './delay.js';
 import Reverb from './reverb.js';
 import Compressor from './compressor.js';
+import DroneFilter from './droneFilter.js';
 
 export default class EffectFactory {
 
@@ -31,6 +32,10 @@ export default class EffectFactory {
 
   createCompressor () {
     return new Compressor(this.audioContext);
+  }
+
+  createDroneFilter () {
+    return new DroneFilter(this.audioContext);
   }
 
 }

@@ -16,6 +16,7 @@
       <div class="factory-option" value="delay">delay</div>
       <div class="factory-option" value="reverb">reverb</div>
       <div class="factory-option" value="compressor">compressor</div>
+      <div class="factory-option" value="drone">drone filter</div>
     </div>
 
   </template>
@@ -91,6 +92,11 @@
           let compressorElement = document.createElement('simple-compressor');
           compressorElement.compressorModel = effectFactory.createCompressor();
           return compressorElement;
+        },
+        drone: (effectFactory) => {
+          let droneElement = document.createElement('drone-filter');
+          droneElement.filterModel = effectFactory.createDroneFilter();
+          return droneElement;
         }
       };
 
