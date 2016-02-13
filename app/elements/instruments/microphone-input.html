@@ -21,11 +21,6 @@
       .input-button {
         width: 30px;
         height: 30px;
-        border: 1px solid black;
-        background-color: #ccc;
-      }
-      .input-button--active {
-        background-color: white;
       }
       .input-node__right {}
     </style>
@@ -33,9 +28,13 @@
     <section class="input-node">
       <section class="input-node__left">
         <p>Toggle Input</p>
-        <div class="input-button" id="inputButton"></div>
+        <div class="input-button">
+          <simple-button button-model="{{inputButtonModel}}" id="inputBtn"></simple-button>
+        </div>
         <p>Record Input</p>
-        <div class="input-button" id="recordButton"></div>
+        <div class="input-button">
+          <simple-button button-model="{{recordButtonModel}}" id="recordBtn"></simple-button>
+        </div>
       </section>
       <section class="input-node__right"></section>
     </section>
@@ -68,66 +67,51 @@
             }
           };
 
-          this.listeners = {
-            down: '_handleClick'
-          };
-
         }
 
         ready() {}
         attached() {
-          this.buttonEvents = buildButtonEvents.call(this);
+          this.inputButtonModel = buildInputButton.call(this);
+          this.recordButtonModel = buildRecordButton.call(this);
         }
         detached() {}
         attributeChanged() {}
 
-        _handleClick (event) {
-          let targetId = event.detail.sourceEvent.srcElement.id;
-          if (this.buttonEvents[targetId]) {
-            this.buttonEvents[targetId]();
-          }
-        }
-
       }
       Polymer(MicrophoneInput);
 
-      function buildButtonEvents () {
-        let inputIsActive = false;
-        let recordIsActive = false;
-
+      function buildInputButton () {
         return {
-          inputButton: () => {
-            inputIsActive = !inputIsActive;
+          callback: (inputIsActive) => {
             if (inputIsActive) {
-              this.$.inputButton.classList.add('input-button--active');
               this.inputModel.turnOnInput();
             }
             else {
-              if (recordIsActive) {
-                recordIsActive = false;
-                this.$.recordButton.classList.remove('input-button--active');
-                this.inputModel.stopRecording();
+              if (this.$.recordBtn.buttonValue) {
+                this.$.recordBtn.trigger();
               }
-
-              this.$.inputButton.classList.remove('input-button--active');
               this.inputModel.turnOffInput();
-            }
-          },
-          recordButton: () => {
-            if (inputIsActive) {
-              recordIsActive = !recordIsActive;
-              if (recordIsActive) {
-                this.$.recordButton.classList.add('input-button--active');
-                this.inputModel.startRecording();
-              }
-              else {
-                this.$.recordButton.classList.remove('input-button--active');
-                this.inputModel.stopRecording();
-              }
             }
           }
         };
-        
+      }
+
+      function buildRecordButton () {
+        return {
+          callback: (recordIsActive) => {
+            if (recordIsActive) {
+              if (this.$.inputBtn.buttonValue) {
+                this.inputModel.startRecording();
+              }
+              else {
+                console.log('hey, cant record now');
+              }
+            }
+            else {
+              this.inputModel.stopRecording();
+            }
+          }
+        };
       }
 
 

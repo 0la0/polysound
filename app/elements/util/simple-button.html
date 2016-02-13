@@ -54,6 +54,10 @@
         detached() {}
         attributeChanged() {}
 
+        trigger () {
+          this._onDown();
+        }
+
         _onDown () {
           this.buttonValue = !this.buttonValue;
           if (this.buttonValue) {
