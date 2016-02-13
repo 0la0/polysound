@@ -1,0 +1,74 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="simple-button">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 100%;
+      }
+      .button {
+        width: 100%;
+        height: 100%;
+        border: 1px solid black;
+        background-color: #ccc;
+      }
+      .button--active {
+        background-color: white;
+      }
+    </style>
+
+    <div id="btn" class="button"></div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class Button {
+
+        beforeRegister() {
+          this.is = 'simple-button';
+
+          this.properties = {
+            buttonValue: {
+              type: Boolean,
+              value: false
+            },
+            buttonModel: {
+              type: Object
+            }
+          };
+
+          this.listeners = {
+            down: '_onDown'
+          };
+
+        }
+
+        ready() {}
+        attached() {}
+        detached() {}
+        attributeChanged() {}
+
+        _onDown () {
+          this.buttonValue = !this.buttonValue;
+          if (this.buttonValue) {
+            Polymer.dom(this.$.btn).classList.add('button--active');
+          }
+          else {
+            Polymer.dom(this.$.btn).classList.remove('button--active');
+          }
+          this.buttonModel.callback(this.buttonValue);
+        }
+
+      }
+
+      Polymer(Button);
+    })();
+  </script>
+
+</dom-module>

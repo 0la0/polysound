@@ -1,5 +1,4 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../behaviors/test-behavior.html">
 
 <dom-module id="simple-synth">
   <template>
@@ -22,9 +21,6 @@
         border-bottom: 1px solid black;
       }
       .synth-button {
-        border: 1px solid black;
-        background-color: #ccc;
-
         width: 30px;
         height: 30px;
       }
@@ -32,13 +28,8 @@
         height: 10px;
         width: 95%;
       }
-      .synth-button--active {
-        background-color: white;
-      }
 
-      .synth-right {
-
-      }
+      .synth-right {}
       .synth-selection {
         display: flex;
         flex-flow: row;
@@ -65,7 +56,9 @@
     <section class="synth">
       <section class="synth-left">
         <p class="synth-name">Synth Label</p>
-        <div class="synth-button" id="triggerButton"></div>
+        <div class="synth-button">
+          <simple-button button-model="{{buttonModel}}"></simple-button>
+        </div>
         <div class="slider-container">
           <slider-horizontal
             slider-value="{{baseFrequency}}"
@@ -127,7 +120,7 @@
         attached() {
           let oscilatorNodes = this.getElementsByClassName('synth-selector');
           this.oscilatorSelectors = Array.prototype.slice.call(oscilatorNodes);
-          this.synthIsOn = false;
+          this.buttonModel = buildButtonModel.call(this);
         }
         detached() {}
         attributeChanged() {}
@@ -151,17 +144,6 @@
           }
         }
 
-        _trigger (synthIsOn) {
-          if (synthIsOn) {
-            this.synthModel.start();
-            Polymer.dom(this.$.triggerButton).classList.add('synth-button--active');
-          }
-          else {
-            this.synthModel.stop();
-            Polymer.dom(this.$.triggerButton).classList.remove('synth-button--active');
-          }
-        }
-
         _onBaseFrequencyChange (newValue) {
           if (this.synthModel) {
             this.synthModel.setBaseFrequency(newValue);
@@ -170,6 +152,19 @@
 
       }
       Polymer(SimpleSynth);
+
+      function buildButtonModel () {
+        return {
+          callback: (synthIsOn) => {
+            if (synthIsOn) {
+              this.synthModel.start();
+            }
+            else {
+              this.synthModel.stop();
+            }
+          }
+        };
+      }
 
     })();
   </script>
