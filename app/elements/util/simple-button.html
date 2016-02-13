@@ -40,6 +40,10 @@
             },
             buttonModel: {
               type: Object
+            },
+            isTrigger: {
+              type: Boolean,
+              value: false
             }
           };
 
@@ -62,10 +66,21 @@
           this.buttonValue = !this.buttonValue;
           if (this.buttonValue) {
             Polymer.dom(this.$.btn).classList.add('button--active');
+
+            if (this.isTrigger) {
+              setTimeout(this._turnOff.bind(this), 50);
+            }
           }
           else {
             Polymer.dom(this.$.btn).classList.remove('button--active');
           }
+
+          this.buttonModel.callback(this.buttonValue);
+        }
+
+        _turnOff () {
+          this.buttonValue = false;
+          Polymer.dom(this.$.btn).classList.remove('button--active');
           this.buttonModel.callback(this.buttonValue);
         }
 

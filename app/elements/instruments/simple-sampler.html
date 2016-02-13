@@ -22,9 +22,6 @@
         border-bottom: 1px solid black;
       }
       .sampler-button {
-        border: 1px solid black;
-        background-color: #ccc;
-
         width: 30px;
         height: 30px;
       }
@@ -32,10 +29,6 @@
         height: 10px;
         width: 95%;
       }
-      .sampler-button--active {
-        background-color: white;
-      }
-
       .sampler-right {}
     </style>
 
@@ -47,7 +40,9 @@
     <section class="sampler">
       <section class="sampler-left">
         <p class="sampler-name">Sampler Label</p>
-        <div class="sampler-button" id="triggerButton"></div>
+        <div class="sampler-button">
+          <simple-button button-model="{{triggerButtonModel}}" is-trigger="true"></simple-button>
+        </div>
         <div class="slider-container">
           <slider-horizontal
             slider-value="{{samplerModel.baseNote}}"
@@ -91,10 +86,6 @@
             }
           };
 
-          this.listeners = {
-            down: '_handleClick'
-          };
-
         }
 
         ready() {}
@@ -107,29 +98,25 @@
               this.samplerVisualizer.render();
             }
           };
+          this.triggerButtonModel = buildButtonModel.call(this);
         }
         detached() {}
         attributeChanged() {}
 
-        _handleClick (event) {
-          if (event.target === this.$.triggerButton) {
-            this._trigger();
+      }
+      Polymer(SimpleSampler);
+
+
+      function buildButtonModel () {
+        return {
+          callback: (btnIsOn) => {
+            if (btnIsOn) {
+              this.samplerModel.play(0, 0);
+            }
           }
-        }
-
-        _trigger () {
-          this.samplerModel.play(0, 0);
-          this._animate();
-          setTimeout(this._animate.bind(this), 50);
-        }
-
-        _animate () {
-          Polymer.dom(this.$.triggerButton).classList.toggle('sampler-button--active');
-        }
-
+        };
       }
 
-      Polymer(SimpleSampler);
     })();
   </script>
 
