@@ -156,12 +156,7 @@
       function buildButtonModel () {
         return {
           callback: (synthIsOn) => {
-            if (synthIsOn) {
-              this.synthModel.start();
-            }
-            else {
-              this.synthModel.stop();
-            }
+            synthIsOn ? this.synthModel.start() : this.synthModel.stop();
           }
         };
       }

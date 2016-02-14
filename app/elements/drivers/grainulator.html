@@ -24,13 +24,8 @@
         margin: 10px 0;
       }
       .grainulator-button {
-        width: 30px;
+        width: 60px;
         height: 30px;
-        border: 1px solid black;
-        background-color: #999;
-      }
-      .grainulator-button--active {
-        background-color: white;
       }
       label {
         width: 50%;
@@ -41,7 +36,9 @@
       <div class="grainulator-header">Grainulator Name</div>
 
       <div class="grainulator-row">
-        <div class="grainulator-button" id="button"></div>
+        <div class="grainulator-button">
+          <simple-button button-model="{{buttonModel}}"></simple-button>
+        </div>
       </div>
 
       <div class="grainulator-row">
@@ -95,10 +92,6 @@
 
       class CustomGrainulator {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'custom-grainulator';
 
@@ -128,23 +121,12 @@
             }
           };
 
-          this.listeners = {};
         }
 
         ready() {}
         attached() {
-          this.button = this.$.button;
           this.isOn = false;
-          this.button.addEventListener('click', (event) => {
-            this.isOn = !this.isOn;
-            if (this.isOn) {
-              Polymer.dom(this.button).classList.add('grainulator-button--active');
-              this._grainLoop();
-            }
-            else {
-              Polymer.dom(this.button).classList.remove('grainulator-button--active');
-            }
-          }, false);
+          this.buttonModel = buildButtonModel.call(this);
         }
         detached() {}
         attributeChanged() {}
@@ -175,6 +157,17 @@
 
       function getPosNeg () {
         return Math.random() < 0.5 ? -1 : 1;
+      }
+
+      function buildButtonModel () {
+        return {
+          callback: (isOn) => {
+            this.isOn = isOn;
+            if (isOn) {
+              this._grainLoop();
+            }
+          }
+        };
       }
 
     })();

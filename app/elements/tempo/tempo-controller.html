@@ -13,9 +13,8 @@
         width: 100%;
         border-bottom: 1px solid black;
       }
-      tempo-button {
-        border: 1px solid black;
-        background: #ccc;
+      .tempo-button {
+        width: 40px;
         margin: 5px;
         padding: 2px;
       }
@@ -28,7 +27,12 @@
       }
     </style>
 
-    <tempo-button metronome="{{metronome}}"></tempo-button>
+    <div class="tempo-button">
+      <simple-button
+        button-model="{{buttonModel}}"
+        default-text="start" active-text="stop">
+      </simple-button>
+    </div>
     <tempo-display tempo="{{metronome.tempo}}"></tempo-display>
 
   </template>
@@ -39,10 +43,6 @@
 
       class TempoController {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'tempo-controller';
 
@@ -51,28 +51,25 @@
               type: Object
             }
           };
-
-          this.listeners = {
-
-          };
-
         }
 
         ready() {}
-        attached() {}
+        attached() {
+          this.buttonModel = buildButtonModel.call(this);
+        }
         detached() {}
         attributeChanged() {}
+      }
+      Polymer(TempoController);
 
-        _toggleMetronome () {
-          console.log('toggle!');
-          return toggleFunction = () => {
-            console.log('toggle')
-          };
-        }
-
+      function buildButtonModel () {
+        return {
+          callback: (metronomeIsOn) => {
+            metronomeIsOn ? this.metronome.start() : this.metronome.stop();
+          }
+        };
       }
 
-      Polymer(TempoController);
     })();
   </script>
 

@@ -44,6 +44,12 @@
             isTrigger: {
               type: Boolean,
               value: false
+            },
+            defaultText: {
+              type: String
+            },
+            activeText: {
+              type: String
             }
           };
 
@@ -54,12 +60,21 @@
         }
 
         ready() {}
-        attached() {}
+        attached() {
+          setTimeout(() => {
+            this._updateText();
+          }, 0);
+        }
         detached() {}
         attributeChanged() {}
 
-        trigger () {
-          this._onDown();
+        setValue (value) {
+          if (value) {
+            this._turnOn();
+          }
+          else {
+            this._turnOff();
+          }
         }
 
         _onDown () {
@@ -76,12 +91,30 @@
           }
 
           this.buttonModel.callback(this.buttonValue);
+          this._updateText();
+        }
+
+        _turnOn () {
+          this.buttonValue = true;
+          Polymer.dom(this.$.btn).classList.add('button--active');
+          this.buttonModel.callback(this.buttonValue);
+          this._updateText();
         }
 
         _turnOff () {
           this.buttonValue = false;
           Polymer.dom(this.$.btn).classList.remove('button--active');
           this.buttonModel.callback(this.buttonValue);
+          this._updateText();
+        }
+
+        _updateText () {
+          if (this.buttonValue && this.activeText) {
+            this.$.btn.innerText = this.activeText;
+          }
+          else if (!this.buttonValue && this.defaultText) {
+            this.$.btn.innerText = this.defaultText;
+          }
         }
 
       }

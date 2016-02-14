@@ -21,18 +21,12 @@
       border-bottom: 1px solid black;
     }
     .noise-button {
-      border: 1px solid black;
-      background-color: #ccc;
-
       width: 30px;
       height: 30px;
     }
     .noise-container {
       height: 10px;
       width: 95%;
-    }
-    .noise-button--active {
-      background-color: white;
     }
     .noise-right {}
     </style>
@@ -45,7 +39,9 @@
     <section class="noise">
       <section class="noise-left">
         <p class="noise-name">White Noise</p>
-        <div class="noise-button" id="triggerButton"></div>
+        <div class="noise-button">
+          <simple-button button-model="{{buttonModel}}"></simple-button>
+        </div>
         <div class="noise-container">
           <slider-horizontal
             slider-value="{{baseFrequency}}"
@@ -92,37 +88,16 @@
               observer: '_onBaseFrequencyChange'
             }
           };
-
-          this.listeners = {
-            down: '_handleClick'
-          };
         }
 
         ready() {}
         attached() {
           this.synthIsOn = false;
+          this.buttonModel = buildButtonModel.call(this);
           setTimeout(() => { this.$$('sample-visualizer').render(); }, 0);
         }
         detached() {}
         attributeChanged() {}
-
-        _handleClick (event) {
-          if (event.target === this.$.triggerButton) {
-            this.synthIsOn = !this.synthIsOn;
-            this._trigger(this.synthIsOn);
-          }
-        }
-
-        _trigger (synthIsOn) {
-          if (synthIsOn) {
-            this.noiseModel.start();
-            Polymer.dom(this.$.triggerButton).classList.add('noise-button--active');
-          }
-          else {
-            this.noiseModel.stop();
-            Polymer.dom(this.$.triggerButton).classList.remove('noise-button--active');
-          }
-        }
 
         _onBaseFrequencyChange (newValue) {
           if (this.noiseModel) {
@@ -132,6 +107,14 @@
 
       }
       Polymer(WhiteNoise);
+
+      function buildButtonModel () {
+        return {
+          callback: (synthIsOn) => {
+            synthIsOn ? this.noiseModel.start() : this.noiseModel.stop();
+          }
+        };
+      }
 
     })();
   </script>

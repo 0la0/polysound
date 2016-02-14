@@ -14,11 +14,6 @@
       .sequencer-trigger {
         width: 30px;
         height: 15px;
-        border: 1px solid black;
-        background-color: #666;
-      }
-      .sequencer-trigger--active {
-        background-color: #ccc;
       }
       .sequencer-header {
         display: flex;
@@ -26,12 +21,16 @@
         justify-content: space-between;
 
         background-color: #999;
+        height: 18px;
       }
       .sequencer-header__name {
         font-style: italic;
       }
       .sequencer-header__toggle {
-        cursor: pointer;
+        height: 90%;
+        width: 65px;
+        text-align: right;
+        padding-right: 2px;
       }
       .sequencer-container {
         border-right: 1px solid black;
@@ -70,10 +69,16 @@
     </style>
 
     <div class="sequencer">
-      <div class="sequencer-trigger" id="sequencerTrigger"></div>
+      <div class="sequencer-trigger">
+        <simple-button button-model="{{triggerButtonModel}}" id="sequencerTrigger"></simple-button>
+      </div>
       <div class="sequencer-header">
         <div class="sequencer-header__name">Sequencer Name</div>
-        <div id="toggle" class="sequencer-header__toggle">toggle</div>
+        <div class="sequencer-header__toggle">
+          <simple-button
+            button-model="{{expandableButtonModel}}"
+            default-text="collapse" active-text="expand"></simple-button>
+        </div>
       </div>
       <div class="sequencer-container">
         <div id="sequencerHeader"></div>
@@ -113,9 +118,7 @@
 
         }
 
-        ready() {
-
-        }
+        ready() {}
         attached() {
           this.sequencerHeader = this.$.sequencerHeader;
           this.sequencerBody = this.$.sequencerBody;
@@ -124,29 +127,14 @@
           this.headerElementList = buildHeader(this.numberOfSteps, this.sequencerHeader);
           this.bodyElementMatrix = buildBody(this.numberOfRows, this.numberOfSteps, this.sequencerBody);
 
-          this.toggle = this.$.toggle;
-          this.toggle.isToggled = false;
-          this.toggle.addEventListener('click', (event) => {
-            this.toggle.isToggled = !this.toggle.isToggled;
-            if (this.toggle.isToggled) {
-              this.sequencerBody.classList.add('sequencer-body--collapsed');
-            }
-            else {
-              this.sequencerBody.classList.remove('sequencer-body--collapsed');
-            }
-          }, false);
+          this.triggerButtonModel = buildTriggerButtonModel.call(this);
+          this.expandableButtonModel = buildExpandableButtonModel.call(this);
         }
 
         detached() {}
         attributeChanged() {}
 
         _onTap (event) {
-          if (event.detail.sourceEvent.srcElement === this.$.sequencerTrigger) {
-            this.clipManager.queueActive(this);
-            this.$.sequencerTrigger.classList.add('sequencer-trigger--active');
-            return;
-          }
-
           let matrixElement = {
             hasSolution: false,
             rowIndex: null,
@@ -203,7 +191,11 @@
         }
 
         setAsInactive () {
-          this.$.sequencerTrigger.classList.remove('sequencer-trigger--active');
+          this.$.sequencerTrigger.setValue(false);
+        }
+
+        setAsActive () {
+          this.$.sequencerTrigger.setValue(true);
         }
 
       }
@@ -252,6 +244,26 @@
           bodyElementMatrix.push(bodyElementList);
         }
         return bodyElementMatrix;
+      }
+
+      function buildTriggerButtonModel () {
+        return {
+          callback: (isOn) => {
+            if (isOn) {
+              this.clipManager.queueActive(this);
+            }
+          }
+        };
+      }
+
+      function buildExpandableButtonModel () {
+        return {
+          callback: (isOn) => {
+            isOn ?
+              this.sequencerBody.classList.add('sequencer-body--collapsed') :
+              this.sequencerBody.classList.remove('sequencer-body--collapsed');
+          }
+        };
       }
 
 

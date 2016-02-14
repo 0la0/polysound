@@ -55,13 +55,16 @@
 
           let matrixNodeList = this.getElementsByClassName('matrix');
           this.matrixList = Array.prototype.slice.call(matrixNodeList);
-          this.activeIndex = 0;
+          this.activeIndex;
 
           this.clipManager = buildClipManager(this.matrixList, (activeIndex) => {
             this.activeIndex = activeIndex;
             this.isReset = true;
           });
 
+          setTimeout(() => {
+            this.matrixList[0].setAsActive();
+          }, 0);
         }
 
         detached() {
@@ -105,9 +108,11 @@
           queueActive: (matrixElement) => {
             let activeIndex = matrixList.indexOf(matrixElement);
             setActiveIndex(activeIndex);
-            matrixList.forEach( (matrix) => {
-              matrix.setAsInactive();
-              matrix.stop();
+            matrixList.forEach( (matrix, index) => {
+              if (index !== activeIndex) {
+                matrix.setAsInactive();
+                matrix.stop();
+              }
             });
           }
         };

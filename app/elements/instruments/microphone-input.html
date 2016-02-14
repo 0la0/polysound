@@ -88,7 +88,7 @@
             }
             else {
               if (this.$.recordBtn.buttonValue) {
-                this.$.recordBtn.trigger();
+                this.$.recordBtn.setValue(false);
               }
               this.inputModel.turnOffInput();
             }
@@ -99,17 +99,12 @@
       function buildRecordButton () {
         return {
           callback: (recordIsActive) => {
-            if (recordIsActive) {
-              if (this.$.inputBtn.buttonValue) {
-                this.inputModel.startRecording();
-              }
-              else {
-                console.log('hey, cant record now');
-              }
+            if (!this.$.inputBtn.buttonValue) {
+              console.warn('input must be activated to record');
+              return;
             }
-            else {
-              this.inputModel.stopRecording();
-            }
+            recordIsActive ?
+              this.inputModel.startRecording() : this.inputModel.stopRecording();
           }
         };
       }
