@@ -6,6 +6,9 @@ import EffectFactory from './audio/effects/effectFactory.js';
 import DriverFactory from './audio/drivers/driverFactory.js';
 import Http from './util/http.js';
 
+import initMidi from './midi/midiFactory.js';
+initMidi();
+
 const CONFIG_FILE_PATH = 'config/example.json';
 const NUM_SYNTHS = 1;
 const NUM_SAMPLERS = 3;
