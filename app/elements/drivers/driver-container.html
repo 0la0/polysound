@@ -73,7 +73,8 @@
             driverElement = DriverFactory.createGrainulator(driverOutputContainer, this.connectionOutput);
           }
           else if (this.driverType === 'apcSequencer') {
-            driverElement = DriverFactory.createApcSequencer(driverOutputContainer, this.connectionOutput);
+            const NUM_CHANNELS = 5;
+            driverElement = DriverFactory.createApcSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
           }
           Polymer.dom(parentContainer).appendChild(driverElement);
         }

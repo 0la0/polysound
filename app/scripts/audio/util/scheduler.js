@@ -38,7 +38,7 @@ export default class Scheduler {
   }
 
   _draw () {
-    if (this.nextScheduledTime >= this.audioContext.currentTime) {
+    if (this.nextScheduledTime >= this.audioContext.currentTime && this.noteToRender !== this.lastNoteDrawn) {
       this.registry.forEach(schedulable => schedulable.render(this.noteToRender, this.lastNoteDrawn));
       this.lastNoteDrawn = this.noteToRender;
     }

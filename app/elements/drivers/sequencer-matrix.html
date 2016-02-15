@@ -153,13 +153,11 @@
           if (!matrixElement.hasSolution) {
             return;
           }
+
           let row = matrixElement.rowIndex;
           let column = matrixElement.columnIndex;
-
-          this.sequencerMatrix[row][column] = !this.sequencerMatrix[row][column];
-          this.sequencerMatrix[row][column] ?
-            this.bodyElementMatrix[row][column].classList.add('sequencer-row__body-element--scheduled') :
-            this.bodyElementMatrix[row][column].classList.remove('sequencer-row__body-element--scheduled');
+          this.setValue(row, column);
+          this.clipManager.onMatrixChange(this, row, column, this.sequencerMatrix[row][column]);
         }
 
         getColumnValueList (beatNumber) {
@@ -196,6 +194,13 @@
 
         setAsActive () {
           this.$.sequencerTrigger.setValue(true);
+        }
+
+        setValue (row, column) {
+          this.sequencerMatrix[row][column] = !this.sequencerMatrix[row][column];
+          this.sequencerMatrix[row][column] ?
+            this.bodyElementMatrix[row][column].classList.add('sequencer-row__body-element--scheduled') :
+            this.bodyElementMatrix[row][column].classList.remove('sequencer-row__body-element--scheduled');
         }
 
       }
