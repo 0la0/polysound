@@ -1,31 +1,3 @@
-
-const StatusMap = {
-  NOTE_ON:  9,
-  NOTE_OFF: 8
-};
-
-var midiDeviceFactory;
-
-function getObjectFromMessage (midiMessage) {
-  let command = (midiMessage[0] & '0xF0') >>> 4;
-  let status = midiMessage[0] & '0xF';
-
-  return {
-    command: command,
-    status: status,
-    note: midiMessage[1],
-    value: midiMessage[2]
-  };
-}
-
-function getMessageFromObject (messageObject) {
-  return new Uint8Array([
-    (messageObject.command << 4) | messageObject.status,
-    messageObject.note,
-    messageObject.value
-  ]);
-}
-
 class MidiDeviceFactory {
 
   constructor (midiAccess) {
@@ -61,29 +33,44 @@ class MidiDeviceFactory {
 
 }
 
-function initMidi () {
+function buildMidiFactory () {
   if (!navigator.requestMIDIAccess) {
     console.warn('WebMidiApi not supported in this browser');
     return;
   }
 
-  navigator.requestMIDIAccess().then(
-    (resolve) => {
-      midiDeviceFactory = new MidiDeviceFactory(resolve);
-
-      let apc = midiDeviceFactory.getDeviceByName('Akai APC20');
-      apc.input.onmidimessage = (event) => {
-        let message = getObjectFromMessage(event.data);
-      };
-
-      testLoop(apc.output, 0, 7);
-    },
-    (reject) => {
-      console.log('requestMidiAccess reject', reject);
+  return navigator.requestMIDIAccess().then(
+    (resolveMidiAccess) => {
+      console.log('resovleMidiAccess' ,resolveMidiAccess);
+      return new MidiDeviceFactory(resolveMidiAccess);
     }
   );
 
 }
+
+// function initMidi () {
+//   if (!navigator.requestMIDIAccess) {
+//     console.warn('WebMidiApi not supported in this browser');
+//     return;
+//   }
+//
+//   navigator.requestMIDIAccess().then(
+//     (resolve) => {
+//       midiDeviceFactory = new MidiDeviceFactory(resolve);
+//
+//       // let apc = midiDeviceFactory.getDeviceByName('Akai APC20');
+//       // apc.input.onmidimessage = (event) => {
+//       //   let message = getObjectFromMessage(event.data);
+//       // };
+//       //
+//       // testLoop(apc.output, 0, 7);
+//     },
+//     (reject) => {
+//       console.log('requestMidiAccess reject', reject);
+//     }
+//   );
+//
+// }
 
 function testLoop (outputDevice, index, lastIndex) {
   let messageObjectOn = {command: StatusMap.NOTE_ON, status: index, note: 56, value: 127};
@@ -102,4 +89,4 @@ function testLoop (outputDevice, index, lastIndex) {
 }
 
 
-export default initMidi;
+export default buildMidiFactory;

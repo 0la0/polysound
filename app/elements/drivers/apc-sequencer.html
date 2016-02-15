@@ -1,0 +1,134 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/midi.html">
+
+<dom-module id="apc-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="matrix-list">
+
+      <sequencer-matrix
+        class="matrix"
+        number-of-steps="8"
+        number-of-rows="5"
+        clip-manager="{{clipManager}}">
+      </sequencer-matrix>
+
+      <!-- <sequencer-matrix
+        class="matrix"
+        number-of-steps="8"
+        number-of-rows="5"
+        clip-manager="{{clipManager}}">
+      </sequencer-matrix> -->
+
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class ApcSequencer {
+
+        beforeRegister() {
+          this.is = 'apc-sequencer';
+
+          this.properties = {
+            instrumentList: {
+              type: Array
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {
+          this.width = 8;
+          this.isReset = true;
+          this.schedulable = buildSchedulable.call(this);
+          app.scheduler.register(this.schedulable);
+
+          let matrixNodeList = this.getElementsByClassName('matrix');
+          this.matrixList = Array.prototype.slice.call(matrixNodeList);
+          this.activeIndex;
+
+          this.clipManager = buildClipManager(this.matrixList, (activeIndex) => {
+            this.activeIndex = activeIndex;
+            this.isReset = true;
+          });
+
+          let inputList = app.audio.midiDeviceFactory.getInputList();
+          let outputList = app.audio.midiDeviceFactory.getOutputList();
+          console.log('io:', inputList, outputList);
+
+          console.log('statusMap:', StatusMap, getObjectFromMessage, getMessageFromObject);
+
+          setTimeout(() => {
+            this.matrixList[0].setAsActive();
+          }, 0);
+        }
+
+        detached() {
+          app.scheduler.deregister(this.schedulable);
+        }
+        attributeChanged() {}
+      }
+      Polymer(ApcSequencer);
+
+      function buildSchedulable () {
+        return {
+          processTick: (beatNumber, time) => {
+            beatNumber = beatNumber % this.width;
+
+            let columnData = this.matrixList[this.activeIndex].getColumnValueList(beatNumber);
+            columnData.forEach( (matrixElement, index) => {
+              if (matrixElement) {
+                this.instrumentList[index].forEach((instrument) => {
+                  instrument.play(0, time);
+                });
+              }
+            });
+          },
+          render: (beatNumber, lastBeatNumber) => {
+            beatNumber = beatNumber % this.width;
+            lastBeatNumber = lastBeatNumber % this.width;
+
+            this.matrixList[this.activeIndex].render(beatNumber, lastBeatNumber, this.isReset);
+            if (this.isReset) {
+              this.isReset = false;
+            }
+          },
+          start: () => {
+            this.isReset = true;
+          },
+          stop: () => {
+            this.matrixList[this.activeIndex].stop();
+          }
+        }
+      }
+
+      function buildClipManager (matrixList, setActiveIndex) {
+        return {
+          queueActive: (matrixElement) => {
+            let activeIndex = matrixList.indexOf(matrixElement);
+            setActiveIndex(activeIndex);
+            matrixList.forEach( (matrix, index) => {
+              if (index !== activeIndex) {
+                matrix.setAsInactive();
+                matrix.stop();
+              }
+            });
+          }
+        };
+      }
+
+    })();
+  </script>
+
+</dom-module>

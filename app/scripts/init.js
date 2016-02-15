@@ -3,11 +3,8 @@ import Metronome from './audio/util/metronome.js';
 import Scheduler from './audio/util/scheduler.js';
 import InstrumentFactory from './audio/instruments/instrumentFactory.js';
 import EffectFactory from './audio/effects/effectFactory.js';
-import DriverFactory from './audio/drivers/driverFactory.js';
+import buildMidiFactory from './midi/midiFactory.js';
 import Http from './util/http.js';
-
-import initMidi from './midi/midiFactory.js';
-initMidi();
 
 const CONFIG_FILE_PATH = 'config/example.json';
 const NUM_SYNTHS = 1;
@@ -19,9 +16,7 @@ let scheduler = new Scheduler(audioGraph.getAudioContext());
 let metronome = new Metronome(audioGraph.getAudioContext(), scheduler);
 let effectFactory = new EffectFactory(audioGraph.getAudioContext());
 let instrumentFactory = new InstrumentFactory(audioGraph.getAudioContext());
-let driverFactory = new DriverFactory(audioGraph.getAudioContext());
 let sampleMap = new Map();
-
 let sampleList = [];
 let lastEqualizerList = buildLastEqualizers();
 
@@ -30,9 +25,8 @@ let audio = {
   metronome: metronome,
   sampleMap: sampleMap,
   lastEqualizerList: lastEqualizerList,
-  driverFactory: driverFactory,
   effectFactory: effectFactory,
-  instrumentFactory: instrumentFactory
+  instrumentFactory: instrumentFactory,
 };
 //window.audio = audio;
 
@@ -76,6 +70,12 @@ function loadConfigFiles (configFilePath, audioContext) {
       console.log('loadConfigFiles error:', error);
     });
 }
+
+buildMidiFactory()
+  .then( (midiFactoryInstance) => {
+    audio.midiDeviceFactory = midiFactoryInstance;
+  })
+  .catch(() => {midiFactory = {}});
 
 loadConfigFiles(CONFIG_FILE_PATH, audioGraph.getAudioContext());
 

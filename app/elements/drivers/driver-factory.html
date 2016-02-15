@@ -16,6 +16,7 @@
       <div class="factory-option" value="sequencer">sequencer</div>
       <div class="factory-option" value="multiSequencer">multi-sequencer</div>
       <div class="factory-option" value="grainulator">gainulator</div>
+      <div class="factory-option" value="apcSequencer">apc-sequencer</div>
     </div>
 
   </template>
@@ -33,16 +34,11 @@
         beforeRegister() {
           this.is = 'driver-factory';
 
-          this.properties = {
-            factoryModel: {
-              type: Object
-            }
-          };
+          this.properties = {};
 
           this.listeners = {
             'tap': '_onTap'
           };
-
         }
 
         ready() {}

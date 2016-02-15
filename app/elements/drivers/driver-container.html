@@ -72,6 +72,9 @@
           else if (this.driverType === 'grainulator') {
             driverElement = DriverFactory.createGrainulator(driverOutputContainer, this.connectionOutput);
           }
+          else if (this.driverType === 'apcSequencer') {
+            driverElement = DriverFactory.createApcSequencer(driverOutputContainer, this.connectionOutput);
+          }
           Polymer.dom(parentContainer).appendChild(driverElement);
         }
         detached() {}
@@ -120,6 +123,29 @@
           }
 
           let samplerElement = document.createElement('multi-sequencer');
+          samplerElement.instrumentList = instrumentList;
+
+          for (let i = 0; i < numChannels; i++) {
+            let driverOut = document.createElement('driver-output');
+            driverOut.driverModel = connectionList[i];
+            driverOut.connectionBus = connectionOutput;
+            Polymer.dom(driverOutputContainer).appendChild(driverOut);
+          }
+          return samplerElement;
+        }
+
+        static createApcSequencer (numChannels, driverOutputContainer, connectionOutput) {
+          let instrumentList = [];
+          let connectionList = [];
+
+          for (let i = 0; i < numChannels; i++) {
+            let instrumentSet = new Set();
+            let connectionModel = createConnection(instrumentSet);
+            instrumentList.push(instrumentSet);
+            connectionList.push(connectionModel);
+          }
+
+          let samplerElement = document.createElement('apc-sequencer');
           samplerElement.instrumentList = instrumentList;
 
           for (let i = 0; i < numChannels; i++) {
