@@ -4,7 +4,12 @@
   <template>
     <style>
       :host {
-        display: block;
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        font-size: 12px;
+      }
+      .grainulator {
         width: 200px;
         border: 1px solid black;
       }
@@ -22,6 +27,10 @@
         min-height: 20px;
         height: 20px;
         margin: 10px 0;
+        line-height: 30px;
+      }
+      .grainulator-row--active {
+        background-color: #ccc;
       }
       .grainulator-button {
         width: 60px;
@@ -30,10 +39,17 @@
       label {
         width: 50%;
       }
+
+      .grainulator__param-box {
+        display: none;
+      }
+      .grainulator__param-box--active {
+        display: block;
+      }
     </style>
 
     <div class="grainulator">
-      <div class="grainulator-header">Grainulator Name</div>
+      <div class="grainulator-header" id="header">Grainulator Name</div>
 
       <div class="grainulator-row">
         <div class="grainulator-button">
@@ -41,7 +57,7 @@
         </div>
       </div>
 
-      <div class="grainulator-row">
+      <div class="grainulator-row" value="position">
         <label>Position</label>
         <slider-horizontal
           slider-value={{position}}
@@ -49,7 +65,7 @@
         </slider-horizontal>
       </div>
 
-      <div class="grainulator-row">
+      <div class="grainulator-row" value="spread">
         <label>Spread</label>
         <slider-horizontal
           slider-value={{spread}}
@@ -57,7 +73,7 @@
         </slider-horizontal>
       </div>
 
-      <div class="grainulator-row">
+      <div class="grainulator-row" value="loopTime">
         <label>Loop Time</label>
         <slider-horizontal
           slider-value={{loopTime}}
@@ -65,15 +81,15 @@
         </slider-horizontal>
       </div>
 
-      <div class="grainulator-row">
-        <label>Num Voices</label>
+      <div class="grainulator-row" value="numVoices">
+        <label>Num Voice</label>
         <slider-horizontal
           slider-value={{numVoices}}
           lower-bound="1" upper-bound="6">
         </slider-horizontal>
       </div>
 
-      <div class="grainulator-row">
+      <div class="grainulator-row" value="pitch">
         <label>Pitch</label>
         <slider-horizontal
           slider-value={{pitch}}
@@ -83,6 +99,9 @@
 
     </div>
 
+    <div class="grainulator__param-box" id="paramBox">
+      <parameter-sequencer parameterized={{parametized}}></parameter-sequencer>
+    </div>
 
   </template>
 
@@ -121,12 +140,41 @@
             }
           };
 
+          this.listeners = {};
+
         }
 
         ready() {}
         attached() {
           this.isOn = false;
+          this.paramBoxIsShowing = false;
           this.buttonModel = buildButtonModel.call(this);
+
+          //TODO: change headers into element, that couples with param box
+          this.$.header.addEventListener('click', (event) => {
+            this.$.paramBox.classList.toggle('grainulator__param-box--active');
+            this.$$('parameter-sequencer').resetBoundingClientRect();
+          }, false);
+
+          let paramRows = this.getElementsByClassName('grainulator-row');
+          this.parameters = Array.prototype.slice.call(paramRows);
+          this.parameters.forEach((paramRow, index) => {
+            let paramValue = paramRow.getAttribute('value');
+            if (paramValue) {
+              paramRow.addEventListener('mousedown', (event) => {
+                this._setActiveParamRow(paramRow);
+              }, false);
+            }
+          });
+
+          this.parametized = {
+            position: this.position,
+            spread: this.spread,
+            loopTime: this.loopTime,
+            numVoices: this.numVoices,
+            pitch: this.pitch
+          }
+
         }
         detached() {}
         attributeChanged() {}
@@ -146,6 +194,18 @@
           }
 
         }
+
+        _setActiveParamRow (activeRow) {
+          this.parameters.forEach((paramRow) => {
+            if (paramRow === activeRow) {
+              paramRow.classList.add('grainulator-row--active');
+            }
+            else {
+              paramRow.classList.remove('grainulator-row--active');
+            }
+          });
+        }
+
       }
       Polymer(CustomGrainulator);
 

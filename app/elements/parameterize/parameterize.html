@@ -1,0 +1,80 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="parameter-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 200px;
+        border: 1px solid black;
+      }
+      .property-row {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+
+        height: 40px;
+        line-height: 40px;
+      }
+      .property-row__label {
+        width: 30%;
+      }
+      .property-row__slider-field {
+        width: 68%;
+        height: 85%;
+      }
+    </style>
+
+    <template is="dom-repeat" items="[[propertyList]]" as="propertyLabel">
+      <div class="property-row">
+        <label class="property-row__label">[[propertyLabel]]</label>
+        <div class="property-row__slider-field">
+          <slider-field-vertical>
+          </slider-field-vertical>
+        </div>
+      </div>
+    </template>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class Parameterize {
+
+        beforeRegister() {
+          this.is = 'parameter-sequencer';
+
+          this.properties = {
+            parameterized: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {
+          this.propertyList = Object.keys(this.parameterized);
+        }
+        detached() {}
+        attributeChanged() {}
+
+        resetBoundingClientRect () {
+          this.$$('property-row__slider-field')
+          
+          Array.prototype.slice.call(this.getElementsByTagName('slider-field-vertical'))
+            .forEach(sliderField => sliderField.resetBoundingClientRect());
+        }
+
+      }
+      Polymer(Parameterize);
+    })();
+
+  </script>
+
+</dom-module>

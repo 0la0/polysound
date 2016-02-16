@@ -1,0 +1,114 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="slider-field-vertical">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 100%;
+        border: 2px solid black;
+        cursor: default;
+        background-color: #efefef;
+      }
+      canvas {
+        width: 100%;
+        height: 100%;
+      }
+
+    </style>
+
+    <canvas></canvas>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class SliderField {
+
+        beforeRegister() {
+          this.is = 'slider-field-vertical';
+
+          this.properties = {
+            numSteps: {
+              type: Number,
+              value: 16
+            }
+          };
+
+          this.listeners = {
+            'down': '_userEvent',
+            'track': '_userEvent'
+          };
+
+        }
+
+        ready() {
+          this.tracker = this.$$('#tracker');
+          this.valueRange = this.upperBound - this.lowerBound;
+        }
+
+        attached() {
+          this.cvs = this.$$('canvas');
+          this.g2d = this.cvs.getContext('2d');
+          this.g2d.fillStyle = '#333';
+          this.values = Array(this.numSteps).fill(0.5); //TODO: fill with poperty value
+          this.resetBoundingClientRect();
+        }
+        detached() {}
+        attributeChanged() {}
+
+        resetBoundingClientRect () {
+          this.boundingClientRect = this.getBoundingClientRect();
+          this.stepWidth = this.cvs.width / this.numSteps;
+          if (this.g2d) {
+            this.g2d.width = this.cvs.width;
+            this.g2d.height = this.cvs.height;
+          }
+          this._renderAllBuckets();
+        }
+
+        _userEvent (event) {
+          let normalizedPositionX = event.detail.sourceEvent.pageX - this.boundingClientRect.left;
+          let normalX = normalizedPositionX / this.boundingClientRect.width;
+          normalX = Math.max(0, Math.min(normalX, 1));
+
+          let normalizedPositionY = event.detail.sourceEvent.pageY - this.boundingClientRect.top;
+          let normalY = normalizedPositionY / this.boundingClientRect.height;
+          normalY = Math.max(0, Math.min(normalY, 1));
+
+          let stepBucket = Math.floor(normalX * this.numSteps);
+          this._renderBucket(stepBucket, normalY, normalX);
+        }
+
+        _renderBucket (step, value, normalX) {
+          console.log('drawing step:', step);
+          let positionX = (step / this.numSteps) * this.g2d.width;
+          let previousValue = this.values[step];
+          this.values[step] = value;
+
+          let previousY = previousValue * this.g2d.height;
+          let currentY = value * this.g2d.height;
+
+          this.g2d.clearRect(positionX, previousY - 1, this.stepWidth, 7);
+          this.g2d.fillRect(positionX, currentY, this.stepWidth, 5);
+        }
+
+        _renderAllBuckets () {
+          this.g2d.clearRect(0, 0, this.g2d.width, this.g2d.height);
+          this.values.forEach((value, index) => {
+            let x = index * this.numSteps;
+            let y = value * this.g2d.height;
+            this.g2d.fillRect(x, y, this.stepWidth, 5);
+          });
+        }
+
+      }
+      Polymer(SliderField);
+    })();
+  </script>
+
+</dom-module>
