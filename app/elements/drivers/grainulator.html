@@ -29,9 +29,6 @@
         margin: 10px 0;
         line-height: 30px;
       }
-      .grainulator-row--active {
-        background-color: #ccc;
-      }
       .grainulator-button {
         width: 60px;
         height: 30px;
@@ -39,7 +36,6 @@
       label {
         width: 50%;
       }
-
       .grainulator__param-box {
         display: none;
       }
@@ -120,28 +116,32 @@
             },
             position: {
               type: Number,
-              value: 0.1
+              value: 0.1,
+              notify: true
             },
             spread: {
               type: Number,
-              value: 0
+              value: 0,
+              notify: true
             },
             loopTime: {
               type: Number,
-              value: 0.5
+              value: 0.5,
+              notify: true
             },
             numVoices: {
               type: Number,
-              value: 1
+              value: 1,
+              notify: true
             },
             pitch: {
               type: Number,
-              value: 0
+              value: 0,
+              notify: true
             }
           };
 
           this.listeners = {};
-
         }
 
         ready() {}
@@ -156,28 +156,24 @@
             this.$$('parameter-sequencer').resetBoundingClientRect();
           }, false);
 
-          let paramRows = this.getElementsByClassName('grainulator-row');
-          this.parameters = Array.prototype.slice.call(paramRows);
-          this.parameters.forEach((paramRow, index) => {
-            let paramValue = paramRow.getAttribute('value');
-            if (paramValue) {
-              paramRow.addEventListener('mousedown', (event) => {
-                this._setActiveParamRow(paramRow);
-              }, false);
-            }
-          });
-
-          this.parametized = {
-            position: this.position,
-            spread: this.spread,
-            loopTime: this.loopTime,
-            numVoices: this.numVoices,
-            pitch: this.pitch
-          }
-
+          this.parametized = [
+            this.position,
+            this.spread,
+            this.loopTime,
+            this.numVoices,
+            this.pitch
+          ];
+          //this.linkPaths(this.position, this.parametized[0]);
+          this._printPosition();
         }
         detached() {}
         attributeChanged() {}
+
+        _printPosition () {
+          console.log('grain position:', this.position);
+          console.log('paramValue:', this.parametized[0]);
+          setTimeout(this._printPosition.bind(this), 1000);
+        }
 
         _grainLoop () {
           this.instrumentSet.forEach((instrument) => {
@@ -193,17 +189,6 @@
             setTimeout(this._grainLoop.bind(this), timeOut);
           }
 
-        }
-
-        _setActiveParamRow (activeRow) {
-          this.parameters.forEach((paramRow) => {
-            if (paramRow === activeRow) {
-              paramRow.classList.add('grainulator-row--active');
-            }
-            else {
-              paramRow.classList.remove('grainulator-row--active');
-            }
-          });
         }
 
       }

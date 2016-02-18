@@ -36,6 +36,10 @@
             numSteps: {
               type: Number,
               value: 16
+            },
+            boundValue: {
+              type: Number,
+              notify: true
             }
           };
 
@@ -55,8 +59,11 @@
           this.cvs = this.$$('canvas');
           this.g2d = this.cvs.getContext('2d');
           this.g2d.fillStyle = '#333';
-          this.values = Array(this.numSteps).fill(0.5); //TODO: fill with poperty value
+          this.values = Array(this.numSteps).fill(this.boundValue); //TODO: fill with poperty value
           this.resetBoundingClientRect();
+
+          this.schedulable = buildSchedulable.call(this);
+          app.scheduler.register(this.schedulable);
         }
         detached() {}
         attributeChanged() {}
@@ -85,7 +92,6 @@
         }
 
         _renderBucket (step, value, normalX) {
-          console.log('drawing step:', step);
           let positionX = (step / this.numSteps) * this.g2d.width;
           let previousValue = this.values[step];
           this.values[step] = value;
@@ -93,8 +99,8 @@
           let previousY = previousValue * this.g2d.height;
           let currentY = value * this.g2d.height;
 
-          this.g2d.clearRect(positionX, previousY - 1, this.stepWidth, 7);
-          this.g2d.fillRect(positionX, currentY, this.stepWidth, 5);
+          this.g2d.clearRect(positionX, previousY - 1, this.stepWidth, 9);
+          this.g2d.fillRect(positionX, currentY, this.stepWidth, 7);
         }
 
         _renderAllBuckets () {
@@ -102,12 +108,42 @@
           this.values.forEach((value, index) => {
             let x = index * this.numSteps;
             let y = value * this.g2d.height;
-            this.g2d.fillRect(x, y, this.stepWidth, 5);
+            this.g2d.fillRect(x, y, this.stepWidth, 7);
           });
+        }
+
+        _renderStep (step) {
+          this.g2d.clearRect(0, 0, this.g2d.width, this.g2d.height);
+          this.values.forEach((value, index) => {
+            let x = index * this.numSteps;
+            let y = value * this.g2d.height;
+            this.g2d.fillRect(x, y, this.stepWidth, 7);
+          });
+
+          let positionX = (step / this.numSteps) * this.g2d.width;
+          this.g2d.fillRect(positionX, 0, this.stepWidth, this.g2d.height);
+        }
+
+        _updateBoundValue (step) {
+          this.boundValue = this.values[step];
+          console.log('setting bound value to:', this.boundValue);
         }
 
       }
       Polymer(SliderField);
+
+      function buildSchedulable () {
+        return {
+          processTick: (beatNumber, time) => {},
+          render: (beatNumber, lastBeatNumber) => {
+            this._updateBoundValue(beatNumber);
+            this._renderStep(beatNumber);
+          },
+          start: () => {},
+          stop: () => {}
+        }
+      }
+
     })();
   </script>
 

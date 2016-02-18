@@ -27,12 +27,11 @@
       }
     </style>
 
-    <template is="dom-repeat" items="[[propertyList]]" as="propertyLabel">
+    <template is="dom-repeat" items="{{parameterized}}" as="item">
       <div class="property-row">
-        <label class="property-row__label">[[propertyLabel]]</label>
+        <label class="property-row__label"></label>
         <div class="property-row__slider-field">
-          <slider-field-vertical>
-          </slider-field-vertical>
+          <slider-field-vertical bound-value="{{item}}"></slider-field-vertical>
         </div>
       </div>
     </template>
@@ -50,7 +49,8 @@
 
           this.properties = {
             parameterized: {
-              type: Object
+              type: Object,
+              notify: true
             }
           };
 
@@ -59,22 +59,27 @@
 
         ready() {}
         attached() {
-          this.propertyList = Object.keys(this.parameterized);
+          this._printPosition();
         }
         detached() {}
         attributeChanged() {}
 
         resetBoundingClientRect () {
-          this.$$('property-row__slider-field')
-          
           Array.prototype.slice.call(this.getElementsByTagName('slider-field-vertical'))
             .forEach(sliderField => sliderField.resetBoundingClientRect());
         }
 
+        _printPosition () {
+          console.log('position:', this.parameterized[0]);
+          setTimeout(() => {
+              this._printPosition();
+          }, 1000);
+        }
+
       }
       Polymer(Parameterize);
-    })();
 
+    })();
   </script>
 
 </dom-module>
