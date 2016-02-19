@@ -64,6 +64,8 @@
 
           this.schedulable = buildSchedulable.call(this);
           app.scheduler.register(this.schedulable);
+
+          this.renderHeight = 7;
         }
         detached() {}
         attributeChanged() {}
@@ -99,8 +101,8 @@
           let previousY = previousValue * this.g2d.height;
           let currentY = value * this.g2d.height;
 
-          this.g2d.clearRect(positionX, previousY - 1, this.stepWidth, 9);
-          this.g2d.fillRect(positionX, currentY, this.stepWidth, 7);
+          this.g2d.clearRect(positionX, previousY - 1, this.stepWidth, this.renderHeight + 2);
+          this.g2d.fillRect(positionX, currentY, this.stepWidth, this.renderHeight);
         }
 
         _renderAllBuckets () {
@@ -108,7 +110,7 @@
           this.values.forEach((value, index) => {
             let x = index * this.numSteps;
             let y = value * this.g2d.height;
-            this.g2d.fillRect(x, y, this.stepWidth, 7);
+            this.g2d.fillRect(x, y, this.stepWidth, this.renderHeight);
           });
         }
 
@@ -117,7 +119,7 @@
           this.values.forEach((value, index) => {
             let x = index * this.numSteps;
             let y = value * this.g2d.height;
-            this.g2d.fillRect(x, y, this.stepWidth, 7);
+            this.g2d.fillRect(x, y, this.stepWidth, this.renderHeight);
           });
 
           let positionX = (step / this.numSteps) * this.g2d.width;
@@ -126,7 +128,6 @@
 
         _updateBoundValue (step) {
           this.boundValue = this.values[step];
-          console.log('setting bound value to:', this.boundValue);
         }
 
       }

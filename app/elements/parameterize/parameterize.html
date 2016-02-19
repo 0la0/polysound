@@ -29,9 +29,9 @@
 
     <template is="dom-repeat" items="{{parameterized}}" as="item">
       <div class="property-row">
-        <label class="property-row__label"></label>
+        <label class="property-row__label">{{item.label}}</label>
         <div class="property-row__slider-field">
-          <slider-field-vertical bound-value="{{item}}"></slider-field-vertical>
+          <slider-field-vertical bound-value="{{item.value}}"></slider-field-vertical>
         </div>
       </div>
     </template>
@@ -58,22 +58,13 @@
         }
 
         ready() {}
-        attached() {
-          this._printPosition();
-        }
+        attached() {}
         detached() {}
         attributeChanged() {}
 
         resetBoundingClientRect () {
           Array.prototype.slice.call(this.getElementsByTagName('slider-field-vertical'))
             .forEach(sliderField => sliderField.resetBoundingClientRect());
-        }
-
-        _printPosition () {
-          console.log('position:', this.parameterized[0]);
-          setTimeout(() => {
-              this._printPosition();
-          }, 1000);
         }
 
       }

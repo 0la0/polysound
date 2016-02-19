@@ -53,15 +53,29 @@
         </div>
       </div>
 
-      <div class="grainulator-row" value="position">
+      <template is="dom-repeat" items="{{objectModel}}" as="item">
+
+        <div class="grainulator-row" value="position">
+          <label>{{item.label}}</label>
+          <slider-horizontal
+            slider-value="{{item.value}}"
+            lower-bound="{{item.lb}}" upper-bound="{{item.ub}}">
+          </slider-horizontal>
+        </div>
+
+      </template>
+
+
+
+      <!-- <div class="grainulator-row" value="position">
         <label>Position</label>
         <slider-horizontal
           slider-value={{position}}
           lower-bound="0" upper-bound="1">
         </slider-horizontal>
-      </div>
+      </div> -->
 
-      <div class="grainulator-row" value="spread">
+      <!-- <div class="grainulator-row" value="spread">
         <label>Spread</label>
         <slider-horizontal
           slider-value={{spread}}
@@ -91,12 +105,12 @@
           slider-value={{pitch}}
           lower-bound="-12" upper-bound="12">
         </slider-horizontal>
-      </div>
+      </div> -->
 
     </div>
 
     <div class="grainulator__param-box" id="paramBox">
-      <parameter-sequencer parameterized={{parametized}}></parameter-sequencer>
+      <parameter-sequencer parameterized={{objectModel}}></parameter-sequencer>
     </div>
 
   </template>
@@ -114,29 +128,8 @@
             instrumentSet: {
               type: Object
             },
-            position: {
-              type: Number,
-              value: 0.1,
-              notify: true
-            },
-            spread: {
-              type: Number,
-              value: 0,
-              notify: true
-            },
-            loopTime: {
-              type: Number,
-              value: 0.5,
-              notify: true
-            },
-            numVoices: {
-              type: Number,
-              value: 1,
-              notify: true
-            },
-            pitch: {
-              type: Number,
-              value: 0,
+            objectModel: {
+              type: Array,
               notify: true
             }
           };
@@ -156,36 +149,31 @@
             this.$$('parameter-sequencer').resetBoundingClientRect();
           }, false);
 
-          this.parametized = [
-            this.position,
-            this.spread,
-            this.loopTime,
-            this.numVoices,
-            this.pitch
-          ];
-          //this.linkPaths(this.position, this.parametized[0]);
-          this._printPosition();
+          this.objectModel = buildGrainulatorModel();
         }
         detached() {}
         attributeChanged() {}
 
-        _printPosition () {
-          console.log('grain position:', this.position);
-          console.log('paramValue:', this.parametized[0]);
-          setTimeout(this._printPosition.bind(this), 1000);
-        }
-
         _grainLoop () {
+          // this.instrumentSet.forEach((instrument) => {
+          //   for (let i = 0; i < this.numVoices; i++) {
+          //     let position = getPosition(this.position, instrument.getDuration(), this.spread);
+          //     let pitch = Math.round(this.pitch);
+          //     instrument.play(pitch, 0, position);
+          //   }
+          // });
+
           this.instrumentSet.forEach((instrument) => {
-            for (let i = 0; i < this.numVoices; i++) {
-              let position = getPosition(this.position, instrument.getDuration(), this.spread);
-              let pitch = Math.round(this.pitch);
+            for (let i = 0; i < this.objectModel[3].value; i++) {
+              let position = getPosition(this.objectModel[0].value, instrument.getDuration(), this.objectModel[1].value);
+              let pitch = Math.round(this.objectModel[4].value);
               instrument.play(pitch, 0, position);
             }
           });
 
           if (this.isOn) {
-            let timeOut = this.loopTime * 1000;
+            //let timeOut = this.loopTime * 1000;
+            let timeOut = this.objectModel[2].value * 1000;
             setTimeout(this._grainLoop.bind(this), timeOut);
           }
 
@@ -213,6 +201,41 @@
             }
           }
         };
+      }
+
+      function buildGrainulatorModel () {
+        return [
+          {
+            label: 'position',
+            value: 0.1,
+            lb: 0,
+            ub: 1
+          },
+          {
+            label: 'spread',
+            value: 0,
+            lb: 0,
+            ub: 1
+          },
+          {
+            label: 'loopTime',
+            value: 0.5,
+            lb: 0.01,
+            ub: 1
+          },
+          {
+            label: 'numVoices',
+            value: 1,
+            lb: 1,
+            ub: 6
+          },
+          {
+            label: 'pitch',
+            value: 0,
+            lb: -12,
+            ub: 12
+          }
+        ];
       }
 
     })();
