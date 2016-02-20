@@ -40,6 +40,8 @@ a, a:visited, a:hover, a:active {
   flex-direction: row;
   flex-wrap: nowrap;
   justify-content: flex-start;
+
+  background-color: #ccc;
 }
 
 .effects-line {
