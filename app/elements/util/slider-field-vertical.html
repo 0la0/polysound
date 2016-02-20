@@ -41,7 +41,10 @@
         <simple-button button-model="{{buttonModel}}"></simple-button>
       </div>
       <canvas></canvas>
-      <textarea type="text" class="parameter-input"></textarea>
+      <textarea
+        class="parameter-input"
+        autocomplete="off" autocorrect="off"
+        autocapitalize="off" spellcheck="false"></textarea>
     </div>
 
   </template>
@@ -90,7 +93,6 @@
           this.resetBoundingClientRect();
 
           this.schedulable = buildSchedulable.call(this);
-          app.scheduler.register(this.schedulable);
 
           this.renderHeight = 7;
 
@@ -180,7 +182,6 @@
         return {
           processTick: (beatNumber, time) => {},
           render: (beatNumber, lastBeatNumber) => {
-            if (!this.isActive) {return;}
             this._updateBoundValue(beatNumber);
             this._renderStep(beatNumber);
             if (beatNumber === this.numSteps - 1) {
@@ -207,6 +208,9 @@
         return {
           callback: (isActive) => {
             this.isActive = isActive;
+            this.isActive ?
+              app.scheduler.register(this.schedulable) :
+              app.scheduler.deregister(this.schedulable);
           }
         };
       }
