@@ -14,6 +14,9 @@
         background-color: white;
         border: 1px solid black;
       }
+      .dropdown-element:hover {
+        background-color: #ccc;
+      }
     </style>
 
     <template is="dom-repeat" items="{{listData}}" as="item" id="dropdownlist">
@@ -33,7 +36,8 @@
 
           this.properties = {
             listData: {
-              type: Array
+              type: Array,
+              notify: true
             },
             callbackHandler: {
               type: Object
@@ -41,7 +45,7 @@
           };
 
           this.listeners = {
-            down: '_onDown'
+            tap: '_onTap'
           };
 
         }
@@ -51,7 +55,7 @@
         detached() {}
         attributeChanged() {}
 
-        _onDown (event) {
+        _onTap (event) {
           let srcElement = event.detail.sourceEvent.srcElement;
           if (srcElement.id) {
             this.callbackHandler.execute(srcElement.id);

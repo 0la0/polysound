@@ -1,0 +1,92 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="dropdown-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        font-size: 12px;
+      }
+      label {
+        background-color: #eee;
+        border: 1px solid black;
+      }
+      .dropdown {
+        display: none;
+      }
+      .dropdown--active {
+        display: block;
+      }
+    </style>
+
+    <label id="dropdownLabel">[[label]]</label>
+    <dropdown-list
+      class="dropdown"
+      list-data="[[listData]]"
+      callback-handler="[[dropdownCallback]]">
+    </dropdown-list>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class DropdownElement {
+
+        beforeRegister() {
+          this.is = 'dropdown-element';
+
+          this.properties = {
+            listData: {
+              type: Array
+            },
+            callbackHandler: {
+              type: Object
+            },
+            label: {
+              type: String,
+              value: 'Label'
+            }
+          };
+
+          this.listeners = {
+            tap: '_onTap'
+          };
+
+        }
+
+        ready() {}
+        attached() {
+          this.dropdownList = this.$$('dropdown-list');
+          this.dropdownIsShown = false;
+
+          this.dropdownCallback = {
+            execute: (selectionString) => {
+              this.dropdownIsShown = false;
+              this.dropdownList.classList.remove('dropdown--active');
+              this.callbackHandler.execute(selectionString);
+            }
+          };
+
+        }
+        detached() {}
+        attributeChanged() {}
+
+        _onTap (event) {
+          if (event.detail.sourceEvent.srcElement !== this.$.dropdownLabel) {
+            return;
+          }
+          this.dropdownIsShown = !this.dropdownIsShown;
+          this.dropdownIsShown ?
+            this.dropdownList.classList.add('dropdown--active') :
+            this.dropdownList.classList.remove('dropdown--active');
+        }
+      }
+
+      Polymer(DropdownElement);
+    })();
+  </script>
+
+</dom-module>

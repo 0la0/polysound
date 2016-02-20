@@ -7,26 +7,17 @@
         display: block;
         position: relative;
       }
-      .sampler-loader {}
-      .sampler-loader__label {
-        line-height: 36px;
-        font-size: 12px;
-      }
-      .sampler-loader__dropdown {
-        display: none;
-      }
-      .sampler-loader__dropdown--active {
-        display: block;
+      .sampler-loader {
+        margin-top: 10px;
       }
     </style>
 
     <div class="samper-loader">
-      <p class="sampler-loader__label">{{activeSampleLabel}}</p>
-      <dropdown-list
-        class="sampler-loader__dropdown"
+      <dropdown-element
         list-data="[[listData]]"
-        callback-handler="[[callbackHandler]]">
-      <dropdown-list>
+        callback-handler="[[callbackHandler]]"
+        label="[[activeSampleLabel]]">
+      </dropdown-element>
     </div>
 
 
@@ -55,8 +46,7 @@
 
         ready() {}
         attached() {
-          this.dropdownIsShown = false;
-          this.dropdownList = this.$$('dropdown-list');
+          this.dropdownElement = this.$$('dropdown-element');
           this.activeSampleLabel = 'Load Sample';
 
           this.callbackHandler = {
@@ -70,15 +60,10 @@
         attributeChanged() {}
 
         _handleClick (event) {
-          this.dropdownIsShown = !this.dropdownIsShown;
-
-          if (this.dropdownIsShown) {
+          if (event.detail.sourceEvent.srcElement !== this.$.dropdownElement) {
             //rehydrate list
             this.listData = Array.from(app.audio.sampleMap.keys());
-            this.dropdownList.classList.add('sampler-loader__dropdown--active');
-          }
-          else {
-            this.dropdownList.classList.remove('sampler-loader__dropdown--active');
+            return;
           }
         }
       }

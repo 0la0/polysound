@@ -6,18 +6,15 @@
       :host {
         display: block;
         position: relative;
-      }
-      .factory-container {
-        border: 1px solid black;
+        width: 70px;
       }
     </style>
 
-    <div class="factory-container">
-      <div class="factory-option" value="sequencer">sequencer</div>
-      <div class="factory-option" value="multiSequencer">multi-sequencer</div>
-      <div class="factory-option" value="grainulator">gainulator</div>
-      <div class="factory-option" value="apcSequencer">apc-sequencer</div>
-    </div>
+    <dropdown-element
+      list-data="[[driverList]]"
+      callback-handler="[[callbackHandler]]"
+      label="Create Driver">
+    </dropdown-element>
 
   </template>
 
@@ -34,29 +31,43 @@
         beforeRegister() {
           this.is = 'driver-factory';
 
-          this.properties = {};
-
-          this.listeners = {
-            'tap': '_onTap'
+          this.properties = {
+            driverList: {
+              type: Array
+            }
           };
+
         }
 
         ready() {}
         attached() {
           this.driverContainer = Polymer.dom(this.parent).querySelector('#driver-container');
+
+          this.driverList = ['Sequencer', 'Multi Sequencer', 'Grainulator', 'APC Sequencer'];
+          this.listMap = {
+            'Sequencer': 'sequencer',
+            'Multi Sequencer': 'multiSequencer',
+            'Grainulator': 'grainulator',
+            'APC Sequencer': 'apcSequencer'
+          };
+
+          this.callbackHandler = {
+            execute: (selectionString) => {
+              let selectionValue = this.listMap[selectionString];
+              if (selectionValue) {
+                this._buildElement(selectionValue);
+              }
+            }
+          };
         }
         detached() {}
         attributeChanged() {}
 
-        _onTap (event) {
-          let targetElement = event.detail.sourceEvent.target
-          let targetValue = targetElement.getAttribute('value');
-          if (targetValue) {
-            let driverElement = document.createElement('driver-container');
-            driverElement.connectionOutput = app.connectionBusses.drivers;
-            driverElement.driverType = targetValue;
-            Polymer.dom(this.driverContainer).appendChild(driverElement);
-          }
+        _buildElement (selectionValue) {
+          let driverElement = document.createElement('driver-container');
+          driverElement.connectionOutput = app.connectionBusses.drivers;
+          driverElement.driverType = selectionValue;
+          Polymer.dom(this.driverContainer).appendChild(driverElement);
         }
 
       }
