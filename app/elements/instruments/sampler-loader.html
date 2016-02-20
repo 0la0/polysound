@@ -10,29 +10,23 @@
       .sampler-loader {}
       .sampler-loader__label {
         line-height: 36px;
+        font-size: 12px;
       }
       .sampler-loader__dropdown {
         display: none;
-        z-index: 0;
       }
       .sampler-loader__dropdown--active {
         display: block;
-        position: absolute;
-        z-index: 5;
-      }
-      .sampler-loader__dropdown-element {
-        background-color: white;
-        border: 1px solid black;
       }
     </style>
 
     <div class="samper-loader">
-      <p class="sampler-loader__label">load</p>
-      <div class="sampler-loader__dropdown" id="dropdown">
-        <template is="dom-repeat" items="{{samplerItems}}" as="sample">
-          <p class="sampler-loader__dropdown-element" id="{{sample}}"> {{sample}} </p>
-        </template>
-      </div>
+      <p class="sampler-loader__label">{{activeSampleLabel}}</p>
+      <dropdown-list
+        class="sampler-loader__dropdown"
+        list-data="[[listData]]"
+        callback-handler="[[callbackHandler]]">
+      <dropdown-list>
     </div>
 
 
@@ -62,26 +56,39 @@
         ready() {}
         attached() {
           this.dropdownIsShown = false;
+          this.dropdownList = this.$$('dropdown-list');
+          this.activeSampleLabel = 'Load Sample';
+
+          this.callbackHandler = {
+            execute: (selectionString) => {
+              this.parentEventHandler.newSample(selectionString);
+              this.activeSampleLabel = getSampleName(selectionString);
+            }
+          };
         }
         detached() {}
         attributeChanged() {}
 
         _handleClick (event) {
           this.dropdownIsShown = !this.dropdownIsShown;
+
           if (this.dropdownIsShown) {
-            this.samplerItems = Array.from(app.audio.sampleMap.keys());
-            this.$.dropdown.classList.add('sampler-loader__dropdown--active');
+            //rehydrate list
+            this.listData = Array.from(app.audio.sampleMap.keys());
+            this.dropdownList.classList.add('sampler-loader__dropdown--active');
           }
           else {
-            this.$.dropdown.classList.remove('sampler-loader__dropdown--active');
-            let srcElement = event.detail.sourceEvent.srcElement;
-            if (srcElement.id) {
-              this.parentEventHandler.newSample(srcElement.id);
-            }
+            this.dropdownList.classList.remove('sampler-loader__dropdown--active');
           }
         }
       }
       Polymer(SamplerLoader);
+
+      function getSampleName (originalName) {
+        let tokens = originalName.split('/');
+        let name = tokens[1] || originalName;
+        return name.split('.')[0];
+      }
 
     })();
   </script>
