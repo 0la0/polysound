@@ -19,19 +19,8 @@
         border-bottom: 1px solid black;
         margin-bottom: 6px;
       }
-      .delay-container__button-row {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: center;
-      }
-      .delay-button {
-        border: 1px solid grey;
-        text-align: center;
-        flex-grow: 1;
-      }
-      .delay-button--active {
-        background-color: #fff;
+      multi-select {
+        height: 20px;
       }
       slider-horizontal {
         height: 20px;
@@ -45,13 +34,14 @@
     </connector-input>
 
     <div class="delay-container">
+
       <p class="delay-container--header">Delay</p>
+
       <p>Quatization:</p>
-      <div class="delay-container__button-row" id="delayButtons">
-        <div class="delay-button" delay-value="0.5">0.5x</div>
-        <div class="delay-button" delay-value="1">1x</div>
-        <div class="delay-button" delay-value="2">2x</div>
-      </div>
+      <multi-select
+        select-model="{{multiSelectModel}}"
+        default-index="1">
+      </multi-select>
 
       <p>Feedback:</p>
       <slider-horizontal
@@ -80,10 +70,6 @@
 
       class SimpleDelay {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'simple-delay';
 
@@ -103,42 +89,36 @@
         }
 
         ready() {}
-
         attached() {
-          var delayButtons = this.getElementsByClassName('delay-button');
-          delayButtons = Array.prototype.slice.call(delayButtons);
-
-          this.$.delayButtons.addEventListener('click', (event) => {
-            let targetElement = event.srcElement;
-            if (delayButtons.some(btn => btn === targetElement)) {
-              this._setQuatization(120, targetElement, delayButtons);
-            }
-          }, false);
-
-          //set initial value:
-          this._setQuatization(120, delayButtons[1], delayButtons);
+          this.multiSelectModel = buildMultiSelectModel.call(this);
         }
-
         detached() {}
-
         attributeChanged() {}
-
-        _setQuatization (tempo, targetElement, delayButtons) {
-          let delayValue = targetElement.getAttribute('delay-value');
-          this.delayModel.setQuatization(tempo, delayValue);
-
-          delayButtons.forEach((delayButton) => {
-            if (delayButton === targetElement) {
-              delayButton.classList.add('delay-button--active');
-            }
-            else {
-              delayButton.classList.remove('delay-button--active');
-            }
-          });
-        }
-
       }
       Polymer(SimpleDelay);
+
+      function buildMultiSelectModel () {
+        return {
+          list: [
+            {
+              display: '0.5x',
+              value: '0.5'
+            },
+            {
+              display: '1x',
+              value: '1'
+            },
+            {
+              display: '2x',
+              value: '2'
+            }
+          ],
+          callback: (delayValue) => {
+            //TODO: sync with actual tempo
+            this.delayModel.setQuatization(120, delayValue);
+          }
+        }
+      }
 
     })();
   </script>

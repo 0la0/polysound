@@ -32,22 +32,9 @@
       }
 
       .synth-right {}
-      .synth-selection {
-        display: flex;
-        flex-flow: row;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        height: 45px;
+      multi-select {
+        height: 35px;
       }
-      .synth-selector {
-        width: 30px;
-        border: 1px solid #666;
-        margin: 0;
-      }
-      .synth-selector--acive {
-        background: white;
-      }
-
     </style>
 
     <driver-input
@@ -68,12 +55,8 @@
         </slider-horizontal>
       </section>
       <section class="synth-right">
-        <section class="synth-selection">
-          <p value="SINE" class="synth-selector synth-selector--acive">sin</p>
-          <p value="SQUARE" class="synth-selector">squ</p>
-          <p value="SAWTOOTH" class="synth-selector">saw</p>
-          <p value="TRIANGLE" class="synth-selector">tri</p>
-        </section>
+        <multi-select select-model="{{multiSelectModel}}">
+        </multi-select>
         <simple-adsr adsr-model="{{synthModel.adsr}}"></simple-adsr>
       </section>
     </section>
@@ -120,9 +103,8 @@
 
         ready() {}
         attached() {
-          let oscilatorNodes = this.getElementsByClassName('synth-selector');
-          this.oscilatorSelectors = Array.prototype.slice.call(oscilatorNodes);
           this.buttonModel = buildButtonModel.call(this);
+          this.multiSelectModel = buildMultiSelectModel.call(this);
         }
         detached() {}
         attributeChanged() {}
@@ -131,18 +113,6 @@
           if (event.target === this.$.triggerButton) {
             this.synthIsOn = !this.synthIsOn;
             this._trigger(this.synthIsOn);
-          }
-          else if (this.oscilatorSelectors.some(element => element === event.target)) {
-            this.oscilatorSelectors.forEach((selector) => {
-              if (selector === event.target) {
-                Polymer.dom(selector).classList.add('synth-selector--acive');
-                let oscType = selector.getAttribute('value');
-                this.synthModel.setOscilator(oscType);
-              }
-              else {
-                Polymer.dom(selector).classList.remove('synth-selector--acive');
-              }
-            });
           }
         }
 
@@ -154,6 +124,32 @@
 
       }
       Polymer(SimpleSynth);
+
+      function buildMultiSelectModel () {
+        return {
+          list: [
+            {
+              display: 'sin',
+              value: 'SINE'
+            },
+            {
+              display: 'squ',
+              value: 'SQUARE'
+            },
+            {
+              display: 'saw',
+              value: 'SAWTOOTH'
+            },
+            {
+              display: 'tri',
+              value: 'TRIANGLE'
+            }
+          ],
+          callback: (selectionString) => {
+            this.synthModel.setOscilator(selectionString);
+          }
+        }
+      }
 
       function buildButtonModel () {
         return {
