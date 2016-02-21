@@ -48,14 +48,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <tempo-controller metronome="{{audio.metronome}}"></tempo-controller>
     </header>
 
-    <section id="main-area">
+    <section class="main-section">
 
-      <section id="left">
+      <section class="main-section__left">
 
         <!-- TOP ROW: INSTRUMENT DRIVERS -->
         <div class="horizontal-line">
           <driver-factory></driver-factory>
-          <div class="horizontal-line" id="driver-container">
+          <div class="horizontal-line driver-line" id="driver-container">
             <multi-sampler
                 sampler-model={{sampler}}
                 connection-input={{connectionBusses.drivers}}
@@ -108,7 +108,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <connector-bus bus-model="{{connectionBusses.effects2}}"></connector-bus>
 
         <!-- FIFTH ROW: MASTER OUTS -->
-        <div class="horizontal-line effects-line">
+        <div class="horizontal-line effects-line output-line">
           <template is="dom-repeat" items="{{audio.lastEqualizerList}}" as="equalizer">
             <equalizer-three
               equalizer-model={{equalizer}}
@@ -119,8 +119,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       </section>
 
-      <section id="right">
-      </section>
+      <section class="main-section__right"></section>
 
     </section>
 

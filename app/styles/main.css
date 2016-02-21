@@ -35,6 +35,22 @@ a, a:visited, a:hover, a:active {
   text-decoration: none;
 }
 
+header {
+  width: 100%;
+  border-bottom: 1px solid black;
+  background: #666;
+  margin-bottom: 10px;
+}
+
+.main-section {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+}
+.main-section__left {}
+.main-section__right {}
+
 .horizontal-line {
   display: flex;
   flex-direction: row;
@@ -44,28 +60,19 @@ a, a:visited, a:hover, a:active {
   background-color: #ccc;
 }
 
-.effects-line {
-  height: 170px;
+.driver-line {
+  height: 287px;
 }
 
 .instrument-line {
   height: 115px;
 }
 
-header {
-  width: 100%;
-  border-bottom: 1px solid black;
-  background: #666;
-  margin-bottom: 10px;
+.effects-line {
+  height: 170px;
 }
 
-#driver-container {
-  height: 287px;
-}
-
-#main-area {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: flex-start;
+.output-line {
+  height: 170px;
+  padding-left: 95px;
 }

@@ -5,19 +5,16 @@
     <style>
       :host {
         display: block;
-      }
-      .factory-container {
-        border: 1px solid black;
+        width: 95px;
+        font-size: 12px;
       }
     </style>
 
-    <div class="factory-container">
-      <div class="factory-option" value="equalizer">equalizer</div>
-      <div class="factory-option" value="delay">delay</div>
-      <div class="factory-option" value="reverb">reverb</div>
-      <div class="factory-option" value="compressor">compressor</div>
-      <div class="factory-option" value="drone">drone filter</div>
-    </div>
+    <dropdown-element
+      list-data="[[effectList]]"
+      callback-handler="[[callbackHandler]]"
+      label="Create Effect">
+    </dropdown-element>
 
   </template>
 
@@ -45,28 +42,39 @@
             }
           };
 
-          this.listeners = {
-            'tap': '_onTap'
-          };
-
+          this.listeners = {};
         }
 
         ready() {}
         attached() {
           this.effectContainer = Polymer.dom(this.parent).querySelector('#' + this.effectContainer);
+
+          this.effectTable = {
+            'Equalizer': 'equalizer',
+            'Delay': 'delay',
+            'Reverb': 'reverb',
+            'Compressor': 'compressor',
+            'Drone Filter': 'drone'
+          };
+          this.effectList = Object.keys(this.effectTable);
+
+          this.callbackHandler = {
+            execute: (selectionString) => {
+              let selectionValue = this.effectTable[selectionString];
+              if (selectionValue) {
+                this._buildElement(selectionValue);
+              }
+            }
+          };
         }
         detached() {}
         attributeChanged() {}
 
-        _onTap (event) {
-          let targetElement = event.detail.sourceEvent.target
-          let targetValue = targetElement.getAttribute('value');
-          if (targetValue) {
-            let effectElement = ElementFactory[targetValue](this.factoryModel);
-            effectElement.connectionInput = this.connectionInput;
-            effectElement.connectionOutput = this.connectionOutput;
-            Polymer.dom(this.effectContainer).appendChild(effectElement);
-          }
+        _buildElement (selectionValue) {
+          let effectElement = ElementFactory[selectionValue](this.factoryModel);
+          effectElement.connectionInput = this.connectionInput;
+          effectElement.connectionOutput = this.connectionOutput;
+          Polymer.dom(this.effectContainer).appendChild(effectElement);
         }
 
       }
