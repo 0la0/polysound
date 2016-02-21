@@ -118,6 +118,11 @@
           this.multiSelectModel = buildMultiSelectModel.call(this);
 
           this.goalElementList = [null, null];
+
+          setTimeout(() => {
+            let trainingElements = this.getElementsByClassName('hillclimber__matrix-train');
+            this.trainingMatricies = Array.prototype.slice.call(trainingElements);
+          }, 0);
         }
 
         detached() {
@@ -127,6 +132,35 @@
 
         _newGoalTap (event) {
           this.push('goalElementList', null);
+        }
+
+        _startHillclimber () {
+          let goalStates = this.trainingMatricies.map((matrixElement) => {
+            return matrixElement.getModel();
+          });
+          this.hillclimber = new HillclimberDriver(goalStates);
+          this.searchMatrix.setModel(this.hillclimber.currentState);
+          this.goalMatrix.setModel(this.hillclimber.goalState);
+
+          app.scheduler.register(this.schedulable);
+          this.$.hillclimberSearch.classList.remove('hide-section');
+          this.$.hillclimberTrain.classList.add('hide-section');
+        }
+
+        _iterateHillclimber () {
+          this.currentFitnessValue = this.hillclimber.iterate();
+          this.searchMatrix.setModel(this.hillclimber.currentState);
+          if (this.currentFitnessValue <= 0) {
+            this.goalMatrix.setModel(this.hillclimber.goalState);
+          }
+        }
+
+        _stopHillclimber () {
+          app.scheduler.deregister(this.schedulable);
+          this.searchMatrix.stop();
+
+          this.$.hillclimberSearch.classList.add('hide-section');
+          this.$.hillclimberTrain.classList.remove('hide-section');
         }
       }
       Polymer(HillclimberElement);
@@ -144,12 +178,7 @@
             });
 
             if (beatNumber === 15) {
-              //iterateHillclimber();
-              this.currentFitnessValue = this.hillclimber.iterate();
-              this.searchMatrix.setModel(this.hillclimber.currentState);
-              if (this.currentFitnessValue <= 0) {
-                this.goalMatrix.setModel(this.hillclimber.goalState);
-              }
+              this._iterateHillclimber();
             }
           },
           render: (beatNumber, lastBeatNumber) => {
@@ -189,27 +218,10 @@
           ],
           callback: (selectionString) => {
             if (selectionString === 'SEARCH') {
-              let matrixElements = this.getElementsByClassName('hillclimber__matrix-train');
-              matrixElements = Array.prototype.slice.call(matrixElements);
-              let goalStates = matrixElements.map((matrixElement) => {
-                return matrixElement.getModel();
-              });
-
-              this.hillclimber = new HillclimberDriver(goalStates);
-              this.searchMatrix.setModel(this.hillclimber.currentState);
-              this.goalMatrix.setModel(this.hillclimber.goalState);
-
-
-              app.scheduler.register(this.schedulable);
-              this.$.hillclimberSearch.classList.remove('hide-section');
-              this.$.hillclimberTrain.classList.add('hide-section');
+              this._startHillclimber();
             }
             else if (selectionString === 'TRAIN') {
-              app.scheduler.deregister(this.schedulable);
-              this.searchMatrix.stop();
-
-              this.$.hillclimberSearch.classList.add('hide-section');
-              this.$.hillclimberTrain.classList.remove('hide-section');
+              this._stopHillclimber();
             }
           }
         }
@@ -224,22 +236,17 @@
 
         iterate () {
           let fitnessSum = getFitnessSum(this.currentState, this.goalState);
-          if (fitnessSum > 0) {
-            this._hillclimb();
-          }
-          else {
-            this._restart();
-          }
+          (fitnessSum > 0) ? this._hillclimb() : this._restart();
           return fitnessSum;
         }
 
         _hillclimb () {
-          //make this more immutable
-          this.currentState.forEach((currentRow, index) => {
+          this.currentState = this.currentState.map((currentRow, index) => {
             let rowFitness = getRowFitness(currentRow, this.goalState[index]);
             if (rowFitness.fitness > 0) {
               currentRow = generateSuccessor(currentRow, rowFitness);
             }
+            return currentRow;
           });
         }
 
@@ -255,7 +262,7 @@
 
       }
 
-      
+
       function generateRandomState (goalState) {
         let randomRestart = goalState.map((goalRow) => {
           return goalRow.map((item) => {
