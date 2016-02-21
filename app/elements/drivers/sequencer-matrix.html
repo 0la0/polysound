@@ -73,7 +73,7 @@
         <simple-button button-model="{{triggerButtonModel}}" id="sequencerTrigger"></simple-button>
       </div>
       <div class="sequencer-header">
-        <div class="sequencer-header__name">Sequencer Name</div>
+        <div class="sequencer-header__name">[[clipLabel]]</div>
         <div class="sequencer-header__toggle">
           <simple-button
             button-model="{{expandableButtonModel}}"
@@ -109,6 +109,10 @@
             },
             clipManager: {
               type: Object
+            },
+            clipLabel: {
+              type: String,
+              value: 'Sequencer Clip'
             }
           };
 
@@ -201,6 +205,26 @@
           this.sequencerMatrix[row][column] ?
             this.bodyElementMatrix[row][column].classList.add('sequencer-row__body-element--scheduled') :
             this.bodyElementMatrix[row][column].classList.remove('sequencer-row__body-element--scheduled');
+        }
+
+        getModel () {
+          return this.sequencerMatrix;
+        }
+
+        setModel (sequencerMatrix) {
+          this.set('sequencerMatrix')
+          this.sequencerMatrix = sequencerMatrix;
+          this.renderMatrix();
+        }
+
+        renderMatrix () {
+          this.sequencerMatrix.forEach((row, rowIndex) => {
+            row.forEach((element, columnIndex) => {
+              element ?
+                this.bodyElementMatrix[rowIndex][columnIndex].classList.add('sequencer-row__body-element--scheduled') :
+                this.bodyElementMatrix[rowIndex][columnIndex].classList.remove('sequencer-row__body-element--scheduled');
+            })
+          });
         }
 
       }

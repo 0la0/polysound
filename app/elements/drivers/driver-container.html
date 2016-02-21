@@ -78,6 +78,10 @@
             const NUM_CHANNELS = 5;
             driverElement = DriverFactory.createApcSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
           }
+          else if (this.driverType === 'hillclimber') {
+            const NUM_CHANNELS = 5;
+            driverElement = DriverFactory.createHillclimberSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
+          }
           Polymer.dom(parentContainer).appendChild(driverElement);
         }
         detached() {}
@@ -173,6 +177,29 @@
           Polymer.dom(driverOutputContainer).appendChild(driverOut);
 
           return grainElement;
+        }
+
+        static createHillclimberSequencer (numChannels, driverOutputContainer, connectionOutput) {
+          let instrumentList = [];
+          let connectionList = [];
+
+          for (let i = 0; i < numChannels; i++) {
+            let instrumentSet = new Set();
+            let connectionModel = createConnection(instrumentSet);
+            instrumentList.push(instrumentSet);
+            connectionList.push(connectionModel);
+          }
+
+          let samplerElement = document.createElement('hillclimber-sequencer');
+          samplerElement.instrumentList = instrumentList;
+
+          for (let i = 0; i < numChannels; i++) {
+            let driverOut = document.createElement('driver-output');
+            driverOut.driverModel = connectionList[i];
+            driverOut.connectionBus = connectionOutput;
+            Polymer.dom(driverOutputContainer).appendChild(driverOut);
+          }
+          return samplerElement;
         }
 
       }
