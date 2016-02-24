@@ -1,0 +1,236 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/midi.html">
+
+<dom-module id="launchpad-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="matrix-list">
+
+      <sequencer-matrix
+        class="matrix"
+        number-of-steps="8"
+        number-of-rows="8"
+        clip-manager="{{clipManager}}"
+        clip-label="Launchpad Clip">
+      </sequencer-matrix>
+
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class LaunchpadSequencer {
+
+        beforeRegister() {
+          this.is = 'launchpad-sequencer';
+
+          this.properties = {
+            instrumentList: {
+              type: Array
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {
+          this.width = 8;
+          this.isReset = true;
+          this.schedulable = buildSchedulable.call(this);
+          app.scheduler.register(this.schedulable);
+
+          let matrixNodeList = this.getElementsByClassName('matrix');
+          this.matrixList = Array.prototype.slice.call(matrixNodeList);
+          this.activeIndex;
+
+          this.apcDevice = buildMidiDevice.call(this, app.audio.midiDeviceFactory, this.matrixList);
+
+          this.clipManager = buildClipManager(this.matrixList, this.apcDevice, (activeIndex) => {
+            this.activeIndex = activeIndex;
+            this.isReset = true;
+          });
+
+          setTimeout(() => {
+            this.matrixList[0].setAsActive();
+          }, 0);
+        }
+
+        detached() {
+          app.scheduler.deregister(this.schedulable);
+        }
+        attributeChanged() {}
+      }
+      Polymer(LaunchpadSequencer);
+
+      function buildMidiDevice (midiDeviceFactory, matrixList) {
+        this.apcDevice = midiDeviceFactory.getDeviceByName('Launchpad Mini');
+
+        let Color = {
+          RED: 15,
+          GREEN: 60,
+          YELLOW: 62,
+          AMBER: 63
+        };
+
+        function buildMessageSender (outputDevice) {
+          return (command, status, note, velocity) => {
+            let messageObjectOn = {command: command, status: status, note: note, value: velocity};
+            outputDevice.send(getMessageFromObject(messageObjectOn));
+          };
+        }
+        window.sendMessage = buildMessageSender(this.apcDevice.output);
+
+        function renderColumn (outputDevice, index, columnData) {
+          for (let i = 0; i < 8; i++) {
+            let message = {
+              command: StatusMap.NOTE_ON,
+              status: 0,
+              note: i * 16 + index
+            };
+            (columnData[i]) ?
+              message.value = Color.RED :
+              message.value = Color.AMBER;
+            outputDevice.send(getMessageFromObject(message));
+          }
+        }
+
+        function clearColumn (outputDevice, index, columnData) {
+          for (let i = 0; i < 8; i++) {
+            let message = {
+              status: 0,
+              note: i * 16 + index
+            };
+            if (columnData[i]) {
+              message.command = StatusMap.NOTE_ON,
+              message.value = Color.GREEN
+            }
+            else {
+              message.command = StatusMap.NOTE_OFF,
+              message.value = 0
+            }
+            outputDevice.send(getMessageFromObject(message));
+          }
+        }
+
+        function processMatrixNote (message, activeMatrix, apcDevice) {
+          let noteValue = message.note;
+          let row = Math.floor(message.note / 16);
+          let column = message.note % 16;
+          if (message.value === 0) {
+            let columnData = activeMatrix.getColumnValueList(column);
+            let messageObject = {
+              status: 0,
+              note: noteValue
+            };
+            if (columnData[row]) {
+              messageObject.command = StatusMap.NOTE_OFF;
+              messageObject.value = 0;
+              activeMatrix.setValue(row, column, false);
+            }
+            else {
+              messageObject.command = StatusMap.NOTE_ON;
+              messageObject.value = Color.GREEN;
+              activeMatrix.setValue(row, column, true);
+            }
+            apcDevice.output.send(getMessageFromObject(messageObject));
+          }
+        }
+
+        this.apcDevice.input.onmidimessage = (event) => {
+          let message = getObjectFromMessage(event.data);
+          processMatrixNote(message, this.matrixList[this.activeIndex], this.apcDevice);
+        };
+
+        this.renderApc = (beatNumber, lastBeatNumber, isReset) => {
+          // let messageObjectOn = {command: StatusMap.NOTE_ON, status: beatNumber, note: 52, value: 127};
+          // let messageObjectOff = {command: StatusMap.NOTE_OFF, status: lastBeatNumber, note: 52, value: 127};
+          // let messageOn = getMessageFromObject(messageObjectOn);
+          // let messageOff = getMessageFromObject(messageObjectOff);
+          // this.apcDevice.output.send(messageOn);
+          // this.apcDevice.output.send(messageOff, performance.now() + 250.0);
+          renderColumn(this.apcDevice.output, beatNumber, this.matrixList[this.activeIndex].getColumnValueList(beatNumber));
+          clearColumn(this.apcDevice.output, lastBeatNumber, this.matrixList[this.activeIndex].getColumnValueList(lastBeatNumber));
+        };
+
+        return this.apcDevice;
+      }
+
+      function buildSchedulable () {
+        return {
+          processTick: (beatNumber, time) => {
+            beatNumber = beatNumber % this.width;
+
+            let columnData = this.matrixList[this.activeIndex].getColumnValueList(beatNumber);
+            columnData.forEach( (matrixElement, index) => {
+              // if (matrixElement && this.instrumentList) {
+              //   this.instrumentList[index].forEach((instrument) => {
+              //     instrument.play(0, time);
+              //   });
+              // }
+            });
+          },
+          render: (beatNumber, lastBeatNumber) => {
+            beatNumber = beatNumber % this.width;
+            lastBeatNumber = lastBeatNumber % this.width;
+
+            this.matrixList[this.activeIndex].render(beatNumber, lastBeatNumber, this.isReset);
+            this.renderApc(beatNumber, lastBeatNumber, this.isReset);
+            if (this.isReset) {
+              this.isReset = false;
+            }
+          },
+          start: () => {
+            this.isReset = true;
+          },
+          stop: () => {
+            this.matrixList[this.activeIndex].stop();
+          }
+        }
+      }
+
+      function buildClipManager (matrixList, midiDevice, setActiveIndex) {
+        return {
+          queueActive: (matrixElement) => {
+            let activeIndex = matrixList.indexOf(matrixElement);
+            setActiveIndex(activeIndex);
+            matrixList.forEach( (matrix, index) => {
+              if (index !== activeIndex) {
+                matrix.setAsInactive();
+                matrix.stop();
+              }
+            });
+          },
+          onMatrixChange: (matrixElement, row, column, value) => {
+            let messageObject = {
+              status: column,
+              note: row + 53
+            };
+
+            if (value) {
+              messageObject.command = StatusMap.NOTE_ON;
+              messageObject.value = 3;
+            }
+            else {
+              messageObject.command = StatusMap.NOTE_OFF;
+              messageObject.value = 127;
+            }
+
+            let midiMessage = getMessageFromObject(messageObject);
+            midiDevice.output.send(midiMessage);
+          }
+        };
+      }
+
+    })();
+  </script>
+
+</dom-module>
