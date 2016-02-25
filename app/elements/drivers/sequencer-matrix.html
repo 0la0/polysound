@@ -7,7 +7,8 @@
         display: block;
       }
       .sequencer {
-        width: 337px;
+        /*width: 337px;*/
+        width: 100%;
         margin-top: 5px;
         margin-right: 5px;
       }
@@ -42,10 +43,10 @@
         flex-wrap: nowrap;
       }
       .sequencer-row__element {
-        min-width: 20px;
+        flex-grow: 1;
+        margin: 0;
         border-bottom: 1px solid black;
         border-left: 1px solid black;
-        margin: 0;
       }
       .sequencer-row__header-element {
         height: 10px;
@@ -180,7 +181,18 @@
               elementRow[lastBeatNumber].classList.toggle('sequencer-row__body-element--active');
             }
           });
+        }
 
+        renderCell (current, last) {
+          this.bodyElementMatrix[current.row][current.column].classList.toggle('sequencer-row__body-element--active');
+          this.bodyElementMatrix[last.row][last.column].classList.toggle('sequencer-row__body-element--active');
+
+          // this.bodyElementMatrix.forEach((elementRow) => {
+          //   elementRow[beatNumber].classList.toggle('sequencer-row__body-element--active');
+          //   if (!isReset) {
+          //     elementRow[lastBeatNumber].classList.toggle('sequencer-row__body-element--active');
+          //   }
+          // });
         }
 
         stop () {

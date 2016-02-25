@@ -73,6 +73,10 @@
 
       function buildMidiDevice (midiDeviceFactory, matrixList) {
         this.apcDevice = midiDeviceFactory.getDeviceByName('Launchpad Mini');
+        if (!this.apcDevice.input && !this.apcDevice.output) {
+          console.warn('no launchpad detected');
+          return;
+        }
 
         let Color = {
           RED: 15,
@@ -165,6 +169,12 @@
       }
 
       function buildSchedulable () {
+
+        let particles = buildParticles();
+
+        let currentTopParticle = particles.topParticle.run();
+        let lastTopParticle = currentTopParticle;
+
         return {
           processTick: (beatNumber, time) => {
             beatNumber = beatNumber % this.width;
@@ -179,11 +189,15 @@
             });
           },
           render: (beatNumber, lastBeatNumber) => {
-            beatNumber = beatNumber % this.width;
-            lastBeatNumber = lastBeatNumber % this.width;
+            lastTopParticle = currentTopParticle;
+            currentTopParticle = particles.topParticle.run();
+            
+            this.matrixList[this.activeIndex].renderCell(currentTopParticle, lastTopParticle, this.isReset);
 
-            this.matrixList[this.activeIndex].render(beatNumber, lastBeatNumber, this.isReset);
-            this.renderApc(beatNumber, lastBeatNumber, this.isReset);
+            if (this.renderApc) {
+              this.renderApc(beatNumber, lastBeatNumber, this.isReset);
+            }
+
             if (this.isReset) {
               this.isReset = false;
             }
@@ -225,9 +239,47 @@
             }
 
             let midiMessage = getMessageFromObject(messageObject);
-            midiDevice.output.send(midiMessage);
+            if (midiDevice && midiDevice.output) {
+              midiDevice.output.send(midiMessage);
+            }
           }
         };
+      }
+
+      function buildParticles () {
+
+        function buildTop () {
+          let row = 0;
+          let column = 0;
+          let isMovingRight = true;
+          return {
+            run: () => {
+              if (isMovingRight) {
+                column++;
+                if (column > 7) {
+                  isMovingRight = false;
+                  column--;
+                  row = 1;
+                }
+              }
+              else {
+                column--;
+                if (column < 0) {
+                  isMovingRight = true;
+                  column++;
+                  row = 0;
+                }
+              }
+
+              return { row: row, column: column };
+            }
+          }
+        }
+
+
+        return {
+          topParticle: buildTop()
+        }
       }
 
     })();
