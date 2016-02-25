@@ -172,8 +172,10 @@
 
         let particles = buildParticles();
 
-        let currentTopParticle = particles.topParticle.run();
+        let currentTopParticle = particles.testParticle.getCurrentState();
         let lastTopParticle = currentTopParticle;
+
+        let testParticle = particles.testParticle;
 
         return {
           processTick: (beatNumber, time) => {
@@ -189,14 +191,13 @@
             });
           },
           render: (beatNumber, lastBeatNumber) => {
-            lastTopParticle = currentTopParticle;
-            currentTopParticle = particles.topParticle.run();
-            
-            this.matrixList[this.activeIndex].renderCell(currentTopParticle, lastTopParticle, this.isReset);
-
-            if (this.renderApc) {
-              this.renderApc(beatNumber, lastBeatNumber, this.isReset);
+            if (!this.isReset) {
+              lastTopParticle = currentTopParticle;
+              currentTopParticle = particles.testParticle.run();
             }
+
+            //console.log('render', currentTopParticle.row, currentTopParticle.column);
+            this.matrixList[this.activeIndex].renderCell(currentTopParticle, lastTopParticle, this.isReset);
 
             if (this.isReset) {
               this.isReset = false;
@@ -248,38 +249,122 @@
 
       function buildParticles () {
 
-        function buildTop () {
-          let row = 0;
-          let column = 0;
-          let isMovingRight = true;
-          return {
-            run: () => {
-              if (isMovingRight) {
-                column++;
-                if (column > 7) {
-                  isMovingRight = false;
-                  column--;
-                  row = 1;
-                }
-              }
-              else {
-                column--;
-                if (column < 0) {
-                  isMovingRight = true;
-                  column++;
-                  row = 0;
-                }
-              }
+        const NUM_ROWS = 8;
+        const NUM_COLUMNS = 8;
 
-              return { row: row, column: column };
-            }
-          }
+        //build 8 by 8 array of objects: {row: x, column: x}
+        const originalMatrix = Array(NUM_COLUMNS).fill(Array(NUM_ROWS).fill(null))
+          .map((row, rowIndex) => {
+            return row.map((column, columnIndex) => {
+              return {row: rowIndex, column: columnIndex}
+            });
+          });
+
+
+        function transpose (matrix) {
+          return matrix[0].map((column, index) => {
+            return matrix.map((row) => {
+              return row[index];
+            });
+          });
         }
+
+        function reverseEachRow (matrix) {
+          return matrix.map((row) => {
+            return row.reverse();
+          });
+        }
+
+        function reverseEachColumn (matrix) {
+          return matrix.reverse();
+        }
+
+        function rotateClockwise (matrix) {
+          let transposed = transpose(matrix);
+          let reversed = reverseEachColumn(transposed);
+          return reversed;
+        }
+
+        function rotateCounterClockwise (matrix) {
+          let transposed = transpose(matrix);
+          let reversed = reverseEachColumn(transposed);
+          return reversed;
+        }
+
+
+        function buildTest () {
+          let matrix = originalMatrix;
+          let activeIndex = 0;
+
+          function run () {
+            activeIndex++;
+            //console.log('activeIndex:', activeIndex);
+            // if (activeIndex === matrix[0].length - 1) {
+            //   printMatrix(matrix);
+            //   //console.log('what is going on here?', matrix[0]);
+            // }
+            if (activeIndex >= matrix[0].length) {
+              activeIndex = 1;
+              matrix = rotateCounterClockwise(matrix);
+            }
+
+            return matrix[0][activeIndex];
+          }
+
+          function getCurrentState () {
+            return matrix[0][activeIndex]
+          }
+
+          return {
+            run: run,
+            getCurrentState: getCurrentState
+          };
+        }
+
+        // function buildTop () {
+        //   let row = 0;
+        //   let column = 0;
+        //   let isMovingRight = true;
+        //   return {
+        //     run: () => {
+        //       if (isMovingRight) {
+        //         column++;
+        //         if (column > 7) {
+        //           isMovingRight = false;
+        //           column--;
+        //           row = 1;
+        //         }
+        //       }
+        //       else {
+        //         column--;
+        //         if (column < 0) {
+        //           isMovingRight = true;
+        //           column++;
+        //           row = 0;
+        //         }
+        //       }
+        //
+        //       return { row: row, column: column };
+        //     }
+        //   }
+        // }
 
 
         return {
-          topParticle: buildTop()
+          //topParticle: buildTop(),
+          testParticle: buildTest()
         }
+      }
+
+
+      function printMatrix (matrix) {
+        let printString = matrix.map((row) => {
+          return row.map((element) => {
+            return ' * ' + element.row + ', ' + element.column;
+          });
+          //return row.join(' ,');
+        }).join('\n');
+        console.log(printString);
       }
 
     })();

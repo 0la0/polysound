@@ -183,16 +183,11 @@
           });
         }
 
-        renderCell (current, last) {
+        renderCell (current, last, isReset) {
           this.bodyElementMatrix[current.row][current.column].classList.toggle('sequencer-row__body-element--active');
-          this.bodyElementMatrix[last.row][last.column].classList.toggle('sequencer-row__body-element--active');
-
-          // this.bodyElementMatrix.forEach((elementRow) => {
-          //   elementRow[beatNumber].classList.toggle('sequencer-row__body-element--active');
-          //   if (!isReset) {
-          //     elementRow[lastBeatNumber].classList.toggle('sequencer-row__body-element--active');
-          //   }
-          // });
+          if (!isReset) {
+            this.bodyElementMatrix[last.row][last.column].classList.toggle('sequencer-row__body-element--active');
+          }
         }
 
         stop () {
