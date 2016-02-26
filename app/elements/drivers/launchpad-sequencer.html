@@ -170,12 +170,10 @@
 
       function buildSchedulable () {
 
-        let particles = buildParticles();
-
-        let currentTopParticle = particles.testParticle.getCurrentState();
-        let lastTopParticle = currentTopParticle;
-
-        let testParticle = particles.testParticle;
+        let particles = [
+          new buildParticleDriver(4, 4, 0, 0, true),
+          new buildParticleDriver(4, 4, 0, 4, false)
+        ];
 
         return {
           processTick: (beatNumber, time) => {
@@ -192,12 +190,12 @@
           },
           render: (beatNumber, lastBeatNumber) => {
             if (!this.isReset) {
-              lastTopParticle = currentTopParticle;
-              currentTopParticle = particles.testParticle.run();
+              particles.forEach(particle => particle.run());
             }
 
-            //console.log('render', currentTopParticle.row, currentTopParticle.column);
-            this.matrixList[this.activeIndex].renderCell(currentTopParticle, lastTopParticle, this.isReset);
+            particles.forEach((particle) => {
+              this.matrixList[this.activeIndex].renderCell(particle.currentValue, particle.lastValue, this.isReset);
+            });
 
             if (this.isReset) {
               this.isReset = false;
@@ -247,113 +245,106 @@
         };
       }
 
-      function buildParticles () {
 
-        const NUM_ROWS = 8;
-        const NUM_COLUMNS = 8;
+      class Matrix {
 
-        //build 8 by 8 array of objects: {row: x, column: x}
-        const originalMatrix = Array(NUM_COLUMNS).fill(Array(NUM_ROWS).fill(null))
-          .map((row, rowIndex) => {
-            return row.map((column, columnIndex) => {
-              return {row: rowIndex, column: columnIndex}
+        static create (width, height, rowLowerBound, columnLowerBound) {
+          rowLowerBound = rowLowerBound || 0;
+          columnLowerBound = columnLowerBound || 0;
+
+          return Array(height).fill(Array(width).fill(null))
+            .map((row, rowIndex) => {
+              return row.map((column, columnIndex) => {
+                return {
+                  row: rowIndex + rowLowerBound,
+                  column: columnIndex + columnLowerBound
+                };
+              });
             });
-          });
+        }
 
-
-        function transpose (matrix) {
-          return matrix[0].map((column, index) => {
-            return matrix.map((row) => {
+        static transpose (matrix) {
+          return matrix[0].map((topRowElement, index) => { //for each row
+            return matrix.map((row) => { //return the columnHeight
               return row[index];
             });
           });
         }
 
-        function reverseEachRow (matrix) {
-          return matrix.map((row) => {
+        static rotateClockwise (matrix) {
+          return Matrix.transpose(matrix).map((row) => {
             return row.reverse();
           });
         }
 
-        function reverseEachColumn (matrix) {
-          return matrix.reverse();
+        static rotateCounterClockwise (matrix) {
+          return Matrix.transpose(matrix).reverse();
         }
 
-        function rotateClockwise (matrix) {
-          let transposed = transpose(matrix);
-          let reversed = reverseEachColumn(transposed);
-          return reversed;
+      }
+
+      function buildParticleDriver (width, height, rowLowerBound, columnLowerBound, isClockwise) {
+        this.particleModel = buildParticle.apply(this, arguments);
+        this.currentValue = this.particleModel.getCurrentState();
+        this.lastValue = this.currentValue;
+
+        this.run = () => {
+          this.lastValue = this.currentValue;
+          this.currentValue = this.particleModel.run();
+          return this.currentValue;
         }
 
-        function rotateCounterClockwise (matrix) {
-          let transposed = transpose(matrix);
-          let reversed = reverseEachColumn(transposed);
-          return reversed;
+      }
+
+      function buildParticle (width, height, rowLowerBound, columnLowerBound, isClockwise) {
+        let matrix = Matrix.create(width, height, rowLowerBound, columnLowerBound); //apply
+
+        let activeIndex = 0;
+        if (!isClockwise) {
+          activeIndex = matrix[0].length - 1;
         }
 
-
-        function buildTest () {
-          let matrix = originalMatrix;
-          let activeIndex = 0;
-
-          function run () {
-            activeIndex++;
-            //console.log('activeIndex:', activeIndex);
-            // if (activeIndex === matrix[0].length - 1) {
-            //   printMatrix(matrix);
-            //   //console.log('what is going on here?', matrix[0]);
-            // }
+        //running a clockwise sequence is rotating the matrix in a counter clockwise direction
+        function runClockwise () {
+          if (++activeIndex >= matrix[0].length) {
+            matrix = Matrix.rotateCounterClockwise(matrix);
+            activeIndex = 1;
+            //a second check covers the case of a one dimensional matrix
             if (activeIndex >= matrix[0].length) {
+              matrix = Matrix.rotateCounterClockwise(matrix);
               activeIndex = 1;
-              matrix = rotateCounterClockwise(matrix);
             }
-
-            return matrix[0][activeIndex];
           }
-
-          function getCurrentState () {
-            return matrix[0][activeIndex]
-          }
-
-          return {
-            run: run,
-            getCurrentState: getCurrentState
-          };
+          return matrix[0][activeIndex];
         }
 
-        // function buildTop () {
-        //   let row = 0;
-        //   let column = 0;
-        //   let isMovingRight = true;
-        //   return {
-        //     run: () => {
-        //       if (isMovingRight) {
-        //         column++;
-        //         if (column > 7) {
-        //           isMovingRight = false;
-        //           column--;
-        //           row = 1;
-        //         }
-        //       }
-        //       else {
-        //         column--;
-        //         if (column < 0) {
-        //           isMovingRight = true;
-        //           column++;
-        //           row = 0;
-        //         }
-        //       }
-        //
-        //       return { row: row, column: column };
-        //     }
-        //   }
-        // }
-
-
-        return {
-          //topParticle: buildTop(),
-          testParticle: buildTest()
+        //running a counter clockwise sequence is rotating the matrix in a clockwise direction
+        function runCounterClockwise () {
+          if (--activeIndex < 0) {
+            matrix = Matrix.rotateClockwise(matrix);
+            activeIndex = matrix[0].length - 2;
+            //a second check covers the case of a one dimensional matrix
+            if (activeIndex < 0) {
+              matrix = Matrix.rotateClockwise(matrix);
+              activeIndex = matrix[0].length - 1;
+            }
+          }
+          return matrix[0][activeIndex];
         }
+
+        function getCurrentState () {
+          return matrix[0][activeIndex];
+        }
+
+        let returnObj = {
+          getCurrentState: getCurrentState
+        };
+
+        isClockwise ?
+          returnObj.run = runClockwise :
+          returnObj.run = runCounterClockwise;
+
+        return returnObj;
       }
 
 
