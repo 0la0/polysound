@@ -171,8 +171,10 @@
       function buildSchedulable () {
 
         let particles = [
-          new buildParticleDriver(4, 4, 0, 0, true),
-          new buildParticleDriver(4, 4, 0, 4, false)
+          new buildParticleDriver(8, 2, 0, 0, true),
+          new buildParticleDriver(8, 2, 2, 0, false),
+          new buildParticleDriver(4, 4, 4, 0, true),
+          new buildParticleDriver(2, 2, 4, 4, false)
         ];
 
         return {
