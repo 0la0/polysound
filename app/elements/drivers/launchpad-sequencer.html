@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../helpers/midi.html">
+<link rel="import" href="../helpers/matrix.html">
 
 <dom-module id="launchpad-sequencer">
   <template>
@@ -65,6 +66,16 @@
       const StatusMap = midiHelpers.StatusMap;
       let getObjectFromMessage = midiHelpers.getObjectFromMessage;
       let getMessageFromObject = midiHelpers.getMessageFromObject;
+      //--- importing Matrix as a class of static functions ---//
+
+      const RunDirection = {
+        CLOCKWISE: 'CLOCKWISE',
+        COUNTER_CLOCKWISE : 'COUNTER_CLOCKWISE',
+        CASCADE: 'CASCADE'
+      };
+
+      let runBehaviors = buildRunBehaviors();
+      let touchBehaviors = buildTouchBehaviors();
 
       function buildMidiDevice (midiDeviceFactory, viewMatrix, particles) {
         const Velocity = {
@@ -75,14 +86,41 @@
           OFF: 0,
           ON: 127
         };
+
         let launchpad = midiDeviceFactory.getDeviceByName('Launchpad Mini');
         let touchList = [];
+
+        function eventIsInMatrix (message, row, column) {
+          return row < 8 && column < 8;
+        }
+
+        function eventIsInTopBar (message, row, column) {
+          return message.command === 11;
+        }
+
+        function eventIsInSideBar (message, row, column) {
+          return column === 8;
+        }
 
         function onmidimessage (event) {
           let message = getObjectFromMessage(event.data);
           let noteValue = message.note;
           let row = Math.floor(message.note / 16);
           let column = message.note % 16;
+
+          // if (eventIsInMatrix(message, row, column)) {
+          //
+          // }
+          if (eventIsInTopBar(message, row, column)) {
+            return;
+          }
+          else if (eventIsInSideBar(message, row, column)) {
+            if (message.value === 127 && particles[row]) {
+              particles[row].particleModel.changeDirection();
+            }
+            return;
+          }
+
 
           let messageObject;
           if (message.value === Velocity.ON) {
@@ -130,10 +168,13 @@
 
       function buildSchedulable () {
 
-        let topParticle = new ParticleDriver(0, 0, 8, 2, true);
-        let middleParticle = new ParticleDriver(0, 2, 8, 2, false);
-        let bottomLeftParticle = new ParticleDriver(0, 4, 4, 4, true);
-        this.particles = [topParticle, middleParticle, bottomLeftParticle];
+        let topParticle = new ParticleDriver(0, 0, 8, 2, RunDirection.CLOCKWISE);
+        let middleParticle = new ParticleDriver(0, 2, 8, 2, RunDirection.COUNTER_CLOCKWISE);
+        let bottomLeftParticle = new ParticleDriver(0, 4, 4, 4, RunDirection.COUNTER_CLOCKWISE);
+        let bottomRightParticle = new ParticleDriver(4, 4, 4, 4, RunDirection.CASCADE);
+        this.particles = [topParticle, middleParticle, bottomLeftParticle, bottomRightParticle];
+        //this.particles = [bottomLeftParticle];
+        window.particles = this.particles;
 
         return {
           processTick: (beatNumber, time) => {
@@ -170,66 +211,18 @@
         }
       }
 
-
-      /**
-        * Matrix helper functions
-        **/
-      class Matrix {
-
-        static create (x, y, width, height) {
-          return Array(height).fill(Array(width).fill(null))
-            .map((row, rowIndex) => {
-              return row.map((column, columnIndex) => {
-                return {
-                  row: rowIndex + y,
-                  column: columnIndex + x
-                };
-              });
-            });
-        }
-
-        static transpose (matrix) {
-          return matrix[0].map((topRowElement, index) => { //for each row index
-            return matrix.map((row) => { //return the corresponding column
-              return row[index];
-            });
-          });
-        }
-
-        static rotateClockwise (matrix) {
-          return Matrix.transpose(matrix).map((row) => {
-            return row.reverse();
-          });
-        }
-
-        static rotateCounterClockwise (matrix) {
-          return Matrix.transpose(matrix).reverse();
-        }
-
-        static print (matrix) {
-          let printString = matrix.map((row) => {
-            return row.map((element) => {
-              return ' * ' + element.row + ', ' + element.column;
-            });
-          }).join('\n');
-          console.log(printString);
-        }
-
-      }
-
-
       /**
         * A particle driver has a particle and manages its state
         **/
       class ParticleDriver {
 
-        constructor (x, y, width, height, isClockwise) {
+        constructor (x, y, width, height, runSequence) {
           this.x = x;
           this.y = y;
           this.width = width;
           this.height = height;
 
-          this.particleModel = buildParticle.apply(this, arguments);
+          this.particleModel = ParticleBuilder.create(x, y, width, height, runSequence);
           this.currentValue = this.particleModel.getCurrentState();
           this.lastValue = this.currentValue;
         }
@@ -241,11 +234,24 @@
         }
 
         applyTouchStates (touchStates) {
-          let activeStates = touchStates.filter((touchState) => {
-            let xIsInBounds = touchState.column >= this.x && touchState.column <= (this.x + this.width);
-            let yIsInBounds = touchState.row >= this.y && touchState.row <= (this.y + this.height);
+          touchBehaviors.adjustSize.call(this, touchStates);
+        }
+
+      }
+
+
+      function buildTouchBehaviors () {
+
+        function getActiveTouchStates (touchStates, x, y, width, height) {
+          return touchStates.filter((touchState) => {
+            let xIsInBounds = touchState.column >= x && touchState.column <= (x + width);
+            let yIsInBounds = touchState.row >= y && touchState.row <= (y + height);
             return xIsInBounds && yIsInBounds;
           });
+        }
+
+        function adjustSize (touchStates) {
+          let activeStates = getActiveTouchStates(touchStates, this.x, this.y, this.width, this.height);
 
           if (activeStates.length > 1) {
             let lowerBound = activeStates[0];
@@ -258,68 +264,101 @@
 
             this.particleModel.setMatrix(newX, newY, newWidth + 1, newHeight + 1);
           }
+
+        }
+
+        return {
+          adjustSize: adjustSize
+        }
+      }
+
+      function buildRunBehaviors () {
+
+        function rotate () {
+          if (++this.columnIndex >= this.matrix[this.rowIndex].length) {
+            this.matrix = Matrix.rotateCounterClockwise(this.matrix);
+            this.columnIndex = 1;
+            //a second check covers the case of a one dimensional matrix
+            if (this.columnIndex >= this.matrix[this.rowIndex].length) {
+              this.matrix = Matrix.rotateCounterClockwise(this.matrix);
+              this.columnIndex = 1;
+            }
+          }
+          return this.matrix[this.rowIndex][this.columnIndex];
+        }
+
+        function cascade () {
+          if (++this.columnIndex >= this.matrix[this.rowIndex].length) {
+
+            this.matrix = Matrix.rotate180(this.matrix);
+            if (++this.runCnt % 2 !== 0) {
+              this.matrix = Matrix.shiftDown(this.matrix);
+              this.matrix = Matrix.shiftDown(this.matrix);
+            }
+            this.columnIndex = 0;
+
+          }
+          return this.matrix[this.rowIndex][this.columnIndex];
+        }
+
+        return {
+          rotate: rotate,
+          cascade: cascade
         }
 
       }
 
 
-      /**
-        * A particle is a matrix context and a position
-        **/
-      function buildParticle (x, y, width, height, isClockwise) {
-        let matrix = Matrix.create(x, y, width, height); //apply
+      class BaseParticleSystem {
 
-        let activeIndex = 0;
-        if (!isClockwise) {
-          activeIndex = matrix[0].length - 1;
+        constructor (x, y, width, height) {
+          this.rowIndex = 0;
+          this.columnIndex = 0;
+          this.runCnt = 0;
+          this.setMatrix(x, y, width, height);
         }
 
-        //running a clockwise sequence is rotating the matrix in a counter clockwise direction
-        function runClockwise () {
-          if (++activeIndex >= matrix[0].length) {
-            matrix = Matrix.rotateCounterClockwise(matrix);
-            activeIndex = 1;
-            //a second check covers the case of a one dimensional matrix
-            if (activeIndex >= matrix[0].length) {
-              matrix = Matrix.rotateCounterClockwise(matrix);
-              activeIndex = 1;
-            }
+        changeDirection () {
+          this.matrix = Matrix.reflectY(this.matrix);
+        }
+
+        getCurrentState () {
+          return this.matrix[this.rowIndex][this.columnIndex];
+        }
+
+        setMatrix (x, y, width, height) {
+          this.matrix = Matrix.create(x, y, width, height);
+        }
+
+        setRunBehavior (runBehavior) {
+          this.runBehavior = runBehavior;
+        }
+
+        run () {
+          if (this.runBehavior) { return this.runBehavior.call(this); }
+        }
+
+      }
+
+      class ParticleBuilder {
+
+        static create (x, y, width, height, runBehavior) {
+
+
+          let particleSystem = new BaseParticleSystem(x, y, width, height);
+          if (runBehavior === RunDirection.CLOCKWISE) {
+            particleSystem.setRunBehavior(runBehaviors.rotate);
           }
-          return matrix[0][activeIndex];
-        }
-
-        //running a counter clockwise sequence is rotating the matrix in a clockwise direction
-        function runCounterClockwise () {
-          if (--activeIndex < 0) {
-            matrix = Matrix.rotateClockwise(matrix);
-            activeIndex = matrix[0].length - 2;
-            //a second check covers the case of a one dimensional matrix
-            if (activeIndex < 0) {
-              matrix = Matrix.rotateClockwise(matrix);
-              activeIndex = matrix[0].length - 1;
-            }
+          else if (runBehavior === RunDirection.COUNTER_CLOCKWISE) {
+            particleSystem.changeDirection();
+            particleSystem.setRunBehavior(runBehaviors.rotate);
           }
-          return matrix[0][activeIndex];
+          else if (runBehavior === RunDirection.CASCADE) {
+            particleSystem.setRunBehavior(runBehaviors.cascade);
+          }
+          return particleSystem;
         }
 
-        function getCurrentState () {
-          return matrix[0][activeIndex];
-        }
-
-        function setMatrix (x, y, width, height, isClockwise) {
-          matrix = Matrix.create(x, y, width, height);
-        }
-
-        let returnObj = {
-          getCurrentState: getCurrentState,
-          setMatrix, setMatrix
-        };
-
-        isClockwise ?
-          returnObj.run = runClockwise :
-          returnObj.run = runCounterClockwise;
-
-        return returnObj;
       }
 
 
