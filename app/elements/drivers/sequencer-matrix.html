@@ -162,7 +162,9 @@
           let row = matrixElement.rowIndex;
           let column = matrixElement.columnIndex;
           this.setValue(row, column);
-          this.clipManager.onMatrixChange(this, row, column, this.sequencerMatrix[row][column]);
+          if (this.clipManager) {
+            this.clipManager.onMatrixChange(this, row, column, this.sequencerMatrix[row][column]);
+          }
         }
 
         getColumnValueList (beatNumber) {
@@ -285,7 +287,7 @@
       function buildTriggerButtonModel () {
         return {
           callback: (isOn) => {
-            if (isOn) {
+            if (isOn && this.clipManager) {
               this.clipManager.queueActive(this);
             }
           }

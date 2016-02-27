@@ -15,7 +15,6 @@
         class="matrix"
         number-of-steps="8"
         number-of-rows="8"
-        clip-manager="{{clipManager}}"
         clip-label="Launchpad Clip">
       </sequencer-matrix>
 
@@ -49,19 +48,9 @@
           app.scheduler.register(this.schedulable);
 
           let matrixNodeList = this.getElementsByClassName('matrix');
-          this.matrixList = Array.prototype.slice.call(matrixNodeList);
-          this.activeIndex;
+          this.viewMatrix = Array.prototype.slice.call(matrixNodeList)[0];
 
-          this.apcDevice = buildMidiDevice.call(this, app.audio.midiDeviceFactory, this.matrixList);
-
-          this.clipManager = buildClipManager(this.matrixList, this.apcDevice, (activeIndex) => {
-            this.activeIndex = activeIndex;
-            this.isReset = true;
-          });
-
-          setTimeout(() => {
-            this.matrixList[0].setAsActive();
-          }, 0);
+          this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.viewMatrix);
         }
 
         detached() {
@@ -71,66 +60,23 @@
       }
       Polymer(LaunchpadSequencer);
 
-      function buildMidiDevice (midiDeviceFactory, matrixList) {
-        this.apcDevice = midiDeviceFactory.getDeviceByName('Launchpad Mini');
-        if (!this.apcDevice.input && !this.apcDevice.output) {
-          console.warn('no launchpad detected');
-          return;
-        }
-
-        let Color = {
+      function buildMidiDevice (midiDeviceFactory, viewMatrix) {
+        const Color = {
           RED: 15,
           GREEN: 60,
           YELLOW: 62,
-          AMBER: 63
+          AMBER: 63,
+          OFF: 0
         };
+        let launchpad = midiDeviceFactory.getDeviceByName('Launchpad Mini');
 
-        function buildMessageSender (outputDevice) {
-          return (command, status, note, velocity) => {
-            let messageObjectOn = {command: command, status: status, note: note, value: velocity};
-            outputDevice.send(getMessageFromObject(messageObjectOn));
-          };
-        }
-        window.sendMessage = buildMessageSender(this.apcDevice.output);
-
-        function renderColumn (outputDevice, index, columnData) {
-          for (let i = 0; i < 8; i++) {
-            let message = {
-              command: StatusMap.NOTE_ON,
-              status: 0,
-              note: i * 16 + index
-            };
-            (columnData[i]) ?
-              message.value = Color.RED :
-              message.value = Color.AMBER;
-            outputDevice.send(getMessageFromObject(message));
-          }
-        }
-
-        function clearColumn (outputDevice, index, columnData) {
-          for (let i = 0; i < 8; i++) {
-            let message = {
-              status: 0,
-              note: i * 16 + index
-            };
-            if (columnData[i]) {
-              message.command = StatusMap.NOTE_ON,
-              message.value = Color.GREEN
-            }
-            else {
-              message.command = StatusMap.NOTE_OFF,
-              message.value = 0
-            }
-            outputDevice.send(getMessageFromObject(message));
-          }
-        }
-
-        function processMatrixNote (message, activeMatrix, apcDevice) {
+        function onmidimessage (event) {
+          let message = getObjectFromMessage(event.data);
           let noteValue = message.note;
           let row = Math.floor(message.note / 16);
           let column = message.note % 16;
           if (message.value === 0) {
-            let columnData = activeMatrix.getColumnValueList(column);
+            let columnData = viewMatrix.getColumnValueList(column);
             let messageObject = {
               status: 0,
               note: noteValue
@@ -138,34 +84,32 @@
             if (columnData[row]) {
               messageObject.command = StatusMap.NOTE_OFF;
               messageObject.value = 0;
-              activeMatrix.setValue(row, column, false);
+              viewMatrix.setValue(row, column, false);
             }
             else {
               messageObject.command = StatusMap.NOTE_ON;
               messageObject.value = Color.GREEN;
-              activeMatrix.setValue(row, column, true);
+              viewMatrix.setValue(row, column, true);
             }
-            apcDevice.output.send(getMessageFromObject(messageObject));
+            launchpad.output.send(getMessageFromObject(messageObject));
           }
         }
 
-        this.apcDevice.input.onmidimessage = (event) => {
-          let message = getObjectFromMessage(event.data);
-          processMatrixNote(message, this.matrixList[this.activeIndex], this.apcDevice);
-        };
+        function renderParticle (currentParticle, lastParticle) {
+          let noteOn = currentParticle.row * 16 + currentParticle.column;
+          let noteOff = lastParticle.row * 16 + lastParticle.column;
+          let messageObjectOn = { command: 9, status: 0, note: noteOn, value: Color.AMBER };
+          let messageObjectOff = { command: 8, status: 0, note: noteOff, value: Color.OFF };
 
-        this.renderApc = (beatNumber, lastBeatNumber, isReset) => {
-          // let messageObjectOn = {command: StatusMap.NOTE_ON, status: beatNumber, note: 52, value: 127};
-          // let messageObjectOff = {command: StatusMap.NOTE_OFF, status: lastBeatNumber, note: 52, value: 127};
-          // let messageOn = getMessageFromObject(messageObjectOn);
-          // let messageOff = getMessageFromObject(messageObjectOff);
-          // this.apcDevice.output.send(messageOn);
-          // this.apcDevice.output.send(messageOff, performance.now() + 250.0);
-          renderColumn(this.apcDevice.output, beatNumber, this.matrixList[this.activeIndex].getColumnValueList(beatNumber));
-          clearColumn(this.apcDevice.output, lastBeatNumber, this.matrixList[this.activeIndex].getColumnValueList(lastBeatNumber));
-        };
+          launchpad.output.send(getMessageFromObject(messageObjectOn));
+          launchpad.output.send(getMessageFromObject(messageObjectOff));
+        }
 
-        return this.apcDevice;
+        if (launchpad.input) {
+          launchpad.input.onmidimessage = onmidimessage;
+        }
+        launchpad.renderParticle = (launchpad.output) ? renderParticle : () => {};
+        return launchpad;
       }
 
       function buildSchedulable () {
@@ -173,32 +117,32 @@
         let particles = [
           new buildParticleDriver(8, 2, 0, 0, true),
           new buildParticleDriver(8, 2, 2, 0, false),
-          new buildParticleDriver(4, 4, 4, 0, true),
-          new buildParticleDriver(2, 2, 4, 4, false)
+          new buildParticleDriver(4, 4, 4, 0, true)
+          //new buildParticleDriver(2, 2, 4, 4, false)
         ];
 
         return {
           processTick: (beatNumber, time) => {
             beatNumber = beatNumber % this.width;
 
-            let columnData = this.matrixList[this.activeIndex].getColumnValueList(beatNumber);
-            columnData.forEach( (matrixElement, index) => {
-              // if (matrixElement && this.instrumentList) {
-              //   this.instrumentList[index].forEach((instrument) => {
-              //     instrument.play(0, time);
-              //   });
-              // }
-            });
+            //TODO: implement instrument logic
+            // let columnData = this.viewMatrix.getColumnValueList(beatNumber);
+            // columnData.forEach( (matrixElement, index) => {
+            //   // if (matrixElement && this.instrumentList) {
+            //   //   this.instrumentList[index].forEach((instrument) => {
+            //   //     instrument.play(0, time);
+            //   //   });
+            //   // }
+            // });
           },
           render: (beatNumber, lastBeatNumber) => {
             if (!this.isReset) {
               particles.forEach(particle => particle.run());
             }
-
             particles.forEach((particle) => {
-              this.matrixList[this.activeIndex].renderCell(particle.currentValue, particle.lastValue, this.isReset);
+              this.viewMatrix.renderCell(particle.currentValue, particle.lastValue, this.isReset);
+              this.launchpad.renderParticle(particle.currentValue, particle.lastValue, this.isReset);
             });
-
             if (this.isReset) {
               this.isReset = false;
             }
@@ -207,47 +151,15 @@
             this.isReset = true;
           },
           stop: () => {
-            this.matrixList[this.activeIndex].stop();
+            this.viewMatrix.stop();
           }
         }
       }
 
-      function buildClipManager (matrixList, midiDevice, setActiveIndex) {
-        return {
-          queueActive: (matrixElement) => {
-            let activeIndex = matrixList.indexOf(matrixElement);
-            setActiveIndex(activeIndex);
-            matrixList.forEach( (matrix, index) => {
-              if (index !== activeIndex) {
-                matrix.setAsInactive();
-                matrix.stop();
-              }
-            });
-          },
-          onMatrixChange: (matrixElement, row, column, value) => {
-            let messageObject = {
-              status: column,
-              note: row + 53
-            };
 
-            if (value) {
-              messageObject.command = StatusMap.NOTE_ON;
-              messageObject.value = 3;
-            }
-            else {
-              messageObject.command = StatusMap.NOTE_OFF;
-              messageObject.value = 127;
-            }
-
-            let midiMessage = getMessageFromObject(messageObject);
-            if (midiDevice && midiDevice.output) {
-              midiDevice.output.send(midiMessage);
-            }
-          }
-        };
-      }
-
-
+      /**
+        * Matrix helper functions
+        **/
       class Matrix {
 
         static create (width, height, rowLowerBound, columnLowerBound) {
@@ -266,8 +178,8 @@
         }
 
         static transpose (matrix) {
-          return matrix[0].map((topRowElement, index) => { //for each row
-            return matrix.map((row) => { //return the columnHeight
+          return matrix[0].map((topRowElement, index) => { //for each row index
+            return matrix.map((row) => { //return the corresponding column
               return row[index];
             });
           });
@@ -283,8 +195,21 @@
           return Matrix.transpose(matrix).reverse();
         }
 
+        static print (matrix) {
+          let printString = matrix.map((row) => {
+            return row.map((element) => {
+              return ' * ' + element.row + ', ' + element.column;
+            });
+          }).join('\n');
+          console.log(printString);
+        }
+
       }
 
+
+      /**
+        * A particle driver has a particle and manages its state
+        **/
       function buildParticleDriver (width, height, rowLowerBound, columnLowerBound, isClockwise) {
         this.particleModel = buildParticle.apply(this, arguments);
         this.currentValue = this.particleModel.getCurrentState();
@@ -294,10 +219,13 @@
           this.lastValue = this.currentValue;
           this.currentValue = this.particleModel.run();
           return this.currentValue;
-        }
-
+        };
       }
 
+
+      /**
+        * A particle is a matrix context and a position
+        **/
       function buildParticle (width, height, rowLowerBound, columnLowerBound, isClockwise) {
         let matrix = Matrix.create(width, height, rowLowerBound, columnLowerBound); //apply
 
@@ -338,9 +266,7 @@
           return matrix[0][activeIndex];
         }
 
-        let returnObj = {
-          getCurrentState: getCurrentState
-        };
+        let returnObj = { getCurrentState: getCurrentState };
 
         isClockwise ?
           returnObj.run = runClockwise :
@@ -349,16 +275,6 @@
         return returnObj;
       }
 
-
-      function printMatrix (matrix) {
-        let printString = matrix.map((row) => {
-          return row.map((element) => {
-            return ' * ' + element.row + ', ' + element.column;
-          });
-          //return row.join(' ,');
-        }).join('\n');
-        console.log(printString);
-      }
 
     })();
   </script>
