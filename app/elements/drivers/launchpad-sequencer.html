@@ -42,15 +42,14 @@
 
         ready() {}
         attached() {
-          this.width = 8;
           this.isReset = true;
+          this.particles = [];
           this.schedulable = buildSchedulable.call(this);
           app.scheduler.register(this.schedulable);
 
           let matrixNodeList = this.getElementsByClassName('matrix');
           this.viewMatrix = Array.prototype.slice.call(matrixNodeList)[0];
-
-          this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.viewMatrix);
+          this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.viewMatrix, this.particles);
         }
 
         detached() {
@@ -60,46 +59,63 @@
       }
       Polymer(LaunchpadSequencer);
 
-      function buildMidiDevice (midiDeviceFactory, viewMatrix) {
-        const Color = {
+
+      //--- js imports ---//
+      let midiHelpers = buildMidiHelpers();
+      const StatusMap = midiHelpers.StatusMap;
+      let getObjectFromMessage = midiHelpers.getObjectFromMessage;
+      let getMessageFromObject = midiHelpers.getMessageFromObject;
+
+      function buildMidiDevice (midiDeviceFactory, viewMatrix, particles) {
+        const Velocity = {
           RED: 15,
           GREEN: 60,
           YELLOW: 62,
           AMBER: 63,
-          OFF: 0
+          OFF: 0,
+          ON: 127
         };
         let launchpad = midiDeviceFactory.getDeviceByName('Launchpad Mini');
+        let touchList = [];
 
         function onmidimessage (event) {
           let message = getObjectFromMessage(event.data);
           let noteValue = message.note;
           let row = Math.floor(message.note / 16);
           let column = message.note % 16;
-          if (message.value === 0) {
-            let columnData = viewMatrix.getColumnValueList(column);
-            let messageObject = {
+
+          let messageObject;
+          if (message.value === Velocity.ON) {
+            touchList.push({row: row, column: column});
+            messageObject = {
+              command: StatusMap.NOTE_ON,
               status: 0,
-              note: noteValue
+              note: noteValue,
+              value: Velocity.GREEN
             };
-            if (columnData[row]) {
-              messageObject.command = StatusMap.NOTE_OFF;
-              messageObject.value = 0;
-              viewMatrix.setValue(row, column, false);
-            }
-            else {
-              messageObject.command = StatusMap.NOTE_ON;
-              messageObject.value = Color.GREEN;
-              viewMatrix.setValue(row, column, true);
-            }
+          }
+          if (message.value === Velocity.OFF) {
+            messageObject = {
+              command: StatusMap.NOTE_OFF,
+              status: 0,
+              note: noteValue,
+              value: Velocity.OFF
+            };
+            touchList = touchList.filter((touchState) => {
+              return touchState.row !== row && touchState.column !== column;
+            });
+          }
+          if (messageObject) {
             launchpad.output.send(getMessageFromObject(messageObject));
           }
+          particles.forEach(particle => particle.applyTouchStates(touchList));
         }
 
         function renderParticle (currentParticle, lastParticle) {
           let noteOn = currentParticle.row * 16 + currentParticle.column;
           let noteOff = lastParticle.row * 16 + lastParticle.column;
-          let messageObjectOn = { command: 9, status: 0, note: noteOn, value: Color.AMBER };
-          let messageObjectOff = { command: 8, status: 0, note: noteOff, value: Color.OFF };
+          let messageObjectOn = { command: 9, status: 0, note: noteOn, value: Velocity.AMBER };
+          let messageObjectOff = { command: 8, status: 0, note: noteOff, value: Velocity.OFF };
 
           launchpad.output.send(getMessageFromObject(messageObjectOn));
           launchpad.output.send(getMessageFromObject(messageObjectOff));
@@ -114,12 +130,10 @@
 
       function buildSchedulable () {
 
-        let particles = [
-          new buildParticleDriver(8, 2, 0, 0, true),
-          new buildParticleDriver(8, 2, 2, 0, false),
-          new buildParticleDriver(4, 4, 4, 0, true)
-          //new buildParticleDriver(2, 2, 4, 4, false)
-        ];
+        let topParticle = new ParticleDriver(0, 0, 8, 2, true);
+        let middleParticle = new ParticleDriver(0, 2, 8, 2, false);
+        let bottomLeftParticle = new ParticleDriver(0, 4, 4, 4, true);
+        this.particles = [topParticle, middleParticle, bottomLeftParticle];
 
         return {
           processTick: (beatNumber, time) => {
@@ -137,9 +151,9 @@
           },
           render: (beatNumber, lastBeatNumber) => {
             if (!this.isReset) {
-              particles.forEach(particle => particle.run());
+              this.particles.forEach(particle => particle.run());
             }
-            particles.forEach((particle) => {
+            this.particles.forEach((particle) => {
               this.viewMatrix.renderCell(particle.currentValue, particle.lastValue, this.isReset);
               this.launchpad.renderParticle(particle.currentValue, particle.lastValue, this.isReset);
             });
@@ -162,16 +176,13 @@
         **/
       class Matrix {
 
-        static create (width, height, rowLowerBound, columnLowerBound) {
-          rowLowerBound = rowLowerBound || 0;
-          columnLowerBound = columnLowerBound || 0;
-
+        static create (x, y, width, height) {
           return Array(height).fill(Array(width).fill(null))
             .map((row, rowIndex) => {
               return row.map((column, columnIndex) => {
                 return {
-                  row: rowIndex + rowLowerBound,
-                  column: columnIndex + columnLowerBound
+                  row: rowIndex + y,
+                  column: columnIndex + x
                 };
               });
             });
@@ -210,24 +221,53 @@
       /**
         * A particle driver has a particle and manages its state
         **/
-      function buildParticleDriver (width, height, rowLowerBound, columnLowerBound, isClockwise) {
-        this.particleModel = buildParticle.apply(this, arguments);
-        this.currentValue = this.particleModel.getCurrentState();
-        this.lastValue = this.currentValue;
+      class ParticleDriver {
 
-        this.run = () => {
+        constructor (x, y, width, height, isClockwise) {
+          this.x = x;
+          this.y = y;
+          this.width = width;
+          this.height = height;
+
+          this.particleModel = buildParticle.apply(this, arguments);
+          this.currentValue = this.particleModel.getCurrentState();
+          this.lastValue = this.currentValue;
+        }
+
+        run () {
           this.lastValue = this.currentValue;
           this.currentValue = this.particleModel.run();
           return this.currentValue;
-        };
+        }
+
+        applyTouchStates (touchStates) {
+          let activeStates = touchStates.filter((touchState) => {
+            let xIsInBounds = touchState.column >= this.x && touchState.column <= (this.x + this.width);
+            let yIsInBounds = touchState.row >= this.y && touchState.row <= (this.y + this.height);
+            return xIsInBounds && yIsInBounds;
+          });
+
+          if (activeStates.length > 1) {
+            let lowerBound = activeStates[0];
+            let upperBound = activeStates[1];
+
+            let newWidth = Math.abs(upperBound.column - lowerBound.column);
+            let newHeight = Math.abs(upperBound.row - lowerBound.row);
+            let newX = Math.min(lowerBound.column, upperBound.column);
+            let newY = Math.min(lowerBound.row, upperBound.row);
+
+            this.particleModel.setMatrix(newX, newY, newWidth + 1, newHeight + 1);
+          }
+        }
+
       }
 
 
       /**
         * A particle is a matrix context and a position
         **/
-      function buildParticle (width, height, rowLowerBound, columnLowerBound, isClockwise) {
-        let matrix = Matrix.create(width, height, rowLowerBound, columnLowerBound); //apply
+      function buildParticle (x, y, width, height, isClockwise) {
+        let matrix = Matrix.create(x, y, width, height); //apply
 
         let activeIndex = 0;
         if (!isClockwise) {
@@ -266,7 +306,14 @@
           return matrix[0][activeIndex];
         }
 
-        let returnObj = { getCurrentState: getCurrentState };
+        function setMatrix (x, y, width, height, isClockwise) {
+          matrix = Matrix.create(x, y, width, height);
+        }
+
+        let returnObj = {
+          getCurrentState: getCurrentState,
+          setMatrix, setMatrix
+        };
 
         isClockwise ?
           returnObj.run = runClockwise :
