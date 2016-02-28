@@ -50,6 +50,14 @@ function importParticle () {
       if (this.touchBehavior) { return this.touchBehavior.apply(this, arguments); }
     }
 
+    setRenderBehavior (renderBehavior) {
+      this.renderBehavior = renderBehavior;
+    }
+
+    processRender () {
+      if (this.renderBehavior) { return this.renderBehavior.call(this); }
+    }
+
   }
 
   return Particle;

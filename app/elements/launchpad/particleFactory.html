@@ -1,6 +1,7 @@
 <link rel="import" href="./particle.html">
 <link rel="import" href="./runBehaviors.html">
 <link rel="import" href="./touchBehaviors.html">
+<link rel="import" href="./renderBehaviors.html">
 
 <script>
 
@@ -16,6 +17,7 @@ function importParticleFactory () {
   let Particle = importParticle();
   let runBehaviors = buildRunBehaviors();
   let touchBehaviors = buildTouchBehaviors();
+  let renderBehaviors = buildRenderBehaviors();
 
   class ParticleFactory {
 
@@ -38,6 +40,7 @@ function importParticleFactory () {
       else if (runBehavior === RunDirection.FALL) {
         particleSystem.setRunBehavior(runBehaviors.fall);
         particleSystem.setTouchBehavior(touchBehaviors.setRowValue);
+        particleSystem.setRenderBehavior(renderBehaviors.columnSingleCell);
       }
       return particleSystem;
     }

@@ -3,19 +3,10 @@
 
 function buildTouchBehaviors () {
 
-  function getActiveTouchStates (touchStates, x, y, width, height) {
-    return touchStates.filter((touchState) => {
-      let xIsInBounds = touchState.column >= x && touchState.column <= (x + width);
-      let yIsInBounds = touchState.row >= y && touchState.row <= (y + height);
-      return xIsInBounds && yIsInBounds;
-    });
-  }
-
-  function adjustSize (touchStates, x, y, width, height) {
-    let activeStates = getActiveTouchStates.apply(this, arguments);
-    if (activeStates.length > 1) {
-      let lowerBound = activeStates[0];
-      let upperBound = activeStates[1];
+  function adjustSize (activeTouchStates) {
+    if (activeTouchStates.length > 1) {
+      let lowerBound = activeTouchStates[0];
+      let upperBound = activeTouchStates[1];
 
       let newWidth = Math.abs(upperBound.column - lowerBound.column);
       let newHeight = Math.abs(upperBound.row - lowerBound.row);
@@ -26,10 +17,9 @@ function buildTouchBehaviors () {
     }
   }
 
-  function setRowValue (touchStates, x, y, width, height) {
-    let activeStates = getActiveTouchStates.apply(this, arguments);
-    if (activeStates.length) {
-      this.targetRowIndex = activeStates[0].row;
+  function setRowValue (activeTouchStates) {
+    if (activeTouchStates.length) {
+      this.targetRowIndex = activeTouchStates[0].row;
     }
   }
 

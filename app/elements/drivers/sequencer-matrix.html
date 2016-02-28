@@ -216,6 +216,10 @@
             this.bodyElementMatrix[row][column].classList.remove('sequencer-row__body-element--scheduled');
         }
 
+        getValue (row, column) {
+          return this.sequencerMatrix[row][column];
+        }
+
         getModel () {
           return this.sequencerMatrix;
         }

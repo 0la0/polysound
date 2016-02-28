@@ -56,7 +56,7 @@
           this.processMatrixEvent = buildMatrixEventBus(this.particles);
           //window.particles = this.particles;
           this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.viewMatrix, this.particles, this.processMatrixEvent);
-          this.clipManager = buildClipManager(this.matrixList, this.launchpad, () => {});
+          this.clipManager = buildClipManager.call(this, this.matrixList, this.launchpad, () => {}, this.processMatrixEvent);
         }
 
         detached() {
@@ -66,11 +66,15 @@
       }
       Polymer(LaunchpadSequencer);
 
+      //let matrixEventHandler = new MatrixEventHandler();
+
       //--- js imports ---//
       let midiHelpers = buildMidiHelpers();
       const StatusMap = midiHelpers.StatusMap;
       let getObjectFromMessage = midiHelpers.getObjectFromMessage;
       let getMessageFromObject = midiHelpers.getMessageFromObject;
+
+
       let ParticleDriver = importParticleDriver();
 
 
@@ -92,19 +96,45 @@
       };
 
 
-
-
       function buildViewMatrix () {
         let matrixNodeList = this.getElementsByClassName('matrix');
         return Array.prototype.slice.call(matrixNodeList)[0];
       }
 
-      function buildClipManager (matrixList, midiDevice, setActiveIndex) {
+      function buildClipManager (matrixList, midiDevice, setActiveIndex, processMatrixEvent) {
         return {
           queueActive: () => { },
           onMatrixChange: (matrixElement, row, column, value) => {
             //TODO: create an event bus
-            console.log('onMatrixChange', row, column, value);
+            //console.log('onMatrixChange', row, column, value);
+            let note = (row * 16) + column;
+            //console.log('note:', note);
+
+            let messageObject = {
+              status: 0,
+              note: note
+            };
+
+            if (value) {
+              let messageOn = {
+                command: StatusMap.NOTE_ON,
+                status: 0,
+                note: note,
+                value: Velocity.ON
+              };
+              let messageOff = {
+                command: StatusMap.NOTE_OFF,
+                status: 0,
+                note: note,
+                value: Velocity.OFF
+              };
+
+              processMatrixEvent(messageOn, row, column);
+              processMatrixEvent(messageOff, row, column);
+
+              this.viewMatrix.setValue(row, column);
+            }
+
           }
         };
       }
@@ -138,8 +168,6 @@
       }
 
 
-
-
       function buildMidiDevice (midiDeviceFactory, viewMatrix, particles, processMatrixEvent) {
 
         let launchpad = midiDeviceFactory.getDeviceByName('Launchpad Mini');
@@ -159,7 +187,7 @@
 
         function onmidimessage (event) {
           let message = getObjectFromMessage(event.data);
-          let noteValue = message.note;
+          //let noteValue = message.note;
           let row = Math.floor(message.note / 16);
           let column = message.note % 16;
 

@@ -6,6 +6,14 @@ function importParticleDriver () {
 
   let ParticleFactory = importParticleFactory();
 
+  function getActiveTouchStates (touchStates, x, y, width, height) {
+    return touchStates.filter((touchState) => {
+      let xIsInBounds = touchState.column >= x && touchState.column <= (x + width);
+      let yIsInBounds = touchState.row >= y && touchState.row <= (y + height);
+      return xIsInBounds && yIsInBounds;
+    });
+  }
+
   /**
     * A particle driver has a particle and manages its state
     **/
@@ -29,12 +37,17 @@ function importParticleDriver () {
     }
 
     applyTouchStates (touchStates) {
-      this.particleModel.processTouch(touchStates, this.x, this.y, this.width, this.height);
+      let activeTouchStates = getActiveTouchStates(touchStates, this.x, this.y, this.width, this.height);
+      this.particleModel.processTouch(activeTouchStates);
+      this.particleModel.processRender(activeTouchStates);
     }
 
   }
 
   return ParticleDriver;
 }
+
+
+
 
 </script>
