@@ -1,0 +1,59 @@
+<link rel="import" href="../helpers/matrix.html">
+
+<script>
+
+function importParticle () {
+
+  let Matrix = importMatrix();
+
+  class Particle {
+
+    constructor (x, y, width, height) {
+      this.rowIndex = 0;
+      this.columnIndex = 0;
+      this.rotateCnt = 0;
+      this.runCnt = 0;
+      this.setMatrix(x, y, width, height);
+    }
+
+    changeDirection () {
+      this.matrix = Matrix.reflectY(this.matrix);
+    }
+
+    getCurrentState () {
+      return this.matrix[this.rowIndex][this.columnIndex];
+    }
+
+    setMatrix (x, y, width, height) {
+      this.matrix = Matrix.create(x, y, width, height);
+    }
+
+    rotate (isClockwise) {
+      this.matrix = isClockwise ?
+        Matrix.rotateClockwise(this.matrix) :
+        Matrix.rotateCounterClockwise(this.matrix);
+    }
+
+    setRunBehavior (runBehavior) {
+      this.runBehavior = runBehavior;
+    }
+
+    run () {
+      if (this.runBehavior) { return this.runBehavior.call(this); }
+    }
+
+    setTouchBehavior (touchBehavior) {
+      this.touchBehavior = touchBehavior;
+    }
+
+    processTouch (events, x, y, width, height) {
+      if (this.touchBehavior) { return this.touchBehavior.apply(this, arguments); }
+    }
+
+  }
+
+  return Particle;
+}
+
+
+</script>

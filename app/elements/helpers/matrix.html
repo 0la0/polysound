@@ -3,68 +3,76 @@
 /**
   * Matrix helper functions
   **/
-class Matrix {
+function importMatrix () {
 
-  static create (x, y, width, height) {
-    return Array(height).fill(Array(width).fill(null))
-      .map((row, rowIndex) => {
-        return row.map((column, columnIndex) => {
-          return {
-            row: rowIndex + y,
-            column: columnIndex + x
-          };
+  class Matrix {
+
+    static create (x, y, width, height) {
+      return Array(height).fill(Array(width).fill(null))
+        .map((row, rowIndex) => {
+          return row.map((column, columnIndex) => {
+            return {
+              row: rowIndex + y,
+              column: columnIndex + x
+            };
+          });
+        });
+    }
+
+    static transpose (matrix) {
+      return matrix[0].map((topRowElement, index) => { //for each row index
+        return matrix.map((row) => { //return the corresponding column
+          return row[index];
         });
       });
+    }
+
+    static rotateClockwise (matrix) {
+      return Matrix.transpose(matrix).map(row => row.reverse());
+    }
+
+    static rotateCounterClockwise (matrix) {
+      return Matrix.transpose(matrix).reverse();
+    }
+
+    static rotate180 (matrix) {
+      let rotate90 = Matrix.rotateClockwise(matrix);
+      return Matrix.rotateClockwise(rotate90);
+    }
+
+    static shiftUp (matrix) {
+      matrix.push(matrix.shift());
+      return matrix;
+    }
+
+    static shiftDown (matrix) {
+      matrix.unshift(matrix.pop());
+      return matrix;
+    }
+
+    static reflectY (matrix) {
+      return matrix.map(row => row.reverse());
+    }
+
+    static reflectX (matrix) {
+      return matrix.reverse();
+    }
+
+    static print (matrix) {
+      let printString = matrix.map((row) => {
+        return row.map((element) => {
+          return ' * ' + element.row + ', ' + element.column;
+        });
+      }).join('\n');
+      console.log(printString);
+    }
+
   }
 
-  static transpose (matrix) {
-    return matrix[0].map((topRowElement, index) => { //for each row index
-      return matrix.map((row) => { //return the corresponding column
-        return row[index];
-      });
-    });
-  }
-
-  static rotateClockwise (matrix) {
-    return Matrix.transpose(matrix).map(row => row.reverse());
-  }
-
-  static rotateCounterClockwise (matrix) {
-    return Matrix.transpose(matrix).reverse();
-  }
-
-  static rotate180 (matrix) {
-    let rotate90 = Matrix.rotateClockwise(matrix);
-    return Matrix.rotateClockwise(rotate90);
-  }
-
-  static shiftUp (matrix) {
-    matrix.push(matrix.shift());
-    return matrix;
-  }
-
-  static shiftDown (matrix) {
-    matrix.unshift(matrix.pop());
-    return matrix;
-  }
-
-  static reflectY (matrix) {
-    return matrix.map(row => row.reverse());
-  }
-
-  static reflectX (matrix) {
-    return matrix.reverse();
-  }
-
-  static print (matrix) {
-    let printString = matrix.map((row) => {
-      return row.map((element) => {
-        return ' * ' + element.row + ', ' + element.column;
-      });
-    }).join('\n');
-    console.log(printString);
-  }
+  return Matrix;
 
 }
+
+
 
 </script>

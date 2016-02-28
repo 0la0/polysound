@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../helpers/midi.html">
 <link rel="import" href="../helpers/matrix.html">
+<link rel="import" href="../launchpad/index.html">
 
 <dom-module id="launchpad-sequencer">
   <template>
@@ -49,9 +50,12 @@
           this.schedulable = buildSchedulable.call(this);
           app.scheduler.register(this.schedulable);
 
-          let matrixNodeList = this.getElementsByClassName('matrix');
-          this.viewMatrix = Array.prototype.slice.call(matrixNodeList)[0];
-          this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.viewMatrix, this.particles);
+          this.viewMatrix = buildViewMatrix.call(this);
+          this.particles = buildParticles();
+
+          this.processMatrixEvent = buildMatrixEventBus(this.particles);
+          //window.particles = this.particles;
+          this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.viewMatrix, this.particles, this.processMatrixEvent);
           this.clipManager = buildClipManager(this.matrixList, this.launchpad, () => {});
         }
 
@@ -62,13 +66,13 @@
       }
       Polymer(LaunchpadSequencer);
 
-
       //--- js imports ---//
       let midiHelpers = buildMidiHelpers();
       const StatusMap = midiHelpers.StatusMap;
       let getObjectFromMessage = midiHelpers.getObjectFromMessage;
       let getMessageFromObject = midiHelpers.getMessageFromObject;
-      //--- importing Matrix as a class of static functions ---//
+      let ParticleDriver = importParticleDriver();
+
 
       const RunDirection = {
         CLOCKWISE: 'CLOCKWISE',
@@ -77,8 +81,23 @@
         FALL: 'FALL'
       };
 
-      let runBehaviors = buildRunBehaviors();
-      let touchBehaviors = buildTouchBehaviors();
+      //TODO: create map of all values
+      const Velocity = {
+        RED: 15,
+        GREEN: 60,
+        YELLOW: 62,
+        AMBER: 63,
+        OFF: 0,
+        ON: 127
+      };
+
+
+
+
+      function buildViewMatrix () {
+        let matrixNodeList = this.getElementsByClassName('matrix');
+        return Array.prototype.slice.call(matrixNodeList)[0];
+      }
 
       function buildClipManager (matrixList, midiDevice, setActiveIndex) {
         return {
@@ -90,28 +109,50 @@
         };
       }
 
+      function buildMatrixEventBus (particles) {
+        let touchList = [];
 
-      function buildMidiDevice (midiDeviceFactory, viewMatrix, particles) {
-        const Velocity = {
-          RED: 15,
-          GREEN: 60,
-          YELLOW: 62,
-          AMBER: 63,
-          OFF: 0,
-          ON: 127
-        };
+        return (message, row, column) => {
+          let messageObject = {
+            status: 0,
+            note: message.note
+          };
+
+          if (message.value === Velocity.ON) {
+            touchList.push({row: row, column: column});
+
+            messageObject.command = StatusMap.NOTE_ON;
+            messageObject.value = Velocity.GREEN;
+          }
+          else if (message.value === Velocity.OFF) {
+            touchList = touchList.filter((touchState) => {
+              return touchState.row !== row && touchState.column !== column;
+            });
+
+            messageObject.command = StatusMap.NOTE_OFF;
+            messageObject.value = Velocity.OFF;
+          }
+          particles.forEach(particle => particle.applyTouchStates(touchList));
+          return messageObject;
+        }
+      }
+
+
+
+
+      function buildMidiDevice (midiDeviceFactory, viewMatrix, particles, processMatrixEvent) {
 
         let launchpad = midiDeviceFactory.getDeviceByName('Launchpad Mini');
-        let touchList = [];
+        if (!launchpad.input && !launchpad.output) {
+          console.warn('Launchpad not connected!');
+        }
 
         function eventIsInMatrix (message, row, column) {
           return row < 8 && column < 8;
         }
-
         function eventIsInTopBar (message, row, column) {
           return message.command === 11;
         }
-
         function eventIsInSideBar (message, row, column) {
           return column === 8;
         }
@@ -122,45 +163,18 @@
           let row = Math.floor(message.note / 16);
           let column = message.note % 16;
 
-          // if (eventIsInMatrix(message, row, column)) {
-          //
-          // }
-          if (eventIsInTopBar(message, row, column)) {
-            return;
+          if (eventIsInMatrix(message, row, column)) {
+            let messageObj = processMatrixEvent(message, row, column);
+            launchpad.output.send(getMessageFromObject(messageObj));
+          }
+          else if (eventIsInTopBar(message, row, column)) {
+            //
           }
           else if (eventIsInSideBar(message, row, column)) {
             if (message.value === 127 && particles[row]) {
               particles[row].particleModel.changeDirection();
             }
-            return;
           }
-
-
-          let messageObject;
-          if (message.value === Velocity.ON) {
-            touchList.push({row: row, column: column});
-            messageObject = {
-              command: StatusMap.NOTE_ON,
-              status: 0,
-              note: noteValue,
-              value: Velocity.GREEN
-            };
-          }
-          if (message.value === Velocity.OFF) {
-            messageObject = {
-              command: StatusMap.NOTE_OFF,
-              status: 0,
-              note: noteValue,
-              value: Velocity.OFF
-            };
-            touchList = touchList.filter((touchState) => {
-              return touchState.row !== row && touchState.column !== column;
-            });
-          }
-          if (messageObject) {
-            launchpad.output.send(getMessageFromObject(messageObject));
-          }
-          particles.forEach(particle => particle.applyTouchStates(touchList));
         }
 
         function renderParticle (currentParticle, lastParticle) {
@@ -177,19 +191,21 @@
           launchpad.input.onmidimessage = onmidimessage;
         }
         launchpad.renderParticle = (launchpad.output) ? renderParticle : () => {};
+
         return launchpad;
       }
 
-      function buildSchedulable () {
-
+      function buildParticles () {
         let topParticle = new ParticleDriver(0, 0, 8, 2, RunDirection.CLOCKWISE);
         let middleParticle = new ParticleDriver(0, 2, 8, 2, RunDirection.COUNTER_CLOCKWISE);
         let bottomLeftParticle = new ParticleDriver(0, 4, 4, 4, RunDirection.COUNTER_CLOCKWISE);
         let bottomRightParticle = new ParticleDriver(4, 4, 4, 4, RunDirection.CASCADE);
         let fall = new ParticleDriver(7, 0, 1, 8, RunDirection.FALL);
-        this.particles = [topParticle, bottomLeftParticle, fall];
-        window.particles = this.particles;
+        return [topParticle, bottomLeftParticle, fall];
+      }
 
+
+      function buildSchedulable () {
         return {
           processTick: (beatNumber, time) => {
             beatNumber = beatNumber % this.width;
@@ -209,6 +225,7 @@
               this.particles.forEach(particle => particle.run());
             }
             this.particles.forEach((particle) => {
+              //TODO: move lauchpad rendering to processTick function, and build viewMatrix batch render function
               this.viewMatrix.renderCell(particle.currentValue, particle.lastValue, this.isReset);
               this.launchpad.renderParticle(particle.currentValue, particle.lastValue, this.isReset);
             });
@@ -224,193 +241,6 @@
           }
         }
       }
-
-      /**
-        * A particle driver has a particle and manages its state
-        **/
-      class ParticleDriver {
-
-        constructor (x, y, width, height, runSequence) {
-          this.x = x;
-          this.y = y;
-          this.width = width;
-          this.height = height;
-
-          this.particleModel = ParticleBuilder.create(x, y, width, height, runSequence);
-          this.currentValue = this.particleModel.getCurrentState();
-          this.lastValue = this.currentValue;
-        }
-
-        run () {
-          this.lastValue = this.currentValue;
-          this.currentValue = this.particleModel.run();
-          return this.currentValue;
-        }
-
-        applyTouchStates (touchStates) {
-          this.particleModel.processTouch(touchStates, this.x, this.y, this.width, this.height);
-        }
-
-      }
-
-
-      function buildTouchBehaviors () {
-
-        function getActiveTouchStates (touchStates, x, y, width, height) {
-          return touchStates.filter((touchState) => {
-            let xIsInBounds = touchState.column >= x && touchState.column <= (x + width);
-            let yIsInBounds = touchState.row >= y && touchState.row <= (y + height);
-            return xIsInBounds && yIsInBounds;
-          });
-        }
-
-        function adjustSize (touchStates, x, y, width, height) {
-          let activeStates = getActiveTouchStates.apply(this, arguments);
-
-          if (activeStates.length > 1) {
-            let lowerBound = activeStates[0];
-            let upperBound = activeStates[1];
-
-            let newWidth = Math.abs(upperBound.column - lowerBound.column);
-            let newHeight = Math.abs(upperBound.row - lowerBound.row);
-            let newX = Math.min(lowerBound.column, upperBound.column);
-            let newY = Math.min(lowerBound.row, upperBound.row);
-
-            this.setMatrix(newX, newY, newWidth + 1, newHeight + 1);
-          }
-        }
-
-        function setRowValue (touchStates, x, y, width, height) {
-          let activeStates = getActiveTouchStates.apply(this, arguments);
-          if (activeStates.length) {
-            this.targetRowIndex = activeStates[0].row;
-          }
-        }
-
-        return {
-          adjustSize: adjustSize,
-          setRowValue: setRowValue
-        }
-      }
-
-      function buildRunBehaviors () {
-
-        function rotate () {
-          if (++this.columnIndex >= this.matrix[this.rowIndex].length) {
-            this.matrix = Matrix.rotateCounterClockwise(this.matrix);
-            this.columnIndex = 1;
-            //a second check covers the case of a one dimensional matrix
-            if (this.columnIndex >= this.matrix[this.rowIndex].length) {
-              this.matrix = Matrix.rotateCounterClockwise(this.matrix);
-              this.columnIndex = 1;
-            }
-          }
-          return this.matrix[this.rowIndex][this.columnIndex];
-        }
-
-        function cascade () {
-          if (++this.columnIndex >= this.matrix[this.rowIndex].length) {
-
-            this.matrix = Matrix.rotate180(this.matrix);
-            if (++this.rotateCnt % 2 !== 0) {
-              this.matrix = Matrix.shiftDown(this.matrix);
-              this.matrix = Matrix.shiftDown(this.matrix);
-            }
-            this.columnIndex = 0;
-
-          }
-          return this.matrix[this.rowIndex][this.columnIndex];
-        }
-
-        function fall () {
-          if (++this.rowIndex >= this.matrix.length) {
-            this.rowIndex = this.targetRowIndex || 0;
-          }
-          return this.matrix[this.rowIndex][this.columnIndex];
-        }
-
-        return {
-          rotate: rotate,
-          cascade: cascade,
-          fall: fall
-        }
-
-      }
-
-
-      class BaseParticleSystem {
-
-        constructor (x, y, width, height) {
-          this.rowIndex = 0;
-          this.columnIndex = 0;
-          this.rotateCnt = 0;
-          this.runCnt = 0;
-          this.setMatrix(x, y, width, height);
-        }
-
-        changeDirection () {
-          this.matrix = Matrix.reflectY(this.matrix);
-        }
-
-        getCurrentState () {
-          return this.matrix[this.rowIndex][this.columnIndex];
-        }
-
-        setMatrix (x, y, width, height) {
-          this.matrix = Matrix.create(x, y, width, height);
-        }
-
-        rotate (isClockwise) {
-          this.matrix = isClockwise ?
-            Matrix.rotateClockwise(this.matrix) :
-            Matrix.rotateCounterClockwise(this.matrix);
-        }
-
-        setRunBehavior (runBehavior) {
-          this.runBehavior = runBehavior;
-        }
-
-        run () {
-          if (this.runBehavior) { return this.runBehavior.call(this); }
-        }
-
-        setTouchBehavior (touchBehavior) {
-          this.touchBehavior = touchBehavior;
-        }
-
-        processTouch (events, x, y, width, height) {
-          if (this.touchBehavior) { return this.touchBehavior.apply(this, arguments); }
-        }
-
-      }
-
-      class ParticleBuilder {
-
-        static create (x, y, width, height, runBehavior) {
-
-          let particleSystem = new BaseParticleSystem(x, y, width, height);
-          if (runBehavior === RunDirection.CLOCKWISE) {
-            particleSystem.setRunBehavior(runBehaviors.rotate);
-            particleSystem.setTouchBehavior(touchBehaviors.adjustSize);
-          }
-          else if (runBehavior === RunDirection.COUNTER_CLOCKWISE) {
-            particleSystem.changeDirection();
-            particleSystem.setRunBehavior(runBehaviors.rotate);
-            particleSystem.setTouchBehavior(touchBehaviors.adjustSize);
-          }
-          else if (runBehavior === RunDirection.CASCADE) {
-            particleSystem.setRunBehavior(runBehaviors.cascade);
-            particleSystem.setTouchBehavior(touchBehaviors.adjustSize);
-          }
-          else if (runBehavior === RunDirection.FALL) {
-            particleSystem.setRunBehavior(runBehaviors.fall);
-            particleSystem.setTouchBehavior(touchBehaviors.setRowValue);
-          }
-          return particleSystem;
-        }
-
-      }
-
 
     })();
   </script>

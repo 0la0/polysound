@@ -1,0 +1,51 @@
+<link rel="import" href="../helpers/matrix.html">
+
+<script>
+
+function buildRunBehaviors () {
+
+  let Matrix = importMatrix();
+
+  function rotate () {
+    if (++this.columnIndex >= this.matrix[this.rowIndex].length) {
+      this.matrix = Matrix.rotateCounterClockwise(this.matrix);
+      this.columnIndex = 1;
+      //a second check covers the case of a one dimensional matrix
+      if (this.columnIndex >= this.matrix[this.rowIndex].length) {
+        this.matrix = Matrix.rotateCounterClockwise(this.matrix);
+        this.columnIndex = 1;
+      }
+    }
+    return this.matrix[this.rowIndex][this.columnIndex];
+  }
+
+  function cascade () {
+    if (++this.columnIndex >= this.matrix[this.rowIndex].length) {
+
+      this.matrix = Matrix.rotate180(this.matrix);
+      if (++this.rotateCnt % 2 !== 0) {
+        this.matrix = Matrix.shiftDown(this.matrix);
+        this.matrix = Matrix.shiftDown(this.matrix);
+      }
+      this.columnIndex = 0;
+
+    }
+    return this.matrix[this.rowIndex][this.columnIndex];
+  }
+
+  function fall () {
+    if (++this.rowIndex >= this.matrix.length) {
+      this.rowIndex = this.targetRowIndex || 0;
+    }
+    return this.matrix[this.rowIndex][this.columnIndex];
+  }
+
+  return {
+    rotate: rotate,
+    cascade: cascade,
+    fall: fall
+  }
+
+}
+
+</script>

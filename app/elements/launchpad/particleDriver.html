@@ -1,0 +1,40 @@
+<link rel="import" href="./particleFactory.html">
+
+<script>
+
+function importParticleDriver () {
+
+  let ParticleFactory = importParticleFactory();
+
+  /**
+    * A particle driver has a particle and manages its state
+    **/
+  class ParticleDriver {
+
+    constructor (x, y, width, height, runSequence) {
+      this.x = x;
+      this.y = y;
+      this.width = width;
+      this.height = height;
+
+      this.particleModel = ParticleFactory.create(x, y, width, height, runSequence);
+      this.currentValue = this.particleModel.getCurrentState();
+      this.lastValue = this.currentValue;
+    }
+
+    run () {
+      this.lastValue = this.currentValue;
+      this.currentValue = this.particleModel.run();
+      return this.currentValue;
+    }
+
+    applyTouchStates (touchStates) {
+      this.particleModel.processTouch(touchStates, this.x, this.y, this.width, this.height);
+    }
+
+  }
+
+  return ParticleDriver;
+}
+
+</script>
