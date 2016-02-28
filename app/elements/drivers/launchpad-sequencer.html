@@ -16,6 +16,7 @@
         class="matrix"
         number-of-steps="8"
         number-of-rows="8"
+        clip-manager="{{clipManager}}"
         clip-label="Launchpad Clip">
       </sequencer-matrix>
 
@@ -51,6 +52,7 @@
           let matrixNodeList = this.getElementsByClassName('matrix');
           this.viewMatrix = Array.prototype.slice.call(matrixNodeList)[0];
           this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.viewMatrix, this.particles);
+          this.clipManager = buildClipManager(this.matrixList, this.launchpad, () => {});
         }
 
         detached() {
@@ -71,11 +73,23 @@
       const RunDirection = {
         CLOCKWISE: 'CLOCKWISE',
         COUNTER_CLOCKWISE : 'COUNTER_CLOCKWISE',
-        CASCADE: 'CASCADE'
+        CASCADE: 'CASCADE',
+        FALL: 'FALL'
       };
 
       let runBehaviors = buildRunBehaviors();
       let touchBehaviors = buildTouchBehaviors();
+
+      function buildClipManager (matrixList, midiDevice, setActiveIndex) {
+        return {
+          queueActive: () => { },
+          onMatrixChange: (matrixElement, row, column, value) => {
+            //TODO: create an event bus
+            console.log('onMatrixChange', row, column, value);
+          }
+        };
+      }
+
 
       function buildMidiDevice (midiDeviceFactory, viewMatrix, particles) {
         const Velocity = {
@@ -172,8 +186,8 @@
         let middleParticle = new ParticleDriver(0, 2, 8, 2, RunDirection.COUNTER_CLOCKWISE);
         let bottomLeftParticle = new ParticleDriver(0, 4, 4, 4, RunDirection.COUNTER_CLOCKWISE);
         let bottomRightParticle = new ParticleDriver(4, 4, 4, 4, RunDirection.CASCADE);
-        this.particles = [topParticle, middleParticle, bottomLeftParticle, bottomRightParticle];
-        //this.particles = [bottomLeftParticle];
+        let fall = new ParticleDriver(7, 0, 1, 8, RunDirection.FALL);
+        this.particles = [topParticle, bottomLeftParticle, fall];
         window.particles = this.particles;
 
         return {
@@ -234,7 +248,7 @@
         }
 
         applyTouchStates (touchStates) {
-          touchBehaviors.adjustSize.call(this, touchStates);
+          this.particleModel.processTouch(touchStates, this.x, this.y, this.width, this.height);
         }
 
       }
@@ -250,8 +264,8 @@
           });
         }
 
-        function adjustSize (touchStates) {
-          let activeStates = getActiveTouchStates(touchStates, this.x, this.y, this.width, this.height);
+        function adjustSize (touchStates, x, y, width, height) {
+          let activeStates = getActiveTouchStates.apply(this, arguments);
 
           if (activeStates.length > 1) {
             let lowerBound = activeStates[0];
@@ -262,13 +276,20 @@
             let newX = Math.min(lowerBound.column, upperBound.column);
             let newY = Math.min(lowerBound.row, upperBound.row);
 
-            this.particleModel.setMatrix(newX, newY, newWidth + 1, newHeight + 1);
+            this.setMatrix(newX, newY, newWidth + 1, newHeight + 1);
           }
+        }
 
+        function setRowValue (touchStates, x, y, width, height) {
+          let activeStates = getActiveTouchStates.apply(this, arguments);
+          if (activeStates.length) {
+            this.targetRowIndex = activeStates[0].row;
+          }
         }
 
         return {
-          adjustSize: adjustSize
+          adjustSize: adjustSize,
+          setRowValue: setRowValue
         }
       }
 
@@ -291,7 +312,7 @@
           if (++this.columnIndex >= this.matrix[this.rowIndex].length) {
 
             this.matrix = Matrix.rotate180(this.matrix);
-            if (++this.runCnt % 2 !== 0) {
+            if (++this.rotateCnt % 2 !== 0) {
               this.matrix = Matrix.shiftDown(this.matrix);
               this.matrix = Matrix.shiftDown(this.matrix);
             }
@@ -301,9 +322,17 @@
           return this.matrix[this.rowIndex][this.columnIndex];
         }
 
+        function fall () {
+          if (++this.rowIndex >= this.matrix.length) {
+            this.rowIndex = this.targetRowIndex || 0;
+          }
+          return this.matrix[this.rowIndex][this.columnIndex];
+        }
+
         return {
           rotate: rotate,
-          cascade: cascade
+          cascade: cascade,
+          fall: fall
         }
 
       }
@@ -314,6 +343,7 @@
         constructor (x, y, width, height) {
           this.rowIndex = 0;
           this.columnIndex = 0;
+          this.rotateCnt = 0;
           this.runCnt = 0;
           this.setMatrix(x, y, width, height);
         }
@@ -330,6 +360,12 @@
           this.matrix = Matrix.create(x, y, width, height);
         }
 
+        rotate (isClockwise) {
+          this.matrix = isClockwise ?
+            Matrix.rotateClockwise(this.matrix) :
+            Matrix.rotateCounterClockwise(this.matrix);
+        }
+
         setRunBehavior (runBehavior) {
           this.runBehavior = runBehavior;
         }
@@ -338,23 +374,37 @@
           if (this.runBehavior) { return this.runBehavior.call(this); }
         }
 
+        setTouchBehavior (touchBehavior) {
+          this.touchBehavior = touchBehavior;
+        }
+
+        processTouch (events, x, y, width, height) {
+          if (this.touchBehavior) { return this.touchBehavior.apply(this, arguments); }
+        }
+
       }
 
       class ParticleBuilder {
 
         static create (x, y, width, height, runBehavior) {
 
-
           let particleSystem = new BaseParticleSystem(x, y, width, height);
           if (runBehavior === RunDirection.CLOCKWISE) {
             particleSystem.setRunBehavior(runBehaviors.rotate);
+            particleSystem.setTouchBehavior(touchBehaviors.adjustSize);
           }
           else if (runBehavior === RunDirection.COUNTER_CLOCKWISE) {
             particleSystem.changeDirection();
             particleSystem.setRunBehavior(runBehaviors.rotate);
+            particleSystem.setTouchBehavior(touchBehaviors.adjustSize);
           }
           else if (runBehavior === RunDirection.CASCADE) {
             particleSystem.setRunBehavior(runBehaviors.cascade);
+            particleSystem.setTouchBehavior(touchBehaviors.adjustSize);
+          }
+          else if (runBehavior === RunDirection.FALL) {
+            particleSystem.setRunBehavior(runBehaviors.fall);
+            particleSystem.setTouchBehavior(touchBehaviors.setRowValue);
           }
           return particleSystem;
         }
