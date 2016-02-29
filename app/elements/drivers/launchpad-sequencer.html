@@ -53,10 +53,14 @@
           this.viewMatrix = buildViewMatrix.call(this);
           this.particles = buildParticles();
 
-          this.processMatrixEvent = buildMatrixEventBus(this.particles);
+          this.eventManager = new EventManager(this.particles);
+          //this.processMatrixEvent = buildMatrixEventBus(this.particles);
           //window.particles = this.particles;
-          this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.viewMatrix, this.particles, this.processMatrixEvent);
-          this.clipManager = buildClipManager.call(this, this.matrixList, this.launchpad, () => {}, this.processMatrixEvent);
+          this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.particles, this.eventManager);
+          this.clipManager = buildClipManager(this.matrixList, this.eventManager, this.viewMatrix);
+
+          this.eventManager.setViewMatrix(this.viewMatrix);
+          this.eventManager.setLaunchpad(this.launchpad);
         }
 
         detached() {
@@ -66,14 +70,12 @@
       }
       Polymer(LaunchpadSequencer);
 
-      //let matrixEventHandler = new MatrixEventHandler();
 
       //--- js imports ---//
       let midiHelpers = buildMidiHelpers();
       const StatusMap = midiHelpers.StatusMap;
       let getObjectFromMessage = midiHelpers.getObjectFromMessage;
       let getMessageFromObject = midiHelpers.getMessageFromObject;
-
       let Matrix = importMatrix();
       let runBehaviors = {
         rotate: importRotateBehavior(Matrix),
@@ -100,21 +102,14 @@
         return Array.prototype.slice.call(matrixNodeList)[0];
       }
 
-      function buildClipManager (matrixList, midiDevice, setActiveIndex, processMatrixEvent) {
+      function buildClipManager (matrixList, eventManager, viewMatrix) {
         return {
           queueActive: () => { },
           onMatrixChange: (matrixElement, row, column, value) => {
-            //TODO: create an event bus
-            //console.log('onMatrixChange', row, column, value);
-            let note = (row * 16) + column;
-            //console.log('note:', note);
-
-            let messageObject = {
-              status: 0,
-              note: note
-            };
 
             if (value) {
+              let note = (row * 16) + column;
+
               let messageOn = {
                 command: StatusMap.NOTE_ON,
                 status: 0,
@@ -128,46 +123,77 @@
                 value: Velocity.OFF
               };
 
-              processMatrixEvent(messageOn, row, column);
-              processMatrixEvent(messageOff, row, column);
-
-              this.viewMatrix.setValue(row, column);
+              eventManager.sendEvent(messageOn, row, column);
             }
 
           }
         };
       }
 
-      function buildMatrixEventBus (particles) {
-        let touchList = [];
+      class EventManager {
 
-        return (message, row, column) => {
+        constructor (particleList) {
+          this.particleList = particleList;
+
+          //this.subscribers = new Set();
+          this.touchList = [];
+        }
+
+        setLaunchpad (launchpad) {
+          this.launchpad = launchpad;
+        }
+
+        setViewMatrix (viewMatrix) {
+          this.viewMatrix = viewMatrix;
+        }
+
+        // subscribe (subscriber) {
+        //   this.subscribers.add(subscriber);
+        // }
+        //
+        // unsubscribe (subscriber) {
+        //   this.subscribers.delete(subscriber);
+        // }
+
+        sendEvent (message, row, column) {
           let messageObject = {
             status: 0,
             note: message.note
           };
 
           if (message.value === Velocity.ON) {
-            touchList.push({row: row, column: column});
+            this.touchList.push({row: row, column: column});
 
             messageObject.command = StatusMap.NOTE_ON;
             messageObject.value = Velocity.GREEN;
           }
           else if (message.value === Velocity.OFF) {
-            touchList = touchList.filter((touchState) => {
+            this.touchList = this.touchList.filter((touchState) => {
               return touchState.row !== row && touchState.column !== column;
             });
 
             messageObject.command = StatusMap.NOTE_OFF;
             messageObject.value = Velocity.OFF;
           }
-          particles.forEach(particle => particle.applyTouchStates(touchList));
-          return messageObject;
+          //pass callback that can be picked up by render behavior
+          this.particleList.forEach(particle => particle.applyTouchStates(this.touchList));
+
+          //TODO: for a given render behavior, apply render to both launchpad and viewMatrix
+          this.launchpad.output.send(getMessageFromObject(messageObject));
+          this.viewMatrix.setValue(row, column);
         }
+
+        renderEvent () {
+          //TODO
+          // this.viewMatrix.renderCell(particle.currentValue, particle.lastValue, this.isReset);
+          // this.launchpad.renderParticle(particle.currentValue, particle.lastValue, this.isReset);
+        }
+
       }
 
 
-      function buildMidiDevice (midiDeviceFactory, viewMatrix, particles, processMatrixEvent) {
+
+      function buildMidiDevice (midiDeviceFactory, particles, eventManager) {
 
         let launchpad = midiDeviceFactory.getDeviceByName('Launchpad Mini');
         if (!launchpad.input && !launchpad.output) {
@@ -191,8 +217,9 @@
           let column = message.note % 16;
 
           if (eventIsInMatrix(message, row, column)) {
-            let messageObj = processMatrixEvent(message, row, column);
-            launchpad.output.send(getMessageFromObject(messageObj));
+            let messageObj = eventManager.sendEvent(message, row, column);
+            //TODO: MOVE TO EVENT MANAGER
+            // launchpad.output.send(getMessageFromObject(messageObj));
           }
           else if (eventIsInTopBar(message, row, column)) {
             //

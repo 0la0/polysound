@@ -118,7 +118,7 @@
           };
 
           this.listeners = {
-            'tap': '_onTap'
+            'down': '_onDown'
           };
 
         }
@@ -139,7 +139,7 @@
         detached() {}
         attributeChanged() {}
 
-        _onTap (event) {
+        _onDown (event) {
           let matrixElement = {
             hasSolution: false,
             rowIndex: null,
