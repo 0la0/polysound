@@ -74,16 +74,15 @@
       let getObjectFromMessage = midiHelpers.getObjectFromMessage;
       let getMessageFromObject = midiHelpers.getMessageFromObject;
 
+      let Matrix = importMatrix();
+      let runBehaviors = {
+        rotate: importRotateBehavior(Matrix),
+        cascade: importCascadeBehavior(Matrix),
+        fall: importFallBehavior()
+      };
 
       let ParticleDriver = importParticleDriver();
 
-
-      const RunDirection = {
-        CLOCKWISE: 'CLOCKWISE',
-        COUNTER_CLOCKWISE : 'COUNTER_CLOCKWISE',
-        CASCADE: 'CASCADE',
-        FALL: 'FALL'
-      };
 
       //TODO: create map of all values
       const Velocity = {
@@ -224,11 +223,11 @@
       }
 
       function buildParticles () {
-        let topParticle = new ParticleDriver(0, 0, 8, 2, RunDirection.CLOCKWISE);
-        let middleParticle = new ParticleDriver(0, 2, 8, 2, RunDirection.COUNTER_CLOCKWISE);
-        let bottomLeftParticle = new ParticleDriver(0, 4, 4, 4, RunDirection.COUNTER_CLOCKWISE);
-        let bottomRightParticle = new ParticleDriver(4, 4, 4, 4, RunDirection.CASCADE);
-        let fall = new ParticleDriver(7, 0, 1, 8, RunDirection.FALL);
+        let topParticle = new ParticleDriver(0, 0, 8, 2, runBehaviors.rotate);
+        let middleParticle = new ParticleDriver(0, 2, 8, 2,runBehaviors.rotate);
+        let bottomLeftParticle = new ParticleDriver(0, 4, 4, 4, runBehaviors.rotate);
+        let bottomRightParticle = new ParticleDriver(4, 4, 4, 4, runBehaviors.cascade);
+        let fall = new ParticleDriver(7, 0, 1, 8, runBehaviors.fall);
         return [topParticle, bottomLeftParticle, fall];
       }
 

@@ -1,10 +1,11 @@
-<link rel="import" href="./particleFactory.html">
+<!-- <link rel="import" href="./particleFactory.html"> -->
+<link rel="import" href="./particle.html">
 
 <script>
 
 function importParticleDriver () {
 
-  let ParticleFactory = importParticleFactory();
+  let Particle = importParticle();
 
   function getActiveTouchStates (touchStates, x, y, width, height) {
     return touchStates.filter((touchState) => {
@@ -19,13 +20,13 @@ function importParticleDriver () {
     **/
   class ParticleDriver {
 
-    constructor (x, y, width, height, runSequence) {
+    constructor (x, y, width, height, runBehavior) {
       this.x = x;
       this.y = y;
       this.width = width;
       this.height = height;
 
-      this.particleModel = ParticleFactory.create(x, y, width, height, runSequence);
+      this.particleModel = new Particle(x, y, width, height, runBehavior);
       this.currentValue = this.particleModel.getCurrentState();
       this.lastValue = this.currentValue;
     }
