@@ -13,13 +13,13 @@
 
     <div class="matrix-list">
 
-      <sequencer-matrix
+      <!-- <sequencer-matrix
         class="matrix"
         number-of-steps="8"
         number-of-rows="8"
         clip-manager="{{clipManager}}"
         clip-label="Launchpad Clip">
-      </sequencer-matrix>
+      </sequencer-matrix> -->
 
     </div>
 
@@ -50,21 +50,13 @@
           this.schedulable = buildSchedulable.call(this);
           app.scheduler.register(this.schedulable);
 
-          this.viewMatrix = buildViewMatrix.call(this);
           this.particles = buildParticles();
-
-          this.eventManager = new EventManager(this.particles);
-          //this.processMatrixEvent = buildMatrixEventBus(this.particles);
-          //window.particles = this.particles;
-          this.launchpad = buildMidiDevice(app.audio.midiDeviceFactory, this.particles, this.eventManager);
-          this.clipManager = buildClipManager(this.matrixList, this.eventManager, this.viewMatrix);
-
-          this.eventManager.setViewMatrix(this.viewMatrix);
-          this.eventManager.setLaunchpad(this.launchpad);
+          this.launchpad = buildLaunchpad(app.audio.midiDeviceFactory, this.particles);
         }
 
         detached() {
           app.scheduler.deregister(this.schedulable);
+          //TODO: close midi connection
         }
         attributeChanged() {}
       }
@@ -77,13 +69,14 @@
       let getObjectFromMessage = midiHelpers.getObjectFromMessage;
       let getMessageFromObject = midiHelpers.getMessageFromObject;
       let Matrix = importMatrix();
+      let launchpadHelpers = importLaunchpadHelpers();
+      let ParticleDriver = importParticleDriver();
+
       let runBehaviors = {
         rotate: importRotateBehavior(Matrix),
         cascade: importCascadeBehavior(Matrix),
         fall: importFallBehavior()
       };
-
-      let ParticleDriver = importParticleDriver();
 
 
       //TODO: create map of all values
@@ -96,158 +89,87 @@
         ON: 127
       };
 
+      function buildOnMidiMessage (launchpad, particleList) {
 
-      function buildViewMatrix () {
-        let matrixNodeList = this.getElementsByClassName('matrix');
-        return Array.prototype.slice.call(matrixNodeList)[0];
-      }
+        let touchList = [];
 
-      function buildClipManager (matrixList, eventManager, viewMatrix) {
-        return {
-          queueActive: () => { },
-          onMatrixChange: (matrixElement, row, column, value) => {
-
-            if (value) {
-              let note = (row * 16) + column;
-
-              let messageOn = {
-                command: StatusMap.NOTE_ON,
-                status: 0,
-                note: note,
-                value: Velocity.ON
-              };
-              let messageOff = {
-                command: StatusMap.NOTE_OFF,
-                status: 0,
-                note: note,
-                value: Velocity.OFF
-              };
-
-              eventManager.sendEvent(messageOn, row, column);
-            }
-
-          }
-        };
-      }
-
-      class EventManager {
-
-        constructor (particleList) {
-          this.particleList = particleList;
-
-          //this.subscribers = new Set();
-          this.touchList = [];
-        }
-
-        setLaunchpad (launchpad) {
-          this.launchpad = launchpad;
-        }
-
-        setViewMatrix (viewMatrix) {
-          this.viewMatrix = viewMatrix;
-        }
-
-        // subscribe (subscriber) {
-        //   this.subscribers.add(subscriber);
-        // }
-        //
-        // unsubscribe (subscriber) {
-        //   this.subscribers.delete(subscriber);
-        // }
-
-        sendEvent (message, row, column) {
-          let messageObject = {
-            status: 0,
-            note: message.note
-          };
-
-          if (message.value === Velocity.ON) {
-            this.touchList.push({row: row, column: column});
-
-            messageObject.command = StatusMap.NOTE_ON;
-            messageObject.value = Velocity.GREEN;
-          }
-          else if (message.value === Velocity.OFF) {
-            this.touchList = this.touchList.filter((touchState) => {
-              return touchState.row !== row && touchState.column !== column;
-            });
-
-            messageObject.command = StatusMap.NOTE_OFF;
-            messageObject.value = Velocity.OFF;
-          }
-          //pass callback that can be picked up by render behavior
-          this.particleList.forEach(particle => particle.applyTouchStates(this.touchList));
-
-          //TODO: for a given render behavior, apply render to both launchpad and viewMatrix
-          this.launchpad.output.send(getMessageFromObject(messageObject));
-          this.viewMatrix.setValue(row, column);
-        }
-
-        renderEvent () {
-          //TODO
-          // this.viewMatrix.renderCell(particle.currentValue, particle.lastValue, this.isReset);
-          // this.launchpad.renderParticle(particle.currentValue, particle.lastValue, this.isReset);
-        }
-
-      }
-
-
-
-      function buildMidiDevice (midiDeviceFactory, particles, eventManager) {
-
-        let launchpad = midiDeviceFactory.getDeviceByName('Launchpad Mini');
-        if (!launchpad.input && !launchpad.output) {
-          console.warn('Launchpad not connected!');
-        }
-
-        function eventIsInMatrix (message, row, column) {
-          return row < 8 && column < 8;
-        }
-        function eventIsInTopBar (message, row, column) {
-          return message.command === 11;
-        }
-        function eventIsInSideBar (message, row, column) {
-          return column === 8;
-        }
-
-        function onmidimessage (event) {
+        return function onmidimessage (event) {
           let message = getObjectFromMessage(event.data);
           //let noteValue = message.note;
           let row = Math.floor(message.note / 16);
           let column = message.note % 16;
 
-          if (eventIsInMatrix(message, row, column)) {
-            let messageObj = eventManager.sendEvent(message, row, column);
-            //TODO: MOVE TO EVENT MANAGER
-            // launchpad.output.send(getMessageFromObject(messageObj));
+          if (launchpadHelpers.eventIsInMatrix(message, row, column)) {
+
+            let messageObject = {
+              status: 0,
+              note: message.note
+            };
+
+            if (message.value === Velocity.ON) {
+              touchList.push({row: row, column: column});
+
+              messageObject.command = StatusMap.NOTE_ON;
+              messageObject.value = Velocity.GREEN;
+            }
+            else if (message.value === Velocity.OFF) {
+              touchList = touchList.filter((touchState) => {
+                return touchState.row !== row && touchState.column !== column;
+              });
+
+              messageObject.command = StatusMap.NOTE_OFF;
+              messageObject.value = Velocity.OFF;
+            }
+            //pass callback that can be picked up by render behavior
+            particleList.forEach(particle => particle.applyTouchStates(touchList));
+
+            //TODO: for a given render behavior, apply render to both launchpad and viewMatrix
+            launchpad.output.send(getMessageFromObject(messageObject));
+
           }
-          else if (eventIsInTopBar(message, row, column)) {
+          else if (launchpadHelpers.eventIsInTopBar(message, row, column)) {
             //
           }
-          else if (eventIsInSideBar(message, row, column)) {
+          else if (launchpadHelpers.eventIsInSideBar(message, row, column)) {
             if (message.value === 127 && particles[row]) {
-              particles[row].particleModel.changeDirection();
+              particleList[row].particleModel.changeDirection();
             }
           }
         }
 
-        function renderParticle (currentParticle, lastParticle) {
+      }
+
+      function buildRenderParticle (launchpad) {
+
+        return function renderParticle (currentParticle, lastParticle) {
+          let MIDI_OFF = 8
+          let MIDI_ON = 9;
+
           let noteOn = currentParticle.row * 16 + currentParticle.column;
           let noteOff = lastParticle.row * 16 + lastParticle.column;
-          let messageObjectOn = { command: 9, status: 0, note: noteOn, value: Velocity.AMBER };
-          let messageObjectOff = { command: 8, status: 0, note: noteOff, value: Velocity.OFF };
+          let messageObjectOn = { command: MIDI_ON, status: 0, note: noteOn, value: Velocity.AMBER };
+          let messageObjectOff = { command: MIDI_OFF, status: 0, note: noteOff, value: Velocity.OFF };
 
           launchpad.output.send(getMessageFromObject(messageObjectOn));
           launchpad.output.send(getMessageFromObject(messageObjectOff));
         }
 
-        if (launchpad.input) {
-          launchpad.input.onmidimessage = onmidimessage;
-        }
-        launchpad.renderParticle = (launchpad.output) ? renderParticle : () => {};
+      }
 
+
+      function buildLaunchpad (midiDeviceFactory, particles) {
+        let launchpad = midiDeviceFactory.getDeviceByName('Launchpad Mini');
+        if (!launchpad.input && !launchpad.output) {
+          console.warn('Launchpad not connected!');
+        }
+
+        if (launchpad.input) {
+          launchpad.input.onmidimessage = buildOnMidiMessage(launchpad, particles);
+        }
+        launchpad.renderParticle = (launchpad.output) ? buildRenderParticle(launchpad) : () => {};
         return launchpad;
       }
+
 
       function buildParticles () {
         let topParticle = new ParticleDriver(0, 0, 8, 2, runBehaviors.rotate);
@@ -279,8 +201,8 @@
               this.particles.forEach(particle => particle.run());
             }
             this.particles.forEach((particle) => {
-              //TODO: move lauchpad rendering to processTick function, and build viewMatrix batch render function
-              this.viewMatrix.renderCell(particle.currentValue, particle.lastValue, this.isReset);
+              //TODO: this is also dependent on render behaviors
+              //this.viewMatrix.renderCell(particle.currentValue, particle.lastValue, this.isReset);
               this.launchpad.renderParticle(particle.currentValue, particle.lastValue, this.isReset);
             });
             if (this.isReset) {
@@ -291,7 +213,8 @@
             this.isReset = true;
           },
           stop: () => {
-            this.viewMatrix.stop();
+            //this.viewMatrix.stop();
+            //TODO: clean launchpad
           }
         }
       }
