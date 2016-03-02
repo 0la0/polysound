@@ -141,7 +141,7 @@
 
       function buildRenderParticle (launchpad) {
 
-        return function renderParticle (currentParticle, lastParticle) {
+        return function renderParticle (currentParticle, lastParticle, time) {
           let MIDI_OFF = 8
           let MIDI_ON = 9;
 
@@ -150,8 +150,8 @@
           let messageObjectOn = { command: MIDI_ON, status: 0, note: noteOn, value: Velocity.AMBER };
           let messageObjectOff = { command: MIDI_OFF, status: 0, note: noteOff, value: Velocity.OFF };
 
-          launchpad.output.send(getMessageFromObject(messageObjectOn));
-          launchpad.output.send(getMessageFromObject(messageObjectOff));
+          launchpad.output.send(getMessageFromObject(messageObjectOn), time);
+          launchpad.output.send(getMessageFromObject(messageObjectOff), time);
         }
 
       }
@@ -176,16 +176,50 @@
         let middleParticle = new ParticleDriver(0, 2, 8, 2,runBehaviors.rotate);
         let bottomLeftParticle = new ParticleDriver(0, 4, 4, 4, runBehaviors.rotate);
         let bottomRightParticle = new ParticleDriver(4, 4, 4, 4, runBehaviors.cascade);
-        let fall = new ParticleDriver(7, 0, 1, 8, runBehaviors.fall);
-        return [topParticle, bottomLeftParticle, fall];
+
+        let fall0 = new ParticleDriver(4, 0, 1, 8, runBehaviors.fall);
+        let fall1 = new ParticleDriver(5, 0, 1, 8, runBehaviors.fall);
+        let fall2 = new ParticleDriver(6, 0, 1, 8, runBehaviors.fall);
+        let fall3 = new ParticleDriver(7, 0, 1, 8, runBehaviors.fall);
+
+        return [topParticle, bottomLeftParticle, fall0, fall1, fall2, fall3];
       }
 
+      const TEMP_NOTE_MAP = {
+        2: 0,
+        3: 5,
+        4: 12,
+        5: 7
+      };
 
       function buildSchedulable () {
         return {
           processTick: (beatNumber, time) => {
             beatNumber = beatNumber % this.width;
 
+
+            if (!this.isReset) {
+              this.particles.forEach(particle => particle.run());
+            }
+            this.particles.forEach((particle, particleIndex) => {
+
+              this.launchpad.renderParticle(particle.currentValue, particle.lastValue, time, this.isReset);
+
+              if (particle.play()) {
+
+                let note = TEMP_NOTE_MAP[particleIndex];
+                this.instrumentList.forEach((instrumentSet) => {
+                  instrumentSet.forEach((instrument) => {
+                    instrument.play(note, time);
+                  });
+                });
+
+              }
+
+            });
+            if (this.isReset) {
+              this.isReset = false;
+            }
             //TODO: implement instrument logic
             // let columnData = this.viewMatrix.getColumnValueList(beatNumber);
             // columnData.forEach( (matrixElement, index) => {
@@ -196,19 +230,7 @@
             //   // }
             // });
           },
-          render: (beatNumber, lastBeatNumber) => {
-            if (!this.isReset) {
-              this.particles.forEach(particle => particle.run());
-            }
-            this.particles.forEach((particle) => {
-              //TODO: this is also dependent on render behaviors
-              //this.viewMatrix.renderCell(particle.currentValue, particle.lastValue, this.isReset);
-              this.launchpad.renderParticle(particle.currentValue, particle.lastValue, this.isReset);
-            });
-            if (this.isReset) {
-              this.isReset = false;
-            }
-          },
+          render: (beatNumber, lastBeatNumber) => {},
           start: () => {
             this.isReset = true;
           },

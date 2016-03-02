@@ -37,6 +37,7 @@ function importParticle () {
 
     setRunBehavior (runBehavior) {
       this.runBehavior = runBehavior;
+      this.runBehavior.init.call(this);
     }
 
     run () {
@@ -49,6 +50,10 @@ function importParticle () {
 
     processRender () {
       return this.runBehavior.render.call(this);
+    }
+
+    processPlay () {
+      return this.runBehavior.play.call(this);
     }
 
   }

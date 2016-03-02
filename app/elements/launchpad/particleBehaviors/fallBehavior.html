@@ -4,7 +4,9 @@ function importFallBehavior () {
 
   function fallBehavior () {
 
-    function init () {}
+    function init (targetRowIndex) {
+      this.targetRowIndex = targetRowIndex || 0;
+    }
 
     function run () {
       if (++this.rowIndex >= this.matrix.length) {
@@ -14,7 +16,7 @@ function importFallBehavior () {
     }
 
     function render () {
-      //console.log('render', this.targetRowIndex, 'clear everything else');
+      //TODO: return a list of value to render, i.e. move current / last management here
     }
 
     function touch (activeTouchStates) {
@@ -23,7 +25,9 @@ function importFallBehavior () {
       }
     }
 
-    function play () {}
+    function play () {
+      return this.rowIndex === this.matrix.length - 1;
+    }
 
     return {
       init: init,
