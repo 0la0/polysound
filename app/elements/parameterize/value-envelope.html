@@ -1,0 +1,104 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="value-envelope">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .envelope {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+      }
+      .envelope__button {
+        height: 10px;
+        width: 10px;
+      }
+      .envelope__button-open {}
+      .envelope__button-schedule {}
+
+      .envelope__container {
+        display: none;
+        position: absolute;
+        background-color: white;
+        width: 300px;
+        border: 1px solid black;
+        z-index: 2;
+        box-shadow: 0 0 1px 1px black;
+        margin: -20px 0 0 8px;
+      }
+      .envelope__container--active {
+        display: block;
+      }
+    </style>
+
+
+    <div class="envelope">
+      <div class="envelope__button">
+        <simple-button class="envelope__button-open" button-model="{{onpenButtonModel}}"></simple-button>
+        <simple-button class="envelope__button-schedule" button-model="{{scheduleButtonModel}}"></simple-button>
+      </div>
+      <div class="envelope__container" id="envelopeContainer">
+        <slider-field-vertical
+          bound-value="{{boundValue}}"
+          is-scheduled="[[isScheduled]]"
+          id="sliderFieldVertical"></slider-field-vertical>
+      </div>
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class Envelope {
+
+        beforeRegister() {
+          this.is = 'value-envelope';
+
+          this.properties = {
+            boundValue: {
+              type: Number,
+              notify: true
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {
+          this.onpenButtonModel = buildOnButtonModel.call(this);
+          this.scheduleButtonModel = buildScheduleButtonModel.call(this);
+        }
+        detached() {}
+        attributeChanged() {}
+
+      }
+      Polymer(Envelope);
+
+      function buildOnButtonModel () {
+        return {
+          callback: (isOpen) => {
+            this.$.envelopeContainer.classList.toggle('envelope__container--active');
+            if (isOpen) {
+              this.$.sliderFieldVertical.resetBoundingClientRect();
+            }
+          }
+        };
+      }
+
+      function buildScheduleButtonModel () {
+        return {
+          callback: (isScheduled) => {
+            this.isScheduled = isScheduled;
+          }
+        };
+      }
+
+    })();
+  </script>
+
+</dom-module>

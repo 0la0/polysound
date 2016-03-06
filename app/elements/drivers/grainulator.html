@@ -4,12 +4,11 @@
   <template>
     <style>
       :host {
-        display: flex;
-        flex-flow: row;
-        flex-wrap: nowrap;
+        display: block;
         font-size: 12px;
       }
       .grainulator {
+        display: block;
         width: 200px;
         border: 1px solid black;
       }
@@ -53,29 +52,18 @@
         </div>
       </div>
 
-      <template is="dom-repeat" items="{{objectModel}}" as="item">
 
-        <div class="grainulator-row" value="position">
-          <label>{{item.label}}</label>
-          <slider-horizontal
-            slider-value="{{item.value}}"
-            lower-bound="{{item.lb}}" upper-bound="{{item.ub}}">
-          </slider-horizontal>
-        </div>
-
-      </template>
-
-
-
-      <!-- <div class="grainulator-row" value="position">
+      <div class="grainulator-row" value="position">
+        <value-envelope bound-value="{{position}}"></value-envelope>
         <label>Position</label>
         <slider-horizontal
           slider-value={{position}}
           lower-bound="0" upper-bound="1">
         </slider-horizontal>
-      </div> -->
+      </div>
 
-      <!-- <div class="grainulator-row" value="spread">
+      <div class="grainulator-row" value="spread">
+        <value-envelope bound-value="{{spread}}"></value-envelope>
         <label>Spread</label>
         <slider-horizontal
           slider-value={{spread}}
@@ -84,6 +72,7 @@
       </div>
 
       <div class="grainulator-row" value="loopTime">
+        <value-envelope bound-value="{{loopTime}}"></value-envelope>
         <label>Loop Time</label>
         <slider-horizontal
           slider-value={{loopTime}}
@@ -92,6 +81,7 @@
       </div>
 
       <div class="grainulator-row" value="numVoices">
+        <value-envelope bound-value="{{numVoices}}"></value-envelope>
         <label>Num Voice</label>
         <slider-horizontal
           slider-value={{numVoices}}
@@ -100,17 +90,14 @@
       </div>
 
       <div class="grainulator-row" value="pitch">
+        <value-envelope bound-value="{{pitch}}"></value-envelope>
         <label>Pitch</label>
         <slider-horizontal
           slider-value={{pitch}}
           lower-bound="-12" upper-bound="12">
         </slider-horizontal>
-      </div> -->
+      </div>
 
-    </div>
-
-    <div class="grainulator__param-box" id="paramBox">
-      <parameter-sequencer parameterized={{objectModel}}></parameter-sequencer>
     </div>
 
   </template>
@@ -128,9 +115,26 @@
             instrumentSet: {
               type: Object
             },
-            objectModel: {
-              type: Array,
-              notify: true
+            position: {
+              type: Number,
+              value: 0.1
+            },
+            spread: {
+              type: Number,
+              value: 0
+            },
+            loopTime: {
+              type: Number,
+              value: 0.5
+            },
+            numVoices: {
+              type: Number,
+              value: 1
+            },
+            pitch: {
+              type: Number,
+              value: 0,
+              test: 0.5
             }
           };
 
@@ -140,40 +144,22 @@
         ready() {}
         attached() {
           this.isOn = false;
-          this.paramBoxIsShowing = false;
           this.buttonModel = buildButtonModel.call(this);
-
-          //TODO: change headers into element, that couples with param box
-          this.$.header.addEventListener('click', (event) => {
-            this.$.paramBox.classList.toggle('grainulator__param-box--active');
-            this.$$('parameter-sequencer').resetBoundingClientRect();
-          }, false);
-
-          this.objectModel = buildGrainulatorModel();
         }
         detached() {}
         attributeChanged() {}
 
         _grainLoop () {
-          // this.instrumentSet.forEach((instrument) => {
-          //   for (let i = 0; i < this.numVoices; i++) {
-          //     let position = getPosition(this.position, instrument.getDuration(), this.spread);
-          //     let pitch = Math.round(this.pitch);
-          //     instrument.play(pitch, 0, position);
-          //   }
-          // });
-
           this.instrumentSet.forEach((instrument) => {
-            for (let i = 0; i < this.objectModel[3].value; i++) {
-              let position = getPosition(this.objectModel[0].value, instrument.getDuration(), this.objectModel[1].value);
-              let pitch = Math.round(this.objectModel[4].value);
+            for (let i = 0; i < this.numVoices; i++) {
+              let position = getPosition(this.position, instrument.getDuration(), this.spread);
+              let pitch = Math.round(this.pitch);
               instrument.play(pitch, 0, position);
             }
           });
 
           if (this.isOn) {
-            //let timeOut = this.loopTime * 1000;
-            let timeOut = this.objectModel[2].value * 1000;
+            let timeOut = this.loopTime * 1000;
             setTimeout(this._grainLoop.bind(this), timeOut);
           }
 
@@ -201,41 +187,6 @@
             }
           }
         };
-      }
-
-      function buildGrainulatorModel () {
-        return [
-          {
-            label: 'position',
-            value: 0.1,
-            lb: 0,
-            ub: 1
-          },
-          {
-            label: 'spread',
-            value: 0,
-            lb: 0,
-            ub: 1
-          },
-          {
-            label: 'loopTime',
-            value: 0.5,
-            lb: 0.01,
-            ub: 1
-          },
-          {
-            label: 'numVoices',
-            value: 1,
-            lb: 1,
-            ub: 6
-          },
-          {
-            label: 'pitch',
-            value: 0,
-            lb: -12,
-            ub: 12
-          }
-        ];
       }
 
     })();

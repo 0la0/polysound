@@ -26,7 +26,7 @@ let audio = {
   sampleMap: sampleMap,
   lastEqualizerList: lastEqualizerList,
   effectFactory: effectFactory,
-  instrumentFactory: instrumentFactory,
+  instrumentFactory: instrumentFactory
 };
 //window.audio = audio;
 

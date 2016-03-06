@@ -19,10 +19,6 @@
 
         height :100%;
       }
-      .button {
-        width: 30px;
-        height: 30px;
-      }
       canvas {
         width: 47%;
         height: 100%;
@@ -37,9 +33,6 @@
     </style>
 
     <div class="parameter-container">
-      <div class="button">
-        <simple-button button-model="{{buttonModel}}"></simple-button>
-      </div>
       <canvas></canvas>
       <textarea
         class="parameter-input"
@@ -67,9 +60,11 @@
               type: Number,
               notify: true
             },
-            isActive: {
+            isScheduled: {
               type: Boolean,
-              notify: true
+              notify: true,
+              value: false,
+              observer: '_onScheduleChange'
             }
           };
 
@@ -93,13 +88,8 @@
           this.resetBoundingClientRect();
 
           this.schedulable = buildSchedulable.call(this);
-
           this.renderHeight = 7;
-
           this.textArea = this.$$('textarea');
-
-          this.isActive = false;
-          this.buttonModel = buildButtonModel.call(this);
         }
         detached() {}
         attributeChanged() {}
@@ -112,6 +102,12 @@
             this.g2d.height = this.cvs.height;
           }
           this._renderAllBuckets();
+        }
+
+        _onScheduleChange (isScheduled) {
+          isScheduled ?
+            app.scheduler.register(this.schedulable) :
+            app.scheduler.deregister(this.schedulable);
         }
 
         _evaluateInput () {
@@ -202,17 +198,6 @@
           console.warn('evalInput error:', error);
           return 0;
         }
-      }
-
-      function buildButtonModel () {
-        return {
-          callback: (isActive) => {
-            this.isActive = isActive;
-            this.isActive ?
-              app.scheduler.register(this.schedulable) :
-              app.scheduler.deregister(this.schedulable);
-          }
-        };
       }
 
     })();
