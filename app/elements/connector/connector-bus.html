@@ -36,10 +36,6 @@
 
       class ConnectorBus {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'connector-bus';
 
@@ -53,22 +49,14 @@
             down: '_handleClick'
           };
 
-          this.lineMap = new Map();
         }
 
-        ready() {
-          window.addEventListener('resize', (event) => {
-            this.boundingClientRect = this.getBoundingClientRect();
-          });
-        }
+        ready() {}
 
         attached() {
-          // this.circleOne = this.$$('#circle01');
-          // this.circleTwo = this.$$('#circle02');
-          // this.line = this.$$('line');
-          //this.busModel.setUpdateView(this._updateView.bind(this));
           this.svgElement = this.$$('svg');
           this.busModel.setHelperFunctions(this._viewModelHelpers());
+          this.lineMap = new Map();
           setTimeout(() => {
             this.boundingClientRect = this.getBoundingClientRect();
           }, 0);
@@ -89,24 +77,12 @@
               Polymer.dom(this.svgElement).appendChild(this.activeLine.line);
             },
             updateActiveLine: (line) => {
-              //var line = this.busModel.currentLine;
               if (!line) {
                 return;
               }
               var xBuffer = this.boundingClientRect.left;
               var yBuffer = this.boundingClientRect.top;
-
-              this.activeLine.point1.setAttribute('cx', line.p1.x - xBuffer);
-              this.activeLine.point1.setAttribute('cy', line.p1.y - yBuffer);
-
-              this.activeLine.point2.setAttribute('cx', line.p2.x - xBuffer);
-              this.activeLine.point2.setAttribute('cy', line.p2.y - yBuffer);
-
-              this.activeLine.line.setAttribute('x1', line.p1.x - xBuffer);
-              this.activeLine.line.setAttribute('y1', line.p1.y - yBuffer);
-
-              this.activeLine.line.setAttribute('x2', line.p2.x - xBuffer);
-              this.activeLine.line.setAttribute('y2', line.p2.y - yBuffer);
+              setLinePosition(this.activeLine, line.p1.x, line.p1.y, line.p2.x, line.p2.y, xBuffer, yBuffer);
             },
             removeActiveLine: (line) => {
               Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
@@ -114,7 +90,7 @@
               Polymer.dom(this.svgElement).removeChild(this.activeLine.line);
               this.activeLine = null;
             },
-            finishLine: (line, connectionKey, inputNode, outputNode) => {
+            finishLine: (line, connectionKey, inputNode, outputNode, connectorInput, connectorOutput) => {
               if (this.lineMap.has(connectionKey)) {
                 app.$.toast.text = 'Connection already exists.';
                 app.$.toast.show();
@@ -127,13 +103,40 @@
                 this.activeLine.connectionKey = connectionKey;
                 this.activeLine.inputNode = inputNode;
                 this.activeLine.outputNode = outputNode;
-                this.lineMap.set(connectionKey, this.activeLine);
+                this.activeLine.connectorInput = connectorInput;
+                this.activeLine.connectorOutput = connectorOutput;
 
+                this.lineMap.set(connectionKey, this.activeLine);
                 this.activeLine.point1.setAttributeNS(null, 'r', 0);
                 this.activeLine.point2.setAttributeNS(null, 'r', 0);
               }
               this.activeLine = null;
-              //this.activeLine.line.setAttributeNS(null, 'stroke-width', '3');
+            },
+            removeElement: (nodeToRemove) => {
+              let hasLineToRemove = false;
+              this.activeLine = null;
+              this.lineMap.forEach((value, key) => {
+                if (value.inputNode === nodeToRemove || value.outputNode === nodeToRemove) {
+                  value.inputNode.disconnect(value.outputNode);
+                  Polymer.dom(this.svgElement).removeChild(value.line);
+                  this.lineMap.delete(key);
+                  hasLineToRemove = true;
+                }
+              });
+
+              if (hasLineToRemove) {
+                setTimeout(() => {
+                  this.lineMap.forEach((value, key) => {
+                    let inputPosition = value.connectorInput.getPosition();
+                    let outputPosition = value.connectorOutput.getPosition();
+                    var xBuffer = this.boundingClientRect.left;
+                    var yBuffer = this.boundingClientRect.top;
+
+                    setLinePosition(value, inputPosition.x, inputPosition.y, outputPosition.x, outputPosition.y, xBuffer, yBuffer);
+                  });
+                }, 0);
+              }
+
             }
           };
         }
@@ -211,6 +214,21 @@
       }
 
       Polymer(ConnectorBus);
+
+      function setLinePosition (lineObj, x1, y1, x2, y2, xBuffer, yBuffer) {
+        lineObj.point1.setAttribute('cx', x1 - xBuffer);
+        lineObj.point1.setAttribute('cy', y1 - yBuffer);
+
+        lineObj.point2.setAttribute('cx', x2 - xBuffer);
+        lineObj.point2.setAttribute('cy', y2 - yBuffer);
+
+        lineObj.line.setAttribute('x1', x1 - xBuffer);
+        lineObj.line.setAttribute('y1', y1 - yBuffer);
+
+        lineObj.line.setAttribute('x2', x2 - xBuffer);
+        lineObj.line.setAttribute('y2', y2 - yBuffer);
+      }
+
     })();
   </script>
 

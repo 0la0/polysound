@@ -32,13 +32,7 @@
     (function() {
       'use strict';
 
-      let MyBehavior = {};
-
       class LineConnector {
-
-        get behaviors() {
-          return [MyBehavior];
-        }
 
         beforeRegister() {
           this.is = 'line-connector';
@@ -67,9 +61,9 @@
           this.line = this.$$('line');
           this.circleIsTracking = false;
 
-          window.addEventListener('resize', (event) => {
-            this.boundingClientRect = this.getBoundingClientRect();
-          });
+          // window.addEventListener('resize', (event) => {
+          //   this.boundingClientRect = this.getBoundingClientRect();
+          // });
           setTimeout(() => {
             this.boundingClientRect = this.getBoundingClientRect();
           }, 0);

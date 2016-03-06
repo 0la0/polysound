@@ -28,10 +28,6 @@
 
       class ConnectorInput {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'connector-input';
 
@@ -50,10 +46,17 @@
         detached() {}
         attributeChanged() {}
 
-        addConnection (inputInstrument) {
+        addConnection (inputInstrument, outputElement) {
           inputInstrument.connectTo(this.audioNode.getInput());
           var connectionKey = inputInstrument.uniqueId + '' + this.audioNode.uniqueId;
-          this.connectionBus.finishLine(connectionKey, inputInstrument.getOutput(), this.audioNode.getInput());
+          this.connectionBus.finishLine(connectionKey, inputInstrument.getOutput(), this.audioNode.getInput(), this, outputElement);
+        }
+
+        getPosition () {
+          let boundingRect = this.getBoundingClientRect();
+          let x = boundingRect.left + document.body.scrollLeft + Math.round(boundingRect.width / 2);
+          let y = boundingRect.top + document.body.scrollTop + Math.round(boundingRect.height / 2);
+          return {x: x, y: y};
         }
       }
 

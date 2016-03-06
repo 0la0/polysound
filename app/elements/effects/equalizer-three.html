@@ -17,6 +17,10 @@
       .eq-header {
         background-color: #999;
         border-bottom: 1px solid black;
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
       }
       .eq-channel__container {
         display: flex;
@@ -41,7 +45,10 @@
     </connector-input>
 
     <div class="eq-container">
-      <div class="eq-header">Equalizer</div>
+      <div class="eq-header">
+        <label>Equalizer</label>
+        <close-button removable="{{removable}}"></close-button>
+      </div>
 
       <div class="eq-channel__container">
 
@@ -122,12 +129,24 @@
           if (!this.connectionOutput) {
             Polymer.dom(this.root).removeChild(outputElement);
           }
+          this.removable = removable.call(this);
         }
         detached() {}
         attributeChanged() {}
       }
 
       Polymer(Equalizer);
+
+      function removable () {
+        return {
+          callback: () => {
+            this.connectionInput.helpers.removeElement(this.equalizerModel.input);
+            this.connectionOutput.helpers.removeElement(this.equalizerModel.getOutput());
+            Polymer.dom(this).parentNode.removeChild(this);
+          }
+        }
+      }
+
     })();
   </script>
 

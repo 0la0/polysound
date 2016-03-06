@@ -24,10 +24,6 @@
 
       class ConnectorOutput {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'connector-output';
 
@@ -72,7 +68,7 @@
         _onEnd (event) {
           var endElement = event.detail.hover();
           if (endElement.tagName === 'CONNECTOR-INPUT') {
-            endElement.addConnection(this.audioNode);
+            endElement.addConnection(this.audioNode, this);
           }
           else {
             this.connectionBus.destroyLine();
@@ -83,6 +79,12 @@
           this.connectionBus.destroyLine();
         }
 
+        getPosition () {
+          let boundingRect = this.getBoundingClientRect();
+          let x = boundingRect.left + document.body.scrollLeft + Math.round(boundingRect.width / 2);
+          let y = boundingRect.top + document.body.scrollTop + Math.round(boundingRect.height / 2);
+          return {x: x, y: y};
+        }
       }
 
       Polymer(ConnectorOutput);

@@ -16,8 +16,8 @@ export default class ConnectionBus {
     this.helpers.updateActiveLine(this.currentLine);
   }
 
-  finishLine (connectionKey, inputNode, outputNode) {
-    this.helpers.finishLine(this.currentLine, connectionKey, inputNode, outputNode);
+  finishLine (connectionKey, inputNode, outputNode, connectorInput, connectorOutput) {
+    this.helpers.finishLine(this.currentLine, connectionKey, inputNode, outputNode, connectorInput, connectorOutput);
   }
 
   destroyLine () {
