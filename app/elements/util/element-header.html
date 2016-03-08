@@ -1,0 +1,61 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="element-header">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      header {
+        background-color: #999;
+        border-bottom: 1px solid black;
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+      }
+    </style>
+
+    <header>
+      <label>[[label]]</label>
+      <close-button removable="{{removable}}"></close-button>
+    </header>
+
+
+  <script>
+    (function() {
+      'use strict';
+
+      class Header {
+
+        beforeRegister() {
+          this.is = 'element-header';
+
+          this.properties = {
+            label: {
+              type: String
+            },
+            removable: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {}
+        detached() {}
+        attributeChanged() {}
+
+        removeCloseButton () {
+          Polymer.dom(this.$$('header')).removeChild(this.$$('close-button'));
+        }
+
+      }
+
+      Polymer(Header);
+    })();
+  </script>
+
+</dom-module>

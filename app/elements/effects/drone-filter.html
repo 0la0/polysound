@@ -14,10 +14,6 @@
         border: 1px solid black;
         height: 100%;
       }
-      .filter-header {
-        background-color: #999;
-        border-bottom: 1px solid black;
-      }
       .filter-row {
         display: flex;
         flex-direction: row;
@@ -45,7 +41,7 @@
     </connector-input>
 
     <div class="filter-container">
-      <div class="filter-header">Drone Filter</div>
+      <element-header label="Drone Filter" removable="{{removable}}"></element-header>
 
       <div class="filter-channel__container">
 
@@ -100,7 +96,9 @@
         }
 
         ready() {}
-        attached() {}
+        attached() {
+          this.removable = removable.call(this);
+        }
         detached() {}
         attributeChanged() {}
 
@@ -113,6 +111,17 @@
       }
 
       Polymer(DroneFilter);
+
+      function removable () {
+        return {
+          callback: () => {
+            this.connectionInput.helpers.removeElement(this.filterModel.input);
+            this.connectionOutput.helpers.removeElement(this.filterModel.getOutput());
+            Polymer.dom(this).parentNode.removeChild(this);
+          }
+        }
+      }
+
     })();
   </script>
 

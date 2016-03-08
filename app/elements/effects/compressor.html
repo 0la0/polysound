@@ -14,11 +14,6 @@
         border: 1px solid black;
         height: 100%;
       }
-      .compressor-header {
-        background-color: #999;
-        border-bottom: 1px solid black;
-      }
-
       .compressor-row {
         display: flex;
         flex-direction: row;
@@ -45,7 +40,7 @@
     </connector-input>
 
     <div class="compressor-container">
-      <div class="compressor-header">Compressor</div>
+      <element-header label="Compressor" removable="{{removable}}"></element-header>
 
       <div class="compressor-channel__container">
 
@@ -140,12 +135,25 @@
         }
 
         ready() {}
-        attached() {}
+        attached() {
+          this.removable = removable.call(this);
+        }
         detached() {}
         attributeChanged() {}
       }
 
       Polymer(Compressor);
+
+      function removable () {
+        return {
+          callback: () => {
+            this.connectionInput.helpers.removeElement(this.compressorModel.input);
+            this.connectionOutput.helpers.removeElement(this.compressorModel.getOutput());
+            Polymer.dom(this).parentNode.removeChild(this);
+          }
+        }
+      }
+
     })();
   </script>
 

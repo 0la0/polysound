@@ -13,10 +13,6 @@
         border: 1px solid black;
         height: 100%;
       }
-      .reverb-header {
-        background-color: #999;
-        border-bottom: 1px solid black;
-      }
       .reverb-gain {
         height: 110px;
         width: 20px;
@@ -31,15 +27,19 @@
         audio-node="{{reverbModel}}"
         connection-bus="{{connectionInput}}">>
     </connector-input>
+
     <div class="reverb-container">
-      <p class="reverb-header">Reverb</p>
+      <element-header label="Reverb" removable="{{removable}}"></element-header>
+
       <div class="reverb-gain">
         <slider-vertical
             slider-value={{reverbModel.mainGain.gain.value}}
             lower-bound="0" upper-bound="1">
         </slider-vertical>
       </div>
+
     </div>
+
     <connector-output
         audio-node="{{reverbModel}}"
         connection-bus="{{connectionOutput}}">>
@@ -52,10 +52,6 @@
       'use strict';
 
       class SimpleReverb {
-
-        get behaviors() {
-          return [];
-        }
 
         beforeRegister() {
           this.is = 'simple-reverb';
@@ -76,12 +72,25 @@
         }
 
         ready() {}
-        attached() {}
+        attached() {
+          this.removable = removable.call(this);
+        }
         detached() {}
         attributeChanged() {}
 
       }
       Polymer(SimpleReverb);
+
+      function removable () {
+        return {
+          callback: () => {
+            this.connectionInput.helpers.removeElement(this.reverbModel.input);
+            this.connectionOutput.helpers.removeElement(this.reverbModel.getOutput());
+            Polymer.dom(this).parentNode.removeChild(this);
+          }
+        }
+      }
+
     })();
   </script>
 
