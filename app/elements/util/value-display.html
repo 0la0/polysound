@@ -1,0 +1,57 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="value-display">
+  <template>
+    <style>
+      :host {
+        display: block;
+        height: 100%;
+        width: 100%;
+        border: 1px solid black;
+        text-align: center;
+      }
+    </style>
+
+    <input id="numberInput" type="text" value="[[model]]" size="6" maxlength="6">
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class ValueDisplay {
+
+        beforeRegister() {
+          this.is = 'value-display';
+
+          this.properties = {
+            model: {
+              type: Number,
+              notify: true
+            }
+          };
+
+        }
+
+        ready() {}
+        attached() {
+          this.$.numberInput.addEventListener('focus', (event) => {
+            let valueLength = (this.$.numberInput.value + '').length;
+            this.$.numberInput.setSelectionRange(2, valueLength);
+          }, true);
+
+          this.$.numberInput.addEventListener('blur', (event) => {
+            let clampedValue = Math.max(0, Math.min(this.$.numberInput.value, 1));
+            this.model = parseFloat(clampedValue);
+          }, true);
+        }
+        detached() {}
+        attributeChanged() {}
+      }
+
+      Polymer(ValueDisplay);
+    })();
+  </script>
+
+</dom-module>

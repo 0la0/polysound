@@ -33,7 +33,13 @@
         height: 30px;
       }
       label {
+        width: 30%;
+      }
+      slider-horizontal {
         width: 50%;
+      }
+      value-display {
+        width: 20%;
       }
       .grainulator__param-box {
         display: none;
@@ -60,6 +66,7 @@
           slider-value={{position}}
           lower-bound="0" upper-bound="1">
         </slider-horizontal>
+        <value-display model="{{position}}"></value-display>
       </div>
 
       <div class="grainulator-row" value="spread">
