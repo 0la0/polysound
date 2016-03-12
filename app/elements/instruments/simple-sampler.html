@@ -1,5 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../behaviors/test-behavior.html">
+<link rel="import" href="../helpers/removable.html">
 
 <dom-module id="simple-sampler">
   <template>
@@ -11,7 +11,7 @@
         margin: 0 5px;
         background: #eee;
       }
-      .sampler {
+      .sampler-main {
         display: flex;
         flex-flow: row;
         flex-wrap: nowrap;
@@ -40,23 +40,29 @@
     </driver-input>
 
     <section class="sampler">
-      <section class="sampler-left">
-        <p class="sampler-name">Sampler Label</p>
-        <div class="sampler-button">
-          <simple-button button-model="{{triggerButtonModel}}" is-trigger="true"></simple-button>
-        </div>
-        <div class="slider-container">
-          <slider-horizontal
-            slider-value="{{samplerModel.baseNote}}"
-            lower-bound="-12" upper-bound="12">
-          </slider-horizontal>
-        </div>
-        <sampler-loader parent-event-handler="{{samplerLoader}}">
-        </sampler-loader>
-      </section>
-      <section class="sampler-right">
-        <sample-visualizer buffer-source={{samplerModel}}></sample-visualizer>
-        <simple-adsr adsr-model="{{samplerModel.adsr}}"></simple-adsr>
+      <element-header label="Sampler" removable="{{removable}}"></element-header>
+
+      <section class="sampler-main">
+
+        <section class="sampler-left">
+          <div class="sampler-button">
+            <simple-button button-model="{{triggerButtonModel}}" is-trigger="true"></simple-button>
+          </div>
+          <div class="slider-container">
+            <slider-horizontal
+              slider-value="{{samplerModel.baseNote}}"
+              lower-bound="-12" upper-bound="12">
+            </slider-horizontal>
+          </div>
+          <sampler-loader parent-event-handler="{{samplerLoader}}">
+          </sampler-loader>
+        </section>
+
+        <section class="sampler-right">
+          <sample-visualizer buffer-source={{samplerModel}}></sample-visualizer>
+          <simple-adsr adsr-model="{{samplerModel.adsr}}"></simple-adsr>
+        </section>
+
       </section>
     </section>
 
@@ -101,6 +107,7 @@
             }
           };
           this.triggerButtonModel = buildButtonModel.call(this);
+          this.removable = importRemovable.call(this, this.samplerModel);
         }
         detached() {}
         attributeChanged() {}

@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
 
 <dom-module id="simple-synth">
   <template>
@@ -10,7 +11,8 @@
         margin: 0 5px;
         background: #eee;
       }
-      .synth {
+      .synth {}
+      .synth-main {
         display: flex;
         flex-flow: row;
         flex-wrap: nowrap;
@@ -32,8 +34,8 @@
       }
 
       .synth-right {}
-      multi-select {
-        height: 35px;
+      .synth-waveform-selector {
+        line-height: 20px;
       }
     </style>
 
@@ -43,21 +45,27 @@
     </driver-input>
 
     <section class="synth">
-      <section class="synth-left">
-        <p class="synth-name">Synth Label</p>
-        <div class="synth-button">
-          <simple-button button-model="{{buttonModel}}"></simple-button>
-        </div>
-        <div class="slider-container">
-          <slider-horizontal
-            slider-value="{{baseFrequency}}"
-            lower-bound="220" upper-bound="660">
-        </slider-horizontal>
-      </section>
-      <section class="synth-right">
-        <multi-select select-model="{{multiSelectModel}}">
-        </multi-select>
-        <simple-adsr adsr-model="{{synthModel.adsr}}"></simple-adsr>
+      <element-header label="Synth" removable="{{removable}}"></element-header>
+
+      <section class="synth-main">
+
+        <section class="synth-left">
+          <div class="synth-button">
+            <simple-button button-model="{{buttonModel}}"></simple-button>
+          </div>
+          <div class="slider-container">
+            <slider-horizontal
+              slider-value="{{baseFrequency}}"
+              lower-bound="220" upper-bound="660">
+          </slider-horizontal>
+        </section>
+
+        <section class="synth-right">
+          <multi-select class="synth-waveform-selector" select-model="{{multiSelectModel}}">
+          </multi-select>
+          <simple-adsr adsr-model="{{synthModel.adsr}}"></simple-adsr>
+        </section>
+
       </section>
     </section>
 
@@ -105,6 +113,7 @@
         attached() {
           this.buttonModel = buildButtonModel.call(this);
           this.multiSelectModel = buildMultiSelectModel.call(this);
+          this.removable = importRemovable.call(this, this.synthModel);
         }
         detached() {}
         attributeChanged() {}

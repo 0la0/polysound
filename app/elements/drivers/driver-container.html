@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
 
 <dom-module id="driver-container">
   <template>
@@ -25,6 +26,7 @@
       }
     </style>
 
+    <element-header label="Sampler" removable="{{removable}}"></element-header>
     <div class="driver-column" id="container"></div>
     <div id="driverOutputContainer"></div>
 
@@ -35,10 +37,6 @@
       'use strict';
 
       class DriverContainer {
-
-        get behaviors() {
-          return [];
-        }
 
         beforeRegister() {
           this.is = 'driver-container';
@@ -62,8 +60,7 @@
         attached() {
           let parentContainer = this.$.container;
           let driverOutputContainer = this.$.driverOutputContainer;
-
-          var driverElement;
+          let  driverElement;
           if (this.driverType === 'sequencer') {
             driverElement = DriverFactory.createSequencer(driverOutputContainer, this.connectionOutput);
           }
@@ -88,6 +85,7 @@
           }
 
           Polymer.dom(parentContainer).appendChild(driverElement);
+          this.removable = buildRemovable.call(this);
         }
         detached() {}
         attributeChanged() {}
@@ -102,6 +100,10 @@
           connectTo: (instrument) => {
             instrumentSet.add(instrument);
           },
+          getInstrumentSet: () => {
+            return instrumentSet;
+          },
+          hasInstrumentSet: true,
           uniqueId: Math.random() * Math.pow(2, 32 - 1) >>> 0
         };
       }
@@ -230,6 +232,18 @@
           return samplerElement;
         }
 
+      }
+
+      function buildRemovable () {
+        return {
+          callback: () => {
+            let outputList = Array.prototype.slice.call(this.$.driverOutputContainer.childNodes);
+            outputList.forEach((outputNode) => {
+              this.connectionOutput.helpers.removeElement(outputNode.driverModel);
+            });
+            Polymer.dom(this).parentNode.removeChild(this);
+          }
+        }
       }
 
     })();

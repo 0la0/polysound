@@ -28,10 +28,6 @@
 
       class DriverInput {
 
-        get behaviors() {
-          return [];
-        }
-
         beforeRegister() {
           this.is = 'driver-input';
 
@@ -53,11 +49,19 @@
 
         attributeChanged() {}
 
-        addConnection (inputInstrument) {
+        addConnection (inputInstrument, outputElement) {
           inputInstrument.connectTo(this.audioNode);
           var connectionKey = inputInstrument.uniqueId + '' + this.audioNode.uniqueId;
-          this.connectionBus.finishLine(connectionKey, inputInstrument, this.audioNode);
+          this.connectionBus.finishLine(connectionKey, inputInstrument, this.audioNode, this, outputElement);
         }
+
+        getPosition () {
+          let boundingRect = this.getBoundingClientRect();
+          let x = boundingRect.left + document.body.scrollLeft + Math.round(boundingRect.width / 2);
+          let y = boundingRect.top + document.body.scrollTop + Math.round(boundingRect.height / 2);
+          return {x: x, y: y};
+        }
+
       }
 
       Polymer(DriverInput);

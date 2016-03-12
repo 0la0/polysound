@@ -116,12 +116,35 @@
               let hasLineToRemove = false;
               this.activeLine = null;
               this.lineMap.forEach((value, key) => {
+
+                //remove effect : effect and effect : instrument
                 if (value.inputNode === nodeToRemove || value.outputNode === nodeToRemove) {
-                  value.inputNode.disconnect(value.outputNode);
+                  try {
+                    value.inputNode.disconnect(value.outputNode);
+                  }
+                  catch (err) {}
+
                   Polymer.dom(this.svgElement).removeChild(value.line);
                   this.lineMap.delete(key);
                   hasLineToRemove = true;
                 }
+                //remove instrument : driver
+                else if (value.inputNode && value.inputNode.hasInstrumentSet) {
+                  let instrumentSet = value.inputNode.getInstrumentSet();
+
+                  instrumentSet.forEach((instrument) => {
+                    if (instrument.input === nodeToRemove) {
+                      instrument.input.disconnect(value.outputNode);
+                      Polymer.dom(this.svgElement).removeChild(value.line);
+                      this.lineMap.delete(key);
+                      hasLineToRemove = true;
+
+                      instrumentSet.delete(instrument);
+                    }
+                  });
+
+                }
+
               });
 
               if (hasLineToRemove) {

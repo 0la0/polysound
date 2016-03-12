@@ -71,13 +71,16 @@ function loadConfigFiles (configFilePath, audioContext) {
     });
 }
 
-buildMidiFactory()
-  .then( (midiFactoryInstance) => {
-    audio.midiDeviceFactory = midiFactoryInstance;
-  })
-  .catch(() => {midiFactory = {}});
+function init () {
+  buildMidiFactory()
+    .then( (midiFactoryInstance) => {
+      audio.midiDeviceFactory = midiFactoryInstance;
+    })
+    .catch(() => {midiFactory = {}});
 
-loadConfigFiles(CONFIG_FILE_PATH, audioGraph.getAudioContext());
+  loadConfigFiles(CONFIG_FILE_PATH, audioGraph.getAudioContext());
+}
 
 
+init();
 export {audio, scheduler};
