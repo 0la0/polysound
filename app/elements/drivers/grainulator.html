@@ -44,7 +44,7 @@
     </style>
 
     <div class="grainulator">
-      <div class="grainulator-header" id="header">Grainulator Name</div>
+      <element-header label="Grainulator" removable="{{removable}}"></element-header>
 
       <div class="grainulator-row">
         <div class="grainulator-button">
@@ -113,6 +113,9 @@
 
           this.properties = {
             instrumentSet: {
+              type: Object
+            },
+            removable: {
               type: Object
             },
             position: {

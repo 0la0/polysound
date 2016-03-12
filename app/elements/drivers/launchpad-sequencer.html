@@ -12,15 +12,7 @@
     </style>
 
     <div class="matrix-list">
-
-      <!-- <sequencer-matrix
-        class="matrix"
-        number-of-steps="8"
-        number-of-rows="8"
-        clip-manager="{{clipManager}}"
-        clip-label="Launchpad Clip">
-      </sequencer-matrix> -->
-
+      <element-header label="Launchpad Driver" removable="{{removable}}"></element-header>
     </div>
 
   </template>
@@ -37,6 +29,9 @@
           this.properties = {
             instrumentList: {
               type: Array
+            },
+            removable: {
+              type: Object
             }
           };
 

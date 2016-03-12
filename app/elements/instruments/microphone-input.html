@@ -9,36 +9,29 @@
         border: 1px solid black;
         margin: 0 5px;
         background: #eee;
+        height: 100%;
       }
       .input-node {
-        display: flex;
-        flex-flow: row;
-        flex-wrap: nowrap;
-
-        height: 115px;
-      }
-      .input-node__left {
-        border: 1px solid black;
+        height: inherit;
       }
       .input-button {
         width: 30px;
         height: 30px;
       }
-      .input-node__right {}
     </style>
 
     <section class="input-node">
-      <section class="input-node__left">
-        <p>Toggle Input</p>
-        <div class="input-button">
-          <simple-button button-model="{{inputButtonModel}}" id="inputBtn"></simple-button>
-        </div>
-        <p>Record Input</p>
-        <div class="input-button">
-          <simple-button button-model="{{recordButtonModel}}" id="recordBtn"></simple-button>
-        </div>
-      </section>
-      <section class="input-node__right"></section>
+      <element-header label="Mic Input" removable="{{removable}}"></element-header>
+
+      <label>Toggle Input</label>
+      <div class="input-button">
+        <simple-button button-model="{{inputButtonModel}}" id="inputBtn"></simple-button>
+      </div>
+      <label>Record Input</label>
+      <div class="input-button">
+        <simple-button button-model="{{recordButtonModel}}" id="recordBtn"></simple-button>
+      </div>
+
     </section>
 
     <connector-output
@@ -75,6 +68,7 @@
         attached() {
           this.inputButtonModel = buildInputButton.call(this);
           this.recordButtonModel = buildRecordButton.call(this);
+          this.removable = buildRemovable.call(this);
         }
         detached() {}
         attributeChanged() {}
@@ -109,6 +103,15 @@
               this.inputModel.startRecording() : this.inputModel.stopRecording();
           }
         };
+      }
+
+      function buildRemovable () {
+        return {
+          callback: () => {
+            this.connectionOutput.helpers.removeElement(this.inputModel.getOutput());
+            Polymer.dom(this).parentNode.removeChild(this);
+          }
+        }
       }
 
 

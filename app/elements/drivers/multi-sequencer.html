@@ -9,6 +9,7 @@
     </style>
 
     <div class="matrix-list">
+      <element-header label="Multi Sequencer" removable="{{removable}}"></element-header>
 
       <sequencer-matrix
         class="matrix"
@@ -42,6 +43,9 @@
           this.properties = {
             instrumentList: {
               type: Array
+            },
+            removable: {
+              type: Object
             }
           };
 

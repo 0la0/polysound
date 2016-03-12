@@ -57,6 +57,7 @@ header {
   flex-wrap: nowrap;
   justify-content: flex-start;
 
+  position: relative;
   background-color: #ccc;
 }
 
@@ -65,7 +66,7 @@ header {
 }
 
 .instrument-line {
-  height: 115px;
+  height: 145px;
 }
 
 .effects-line {

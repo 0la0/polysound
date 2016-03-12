@@ -10,6 +10,7 @@
     </style>
 
     <div class="matrix-list">
+      <element-header label="APC Sequencer" removable="{{removable}}"></element-header>
 
       <sequencer-matrix
         class="matrix"
@@ -35,6 +36,9 @@
           this.properties = {
             instrumentList: {
               type: Array
+            },
+            removable: {
+              type: Object
             }
           };
 
@@ -73,6 +77,12 @@
 
       function buildMidiDevice (midiDeviceFactory, matrixList) {
         this.apcDevice = midiDeviceFactory.getDeviceByName('Akai APC20');
+
+        if (!this.apcDevice.input && !this.apcDevice.output) {
+          this.apcDevice.input = {};
+          this.apcDevice.output = {};
+          console.warn('APC not connected');
+        }
 
         function renderColumn (outputDevice, index, columnData) {
           for (let i = 0; i < 5; i++) {
@@ -137,6 +147,7 @@
       function buildSchedulable () {
         return {
           processTick: (beatNumber, time) => {
+            if (Object.keys(this.apcDevice.output).length === 0) { return; }
             beatNumber = beatNumber % this.width;
 
             let columnData = this.matrixList[this.activeIndex].getColumnValueList(beatNumber);
@@ -149,6 +160,7 @@
             });
           },
           render: (beatNumber, lastBeatNumber) => {
+            if (Object.keys(this.apcDevice.output).length === 0) { return; }
             beatNumber = beatNumber % this.width;
             lastBeatNumber = lastBeatNumber % this.width;
 

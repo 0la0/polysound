@@ -20,6 +20,7 @@
     </style>
 
     <div class="matrix-list">
+      <element-header label="Hillclimber Sequencer" removable="{{removable}}"></element-header>
 
       <div class="hillclimber__header">
         <label>Mode:</label>
@@ -90,6 +91,9 @@
           this.properties = {
             instrumentList: {
               type: Array
+            },
+            removable: {
+              type: Object
             }
           };
 
