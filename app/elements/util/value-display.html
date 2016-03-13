@@ -5,14 +5,23 @@
     <style>
       :host {
         display: block;
+        position: relative;
         height: 100%;
         width: 100%;
-        border: 1px solid black;
+        border: 2px solid black;
         text-align: center;
+      }
+      input {
+        display: block;
+        margin: 0;
+        border: none;
+        padding: 0;
+        width: 100%;
+        height: 100%;
       }
     </style>
 
-    <input id="numberInput" type="text" value="[[model]]" size="6" maxlength="6">
+    <input id="numberInput" type="text" value="[[model]]">
 
   </template>
 

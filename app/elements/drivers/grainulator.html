@@ -16,94 +16,53 @@
         background-color: #999;
         width: 100%;
       }
-      .grainulator-row {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: flex-start;
-        align-items: stretch;
-
-        min-height: 20px;
-        height: 20px;
-        margin: 10px 0;
-        line-height: 30px;
-      }
       .grainulator-button {
         width: 60px;
         height: 30px;
-      }
-      label {
-        width: 30%;
-      }
-      slider-horizontal {
-        width: 50%;
-      }
-      value-display {
-        width: 20%;
-      }
-      .grainulator__param-box {
-        display: none;
-      }
-      .grainulator__param-box--active {
-        display: block;
       }
     </style>
 
     <div class="grainulator">
       <element-header label="Grainulator" removable="{{removable}}"></element-header>
 
-      <div class="grainulator-row">
-        <div class="grainulator-button">
-          <simple-button button-model="{{buttonModel}}"></simple-button>
-        </div>
+      <div class="grainulator-button">
+        <simple-button button-model="{{buttonModel}}"></simple-button>
       </div>
 
+      <parameter-display
+        model="{{position}}"
+        label="Position"
+        lower-bound="0"
+        upper-bound="1">
+      </parameter-display>
 
-      <div class="grainulator-row" value="position">
-        <value-envelope bound-value="{{position}}"></value-envelope>
-        <label>Position</label>
-        <slider-horizontal
-          slider-value={{position}}
-          lower-bound="0" upper-bound="1">
-        </slider-horizontal>
-        <value-display model="{{position}}"></value-display>
-      </div>
+      <parameter-display
+        model="{{spread}}"
+        label="Spread"
+        lower-bound="0"
+        upper-bound="1">
+      </parameter-display>
 
-      <div class="grainulator-row" value="spread">
-        <value-envelope bound-value="{{spread}}"></value-envelope>
-        <label>Spread</label>
-        <slider-horizontal
-          slider-value={{spread}}
-          lower-bound="0" upper-bound="1">
-        </slider-horizontal>
-      </div>
+      <parameter-display
+        model="{{loopTime}}"
+        label="Loop Time"
+        lower-bound="0.01"
+        upper-bound="1">
+      </parameter-display>
 
-      <div class="grainulator-row" value="loopTime">
-        <value-envelope bound-value="{{loopTime}}"></value-envelope>
-        <label>Loop Time</label>
-        <slider-horizontal
-          slider-value={{loopTime}}
-          lower-bound="0.01" upper-bound="1">
-        </slider-horizontal>
-      </div>
+      <parameter-display
+        model="{{numVoices}}"
+        label="Voices"
+        lower-bound="1"
+        upper-bound="6">
+      </parameter-display>
 
-      <div class="grainulator-row" value="numVoices">
-        <value-envelope bound-value="{{numVoices}}"></value-envelope>
-        <label>Num Voice</label>
-        <slider-horizontal
-          slider-value={{numVoices}}
-          lower-bound="1" upper-bound="6">
-        </slider-horizontal>
-      </div>
-
-      <div class="grainulator-row" value="pitch">
-        <value-envelope bound-value="{{pitch}}"></value-envelope>
-        <label>Pitch</label>
-        <slider-horizontal
-          slider-value={{pitch}}
-          lower-bound="-12" upper-bound="12">
-        </slider-horizontal>
-      </div>
+      <parameter-display
+        model="{{pitch}}"
+        label="Pitch"
+        lower-bound="-12"
+        upper-bound="12">
+      </parameter-display>
 
     </div>
 
