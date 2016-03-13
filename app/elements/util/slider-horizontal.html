@@ -60,27 +60,18 @@
 
         }
 
-        ready() {
-          this.tracker = this.$$('#tracker');
-          this.valueRange = this.upperBound - this.lowerBound;
-
-          window.addEventListener('resize', (event) => {
-            this.boundingClientRect = this.getBoundingClientRect();
-          });
-        }
-
+        ready() {}
         attached() {
-          this.boundingClientRect = this.getBoundingClientRect();
+          this.valueRange = this.upperBound - this.lowerBound;
           this._valueChanged(this.sliderValue);
         }
-
         detached() {}
-
         attributeChanged() {}
 
         _userEvent (event) {
-          let normalizedPosition = event.detail.sourceEvent.pageX - this.boundingClientRect.left;
-          let normalValue = normalizedPosition / this.boundingClientRect.width;
+          let boundingRect = this.getBoundingClientRect();
+          let normalizedPosition = event.detail.sourceEvent.pageX - boundingRect.left;
+          let normalValue = normalizedPosition / boundingRect.width;
           normalValue = Math.max(0, Math.min(normalValue, 1));
           let realValue = normalValue * this.valueRange;
           this.sliderValue = realValue + this.lowerBound;
@@ -88,9 +79,7 @@
 
         _valueChanged (newValue) {
           var normalValue = (newValue - this.lowerBound) / this.valueRange;
-          if (this.tracker) {
-            this.tracker.style.width = (normalValue * 100) + '%';
-          }
+          this.$.tracker.style.width = (normalValue * 100) + '%';
         }
 
 

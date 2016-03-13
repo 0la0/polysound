@@ -8,7 +8,6 @@
         position: relative;
         height: 100%;
         border: 2px solid black;
-        cursor: default;
       }
       #tracker {
         display: block;
@@ -29,10 +28,6 @@
       'use strict';
 
       class SliderVertical {
-
-        get behaviors() {
-          return [];
-        }
 
         beforeRegister() {
           this.is = 'slider-vertical';
@@ -61,38 +56,26 @@
 
         }
 
-        ready() {
-          this.tracker = this.$$('#tracker');
-          this.valueRange = this.upperBound - this.lowerBound;
-
-          window.addEventListener('resize', (event) => {
-            this.boundingClientRect = this.getBoundingClientRect();
-          });
-        }
-
+        ready() {}
         attached() {
-          this.boundingClientRect = this.getBoundingClientRect();
+          this.valueRange = this.upperBound - this.lowerBound;
           this._valueChanged(this.sliderValue);
         }
-
         detached() {}
-
         attributeChanged() {}
 
         _userEvent (event) {
-          let normalizedPosition = event.detail.sourceEvent.pageY - this.offsetTop;
-          let normalValue = normalizedPosition / this.boundingClientRect.height;
+          let boundingRect = this.getBoundingClientRect();
+          let normalizedPosition = event.detail.y - boundingRect.top;
+          let normalValue = normalizedPosition / boundingRect.height;
           normalValue = Math.max(0, Math.min(normalValue, 1));
           let realValue = normalValue * this.valueRange;
           this.sliderValue = this.upperBound - realValue;
         }
 
         _valueChanged (newValue) {
-          var normalValue = (newValue - this.lowerBound) / this.valueRange;
-          var percentString = 'height: ' + (normalValue * 100) + '%';
-          if (this.tracker) {
-            this.tracker.style.height = (normalValue * 100) + '%';
-          }
+          let normalValue = (newValue - this.lowerBound) / this.valueRange;
+          this.$.tracker.style.height = (normalValue * 100) + '%';
         }
 
       }

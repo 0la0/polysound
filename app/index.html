@@ -53,7 +53,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <section class="main-section__left">
 
         <!-- TOP ROW: INSTRUMENT DRIVERS -->
-        <div class="horizontal-line">
+        <div class="horizontal-line driver-line">
           <driver-factory></driver-factory>
           <div class="horizontal-line driver-line" id="driver-container">
             <multi-sampler
@@ -67,7 +67,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <connector-bus bus-model="{{connectionBusses.drivers}}"></connector-bus>
 
         <!-- SECOND ROW: INSTRUMENTS -->
-        <div class="horizontal-line">
+        <div class="horizontal-line instrument-line">
           <instrument-factory
             factory-model="{{audio.instrumentFactory}}"
             connection-input={{connectionBusses.drivers}}
@@ -80,7 +80,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <connector-bus bus-model="{{connectionBusses.instruments}}"></connector-bus>
 
         <!-- THIRD ROW: EFFECTS ONE -->
-        <div class="horizontal-line">
+        <div class="horizontal-line effects-line ">
           <effect-factory
             factory-model="{{audio.effectFactory}}"
             connection-input={{connectionBusses.instruments}}
@@ -94,7 +94,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <connector-bus bus-model="{{connectionBusses.effects1}}"></connector-bus>
 
         <!-- FOURTH ROW: EFFECTS TWO -->
-        <div class="horizontal-line">
+        <div class="horizontal-line effects-line ">
           <effect-factory
             factory-model="{{audio.effectFactory}}"
             connection-input={{connectionBusses.effects1}}
