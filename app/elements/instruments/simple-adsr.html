@@ -9,59 +9,41 @@
         position: relative;
         width: 120px;
       }
-      .adsr {
-
-      }
-      .adsr__row {
-        display: flex;
-        flex-flow: wrap;
-        flex-wrap: nowrap;
-        position: relative;
-
-        height: 10px;
-        margin: 6px 0;
-      }
-      .adsr__label {
-        margin: 0;
-        width: 30px;
-        line-height: 10px;
-        text-align: center;
+      .adsr {}
+      parameter-display {
+        height: 15px;
       }
     </style>
 
     <section class="adsr">
 
-      <div class="adsr__row">
-        <p class="adsr__label">A</p>
-        <slider-horizontal
-          slider-value="{{adsrModel.attack}}"
-          lower-bound="0.001" upper-bound="1">
-        </slider-horizontal>
-      </div>
+      <parameter-display
+        model="{{adsrModel.attack}}"
+        label="A"
+        lower-bound="0.001"
+        upper-bound="1">
+      </parameter-display>
 
-      <div class="adsr__row">
-        <p class="adsr__label">D</p>
-        <slider-horizontal
-          slider-value="{{adsrModel.decay}}"
-          lower-bound="0.001" upper-bound="1">
-        </slider-horizontal>
-      </div>
+      <parameter-display
+        model="{{adsrModel.decay}}"
+        label="D"
+        lower-bound="0.001"
+        upper-bound="1">
+      </parameter-display>
 
-      <div class="adsr__row">
-        <p class="adsr__label">S</p>
-        <slider-horizontal
-          slider-value="{{adsrModel.sustain}}"
-          lower-bound="0.001" upper-bound="1">
-        </slider-horizontal>
-      </div>
+      <parameter-display
+        model="{{adsrModel.sustain}}"
+        label="S"
+        lower-bound="0.001"
+        upper-bound="1">
+      </parameter-display>
 
-      <div class="adsr__row">
-        <p class="adsr__label">R</p>
-        <slider-horizontal
-          slider-value="{{adsrModel.release}}"
-          lower-bound="0.001" upper-bound="1">
-        </slider-horizontal>
-      </div>
+      <parameter-display
+        model="{{adsrModel.release}}"
+        label="R"
+        lower-bound="0.001"
+        upper-bound="1">
+      </parameter-display>
 
     </section>
 
