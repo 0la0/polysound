@@ -1,0 +1,39 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="tempo-controller">
+  <template>
+    <style>
+      :host {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+
+        cursor: default;
+        width: 100%;
+        border-bottom: 1px solid black;
+      }
+      .tempo-button {
+        width: 40px;
+        margin: 5px;
+        padding: 2px;
+      }
+      tempo-display {
+        border: 1px solid black;
+        width: 90px;
+        background: #ccc;
+        margin: 5px;
+        padding: 2px;
+      }
+    </style>
+
+    <div class="tempo-button">
+      <simple-button button-model="{{buttonModel}}" default-text="start" active-text="stop">
+      </simple-button>
+    </div>
+    <tempo-display tempo="{{metronome.tempo}}"></tempo-display>
+
+  </template>
+
+  </dom-module>
+<script src="tempo-controller.js"></script></body></html>

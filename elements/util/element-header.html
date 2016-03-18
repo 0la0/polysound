@@ -1,0 +1,26 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="element-header">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      header {
+        background-color: #999;
+        border-bottom: 1px solid black;
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        margin: 0;
+      }
+    </style>
+
+    <header>
+      <label>[[label]]</label>
+      <close-button removable="{{removable}}"></close-button>
+    </header>
+
+
+  </template></dom-module><script src="element-header.js"></script></body></html>

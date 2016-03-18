@@ -1,0 +1,29 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="dropdown-list">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: absolute;
+        z-index: 5;
+        background-color: #eee;
+        border: 1px solid black;
+      }
+      .dropdown-element {
+        background-color: white;
+        border: 1px solid black;
+      }
+      .dropdown-element:hover {
+        background-color: #ccc;
+      }
+    </style>
+
+    <template is="dom-repeat" items="{{listData}}" as="item" id="dropdownlist">
+      <p class="dropdown-element" id="{{item}}"> {{item}} </p>
+    </template>
+
+  </template>
+
+  </dom-module>
+<script src="dropdown-list.js"></script></body></html>

@@ -1,0 +1,25 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="simple-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="matrix-list">
+      <element-header label="Sequencer" removable="{{removable}}"></element-header>
+
+      <sequencer-matrix class="matrix" number-of-steps="16" number-of-rows="12" clip-manager="{{clipManager}}" clip-label="Sequencer Roll">
+      </sequencer-matrix>
+
+      <sequencer-matrix class="matrix" number-of-steps="16" number-of-rows="12" clip-manager="{{clipManager}}" clip-label="Sequencer Roll">
+      </sequencer-matrix>
+
+    </div>
+
+  </template>
+
+  </dom-module>
+<script src="simple-sequencer.js"></script></body></html>

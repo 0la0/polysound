@@ -1,0 +1,75 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
+
+</head><body><dom-module id="simple-sampler">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        border: 1px solid black;
+        margin: 0 5px;
+        background: #eee;
+        height: 100%;
+      }
+      .sampler {
+        height: inherit;
+      }
+      .sampler-main {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+      }
+      .sampler-left {
+        width: 80px;
+        border-right: 1px solid black;
+      }
+      .sampler-name {
+        border-bottom: 1px solid black;
+      }
+      .sampler-button {
+        width: 30px;
+        height: 30px;
+      }
+      .slider-container {
+        height: 10px;
+        width: 95%;
+      }
+      .sampler-right {}
+    </style>
+
+    <driver-input audio-node="{{samplerModel}}" connection-bus="{{connectionInput}}">
+    </driver-input>
+
+    <section class="sampler">
+      <element-header label="Sampler" removable="{{removable}}"></element-header>
+
+      <section class="sampler-main">
+
+        <section class="sampler-left">
+          <div class="sampler-button">
+            <simple-button button-model="{{triggerButtonModel}}" is-trigger="true"></simple-button>
+          </div>
+          <div class="slider-container">
+            <slider-horizontal slider-value="{{samplerModel.baseNote}}" lower-bound="-12" upper-bound="12">
+            </slider-horizontal>
+          </div>
+          <sampler-loader parent-event-handler="{{samplerLoader}}">
+          </sampler-loader>
+        </section>
+
+        <section class="sampler-right">
+          <sample-visualizer buffer-source="{{samplerModel}}"></sample-visualizer>
+          <simple-adsr adsr-model="{{samplerModel.adsr}}"></simple-adsr>
+        </section>
+
+      </section>
+    </section>
+
+    <connector-output audio-node="{{samplerModel}}" connection-bus="{{connectionOutput}}">
+    </connector-output>
+
+  </template>
+
+  </dom-module>
+<script src="simple-sampler.js"></script></body></html>

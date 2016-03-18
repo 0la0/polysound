@@ -1,0 +1,20 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="driver-factory">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 95px;
+        font-size: 12px;
+      }
+    </style>
+
+    <dropdown-element list-data="[[driverList]]" callback-handler="[[callbackHandler]]" label="Create Driver">
+    </dropdown-element>
+
+  </template>
+
+  </dom-module>
+<script src="driver-factory.js"></script></body></html>

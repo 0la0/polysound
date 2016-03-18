@@ -1,0 +1,29 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="value-display">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        height: 100%;
+        width: 100%;
+        border: 2px solid black;
+        text-align: center;
+      }
+      input {
+        display: block;
+        margin: 0;
+        border: none;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+    <input id="numberInput" type="text" value="[[model]]">
+
+  </template>
+
+  </dom-module>
+<script src="value-display.js"></script></body></html>

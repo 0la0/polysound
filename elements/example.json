@@ -1,0 +1,31 @@
+{
+  "sampleList": [
+    "audioSamples/cogs3.wav",
+    "audioSamples/cogs4.wav",
+    "audioSamples/drakeVoice.wav",
+    "audioSamples/eKick1.wav",
+    "audioSamples/hat_expHit.wav",
+    "audioSamples/hat_gb.wav",
+    "audioSamples/hat_loFi.wav",
+    "audioSamples/headlines.wav",
+    "audioSamples/matrix-reverb1.wav",
+    "audioSamples/morph12.wav",
+    "audioSamples/morph5.wav",
+    "audioSamples/pinball3.wav",
+    "audioSamples/pinball4.wav",
+    "audioSamples/snare_gb01.wav",
+    "audioSamples/snare_gb02.wav",
+    "audioSamples/snare_gb03.wav",
+    "audioSamples/snare_loFi_bright.wav",
+    "audioSamples/snare_loFi_muff.wav",
+    "audioSamples/spatialized1.wav",
+    "audioSamples/spatialized6.wav",
+    "audioSamples/vinyl9.wav",
+    "audioSamples/woodAndMetal.wav",
+    "audioSamples/woodClog51.wav",
+    "audioSamples/woodClog55.wav"
+  ],
+  "reverbBufferList": [
+    "audioSamples/matrix-reverb1.wav"
+  ]
+}

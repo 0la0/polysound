@@ -1,0 +1,77 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
+
+</head><body><dom-module id="simple-synth">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        border: 1px solid black;
+        margin: 0 5px;
+        background: #eee;
+        height: 100%;
+      }
+      .synth {
+        height: inherit;
+      }
+      .synth-main {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+      }
+      .synth-left {
+        width: 80px;
+        border-right: 1px solid black;
+      }
+      .synth-name {
+        border-bottom: 1px solid black;
+      }
+      .synth-button {
+        width: 30px;
+        height: 30px;
+      }
+      .slider-container {
+        height: 10px;
+        width: 95%;
+      }
+
+      .synth-right {}
+      .synth-waveform-selector {
+        line-height: 20px;
+      }
+    </style>
+
+    <driver-input audio-node="{{synthModel}}" connection-bus="{{connectionInput}}">
+    </driver-input>
+
+    <section class="synth">
+      <element-header label="Synth" removable="{{removable}}"></element-header>
+
+      <section class="synth-main">
+
+        <section class="synth-left">
+          <div class="synth-button">
+            <simple-button button-model="{{buttonModel}}"></simple-button>
+          </div>
+          <div class="slider-container">
+            <slider-horizontal slider-value="{{baseFrequency}}" lower-bound="220" upper-bound="660">
+          </slider-horizontal>
+        </div></section>
+
+        <section class="synth-right">
+          <multi-select class="synth-waveform-selector" select-model="{{multiSelectModel}}">
+          </multi-select>
+          <simple-adsr adsr-model="{{synthModel.adsr}}"></simple-adsr>
+        </section>
+
+      </section>
+    </section>
+
+    <connector-output audio-node="{{synthModel}}" connection-bus="{{connectionOutput}}">
+    </connector-output>
+
+  </template>
+
+  </dom-module>
+<script src="simple-synth.js"></script></body></html>

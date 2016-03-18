@@ -1,0 +1,43 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="microphone-input">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        border: 1px solid black;
+        margin: 0 5px;
+        background: #eee;
+        height: 100%;
+      }
+      .input-node {
+        height: inherit;
+      }
+      .input-button {
+        width: 30px;
+        height: 30px;
+      }
+    </style>
+
+    <section class="input-node">
+      <element-header label="Mic Input" removable="{{removable}}"></element-header>
+
+      <label>Toggle Input</label>
+      <div class="input-button">
+        <simple-button button-model="{{inputButtonModel}}" id="inputBtn"></simple-button>
+      </div>
+      <label>Record Input</label>
+      <div class="input-button">
+        <simple-button button-model="{{recordButtonModel}}" id="recordBtn"></simple-button>
+      </div>
+
+    </section>
+
+    <connector-output audio-node="{{inputModel}}" connection-bus="{{connectionOutput}}">
+    </connector-output>
+
+  </template>
+
+  </dom-module>
+<script src="microphone-input.js"></script></body></html>

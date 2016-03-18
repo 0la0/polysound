@@ -1,0 +1,92 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="sequencer-matrix">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .sequencer {
+        /*width: 337px;*/
+        width: 100%;
+        margin-top: 5px;
+        margin-right: 5px;
+      }
+      .sequencer-trigger {
+        width: 30px;
+        height: 15px;
+      }
+      .sequencer-header {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-between;
+
+        background-color: #999;
+        height: 18px;
+      }
+      .sequencer-header__name {
+        font-style: italic;
+      }
+      .sequencer-header__toggle {
+        height: 90%;
+        width: 65px;
+        text-align: right;
+        padding-right: 2px;
+      }
+      .sequencer-container {
+        border-right: 1px solid black;
+        border-top: 1px solid black;
+      }
+      .sequencer-row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+      }
+      .sequencer-row__element {
+        flex-grow: 1;
+        margin: 0;
+        border-bottom: 1px solid black;
+        border-left: 1px solid black;
+      }
+      .sequencer-row__header-element {
+        height: 10px;
+      }
+      .sequencer-row__header-element--active {
+        background: #666;
+      }
+
+      .sequencer-body--collapsed {
+        display: none;
+      }
+      .sequencer-row__body-element {
+        height: 20px;
+      }
+      .sequencer-row__body-element--active {
+        background: #aaa;
+      }
+      .sequencer-row__body-element--scheduled {
+        background: #666;
+      }
+    </style>
+
+    <div class="sequencer">
+      <div class="sequencer-trigger">
+        <simple-button button-model="{{triggerButtonModel}}" id="sequencerTrigger"></simple-button>
+      </div>
+      <div class="sequencer-header">
+        <div class="sequencer-header__name">[[clipLabel]]</div>
+        <div class="sequencer-header__toggle">
+          <simple-button button-model="{{expandableButtonModel}}" default-text="collapse" active-text="expand"></simple-button>
+        </div>
+      </div>
+      <div class="sequencer-container">
+        <div id="sequencerHeader"></div>
+        <div id="sequencerBody"></div>
+      </div>
+    </div>
+
+
+  </template>
+
+  </dom-module>
+<script src="sequencer-matrix.js"></script></body></html>

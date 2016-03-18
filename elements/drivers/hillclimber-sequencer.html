@@ -1,0 +1,68 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="hillclimber-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .hide-section {
+        display: none;
+      }
+      .hillclimber {}
+      .hillclimber__header {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+      }
+      .hillclimber__header-train {}
+      .hillclimber__header-search {}
+    </style>
+
+    <div class="matrix-list">
+      <element-header label="Hillclimber Sequencer" removable="{{removable}}"></element-header>
+
+      <div class="hillclimber__header">
+        <label>Mode:</label>
+        <multi-select select-model="{{multiSelectModel}}">
+        </multi-select>
+      </div>
+
+      <div class="hillclimber__train" id="hillclimberTrain">
+
+        <div class="hillclimber__header hillclimber__header-train">
+          <label id="createNewGoal">Add New Goal State</label>
+        </div>
+
+        <div class="hillclimber__body hillclimber__body-train">
+          <template is="dom-repeat" items="{{goalElementList}}" as="item">
+            <sequencer-matrix class="hillclimber__matrix-train" number-of-steps="16" number-of-rows="2" clip-manager="[[clipManager]]" clip-label="Goal State">
+            </sequencer-matrix>
+          </template>
+        </div>
+
+      </div>
+
+      <div class="hillclimber__search" id="hillclimberSearch">
+
+        <div class="hillclimber__header hillclimber__header-search">
+          <span>Current Fitness: </span>
+          <span>[[currentFitnessValue]]</span>
+        </div>
+
+        <div class="hillclimber__body hillclimber__body-search">
+          <sequencer-matrix class="search-matrix" number-of-steps="16" number-of-rows="2" clip-manager="{{clipManager}}" clip-label="Active Search">
+          </sequencer-matrix>
+
+          <sequencer-matrix class="goal-matrix" number-of-steps="16" number-of-rows="2" clip-manager="{{clipManager}}" clip-label="Goal State">
+          </sequencer-matrix>
+        </div>
+
+      </div>
+
+    </div>
+
+  </template>
+
+  </dom-module>
+<script src="hillclimber-sequencer.js"></script></body></html>

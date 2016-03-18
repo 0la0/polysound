@@ -1,0 +1,29 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="dropdown-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+      }
+      label {
+        background-color: #eee;
+        border: 1px solid black;
+      }
+      .dropdown {
+        display: none;
+      }
+      .dropdown--active {
+        display: block;
+      }
+    </style>
+
+    <label id="dropdownLabel">[[label]]</label>
+    <dropdown-list class="dropdown" list-data="[[listData]]" callback-handler="[[dropdownCallback]]">
+    </dropdown-list>
+
+  </template>
+
+  </dom-module>
+<script src="dropdown-element.js"></script></body></html>

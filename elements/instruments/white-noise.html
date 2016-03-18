@@ -1,0 +1,74 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
+
+</head><body><dom-module id="white-noise">
+  <template>
+    <style>
+    :host {
+      display: block;
+      position: relative;
+      border: 1px solid black;
+      margin: 0 5px;
+      background: #eee;
+      height: 100%;
+    }
+    .noise {
+      height: inherit;
+    }
+    .noise-main {
+      display: flex;
+      flex-flow: row;
+      flex-wrap: nowrap;
+    }
+    .noise-left {
+      width: 80px;
+      border-right: 1px solid black;
+    }
+    .noise-name {
+      border-bottom: 1px solid black;
+    }
+    .noise-button {
+      width: 30px;
+      height: 30px;
+    }
+    .noise-container {
+      height: 10px;
+      width: 95%;
+    }
+    .noise-right {}
+    </style>
+
+    <driver-input audio-node="{{noiseModel}}" connection-bus="{{connectionInput}}">
+    </driver-input>
+
+    <section class="noise">
+      <element-header label="White Noise" removable="{{removable}}"></element-header>
+
+      <section class="noise-main">
+
+        <section class="noise-left">
+          <div class="noise-button">
+            <simple-button button-model="{{buttonModel}}"></simple-button>
+          </div>
+          <div class="noise-container">
+            <slider-horizontal slider-value="{{baseFrequency}}" lower-bound="-1200" upper-bound="1200">
+            </slider-horizontal>
+          </div>
+        </section>
+
+        <section class="noise-right">
+          <sample-visualizer buffer-source="{{noiseModel}}"></sample-visualizer>
+          <simple-adsr adsr-model="{{noiseModel.adsr}}"></simple-adsr>
+        </section>
+
+      </section>
+
+    </section>
+
+    <connector-output audio-node="{{noiseModel}}" connection-bus="{{connectionOutput}}">
+    </connector-output>
+
+  </template>
+
+  </dom-module>
+<script src="white-noise.js"></script></body></html>

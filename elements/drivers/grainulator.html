@@ -1,0 +1,52 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="custom-grainulator">
+  <template>
+    <style>
+      :host {
+        display: block;
+        font-size: 12px;
+      }
+      .grainulator {
+        display: block;
+        width: 200px;
+        border: 1px solid black;
+      }
+      .grainulator-header {
+        background-color: #999;
+        width: 100%;
+      }
+      .grainulator-button {
+        width: 60px;
+        height: 30px;
+      }
+    </style>
+
+    <div class="grainulator">
+      <element-header label="Grainulator" removable="{{removable}}"></element-header>
+
+      <div class="grainulator-button">
+        <simple-button button-model="{{buttonModel}}"></simple-button>
+      </div>
+
+      <parameter-display model="{{position}}" label="Position" lower-bound="0" upper-bound="1">
+      </parameter-display>
+
+      <parameter-display model="{{spread}}" label="Spread" lower-bound="0" upper-bound="1">
+      </parameter-display>
+
+      <parameter-display model="{{loopTime}}" label="Loop Time" lower-bound="0.01" upper-bound="1">
+      </parameter-display>
+
+      <parameter-display model="{{numVoices}}" label="Voices" lower-bound="1" upper-bound="6">
+      </parameter-display>
+
+      <parameter-display model="{{pitch}}" label="Pitch" lower-bound="-12" upper-bound="12">
+      </parameter-display>
+
+    </div>
+
+  </template>
+
+  </dom-module>
+<script src="grainulator.js"></script></body></html>

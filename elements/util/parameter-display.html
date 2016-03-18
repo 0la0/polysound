@@ -1,0 +1,46 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="parameter-display">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .parameter-display {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: stretch;
+
+        min-height: 20px;
+        height: 20px;
+        margin: 10px 0;
+        line-height: 30px;
+      }
+      label {
+        width: 30%;
+      }
+      slider-horizontal {
+        width: 50%;
+      }
+      value-display {
+        width: 20%;
+        max-width: 18%;
+      }
+    </style>
+
+    <div class="parameter-display">
+
+      <value-envelope bound-value="{{model}}"></value-envelope>
+      <label>[[label]]</label>
+      <slider-horizontal slider-value="{{model}}" lower-bound="[[lowerBound]]" upper-bound="[[upperBound]]">
+      </slider-horizontal>
+      <value-display model="{{model}}"></value-display>
+
+    </div>
+
+  </template>
+
+  </dom-module>
+<script src="parameter-display.js"></script></body></html>

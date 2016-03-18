@@ -1,0 +1,43 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="slider-field-vertical">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        width: 100%;
+        height: 100%;
+
+        cursor: default;
+        background-color: #efefef;
+      }
+      .parameter-container {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+
+        height :100%;
+      }
+      canvas {
+        width: 47%;
+        height: 100%;
+        border: 1px solid black;
+      }
+      .parameter-input {
+        width: 47%;
+        height: 100%;
+        border: 1px solid black;
+        resize: none;
+      }
+    </style>
+
+    <div class="parameter-container">
+      <canvas></canvas>
+      <textarea class="parameter-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+    </div>
+
+  </template>
+
+  </dom-module>
+<script src="slider-field-vertical.js"></script></body></html>

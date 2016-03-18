@@ -1,0 +1,76 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="equalizer-three">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 0 5px;
+        height: 100%;
+        background: #eee;
+      }
+      .eq-container {
+        width: 110px;
+        border: 1px solid black;
+        height: 100%;
+      }
+      .eq-channel__container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: space-around;
+        font-size: 11px;
+      }
+      .eq-channel__column {
+        height: 110px;
+        width: 20px;
+        text-align: center;
+      }
+      connector-output {
+        margin-left: 5px;
+      }
+    </style>
+
+    <connector-input audio-node="{{equalizerModel}}" connection-bus="{{connectionInput}}">
+    </connector-input>
+
+    <div class="eq-container">
+      <element-header label="Equalizer" removable="{{removable}}"></element-header>
+
+      <div class="eq-channel__container">
+
+        <div class="eq-channel__column">
+          <p class="eq-label">lo</p>
+          <slider-vertical slider-value="{{equalizerModel.lo.gain.value}}" lower-bound="-40" upper-bound="40">
+          </slider-vertical>
+        </div>
+
+        <div class="eq-channel__column">
+          <p class="eq-label">mid</p>
+          <slider-vertical slider-value="{{equalizerModel.mid.gain.value}}" lower-bound="-40" upper-bound="40">
+          </slider-vertical>
+        </div>
+
+        <div class="eq-channel__column">
+          <p class="eq-label">hi</p>
+          <slider-vertical slider-value="{{equalizerModel.hi.gain.value}}" lower-bound="-40" upper-bound="40">
+          </slider-vertical>
+        </div>
+
+        <div class="eq-channel__column">
+          <p class="eq-label">gain</p>
+          <slider-vertical slider-value="{{equalizerModel.mainGain.gain.value}}" lower-bound="0" upper-bound="1">
+          </slider-vertical>
+        </div>
+
+      </div>
+
+    </div>
+
+    <connector-output audio-node="{{equalizerModel}}" connection-bus="{{connectionOutput}}">
+    </connector-output>
+
+  </template>
+
+  </dom-module>
+<script src="equalizer-three.js"></script></body></html>

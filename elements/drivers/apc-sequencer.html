@@ -1,0 +1,23 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/midi.html">
+
+</head><body><dom-module id="apc-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <div class="matrix-list">
+      <element-header label="APC Sequencer" removable="{{removable}}"></element-header>
+
+      <sequencer-matrix class="matrix" number-of-steps="8" number-of-rows="5" clip-manager="{{clipManager}}" clip-label="APC Clip">
+      </sequencer-matrix>
+
+    </div>
+
+  </template>
+
+  </dom-module>
+<script src="apc-sequencer.js"></script></body></html>

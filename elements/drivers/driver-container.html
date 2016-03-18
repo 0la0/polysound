@@ -1,0 +1,36 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
+
+</head><body><dom-module id="driver-container">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: relative;
+        height: 100%;
+        margin: 0 5px;
+        background: #eee;
+        height: 100%;
+      }
+      .driver-column {
+        border: 1px solid black;
+        height: 100%;
+        overflow-y: scroll;
+      }
+      #driverOutputContainer {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+      }
+      driver-output {
+        margin: 0 5px;
+      }
+    </style>
+
+    <div class="driver-column" id="container"></div>
+    <div id="driverOutputContainer"></div>
+
+  </template>
+
+  </dom-module>
+<script src="driver-container.js"></script></body></html>
