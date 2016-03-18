@@ -48,9 +48,9 @@ window.addEventListener('WebComponentsReady', function () {
 
   // 404
   page('*', function () {
-    app.$.toast.text = 'Can\'t find: ' + window.location.href + '. Redirected you to Home Page';
-    app.$.toast.show();
-    page.redirect(app.baseUrl);
+    // app.$.toast.text = 'Can\'t find: ' + window.location.href  + '. Redirected you to Home Page';
+    // app.$.toast.show();
+    // page.redirect(app.baseUrl);
   });
 
   // add #! before urls
