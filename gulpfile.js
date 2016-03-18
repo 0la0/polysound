@@ -363,22 +363,11 @@ gulp.task('serve:dist', ['default'], function() {
 gulp.task('default', ['clean'], function(cb) {
   // Uncomment 'cache-config' if you are going to use service workers.
   runSequence(
-    ['copy', 'styles', 'audio-samples'],
-    ['elements', 'js'],
+    ['copy', 'styles', 'audio-samples', 'elements', 'js'],
     ['lint', 'images', 'fonts'],
     ['html'],
     'vulcanize',
     cb);
-});
-
-//Copy dist directory to main github pages repo
-gulp.task('copy-dist', function () {
-  return gulp.src(['dist/**/*'])
-    .pipe(gulp.dest('../0la0.github.io/'));
-});
-
-gulp.task('build', function () {
-  runSequence('default', 'copy-dist');
 });
 
 // Build then deploy to GitHub pages gh-pages branch
