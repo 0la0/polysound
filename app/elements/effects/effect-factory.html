@@ -54,7 +54,8 @@
             'Delay': 'delay',
             'Reverb': 'reverb',
             'Compressor': 'compressor',
-            'Drone Filter': 'drone'
+            'Drone Filter': 'drone',
+            'Waveshaper': 'waveshaper'
           };
           this.effectList = Object.keys(this.effectTable);
 
@@ -104,6 +105,11 @@
         drone: (effectFactory) => {
           let droneElement = document.createElement('drone-filter');
           droneElement.filterModel = effectFactory.createDroneFilter();
+          return droneElement;
+        },
+        waveshaper: (effectFactory) => {
+          let droneElement = document.createElement('waveshaper-element');
+          droneElement.waveshaperModel = effectFactory.createWaveshaper();
           return droneElement;
         }
       };

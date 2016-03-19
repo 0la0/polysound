@@ -3,6 +3,7 @@ import Delay from './delay.js';
 import Reverb from './reverb.js';
 import Compressor from './compressor.js';
 import DroneFilter from './droneFilter.js';
+import Waveshaper from './Waveshaper.js';
 
 export default class EffectFactory {
 
@@ -36,6 +37,10 @@ export default class EffectFactory {
 
   createDroneFilter () {
     return new DroneFilter(this.audioContext);
+  }
+
+  createWaveshaper () {
+    return new Waveshaper(this.audioContext);
   }
 
 }

@@ -1,0 +1,74 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
+
+<dom-module id="waveshaper-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 0 5px;
+        height: 100%;
+        background: #eee;
+      }
+      .waveshaper-container {
+        border: 1px solid black;
+        height: 100%;
+      }
+    </style>
+
+    <connector-input
+        audio-node="{{waveshaperModel}}"
+        connection-bus="{{connectionInput}}">>
+    </connector-input>
+
+    <div class="waveshaper-container">
+      <element-header label="Waveshaper" removable="{{removable}}"></element-header>
+
+
+    </div>
+
+    <connector-output
+        audio-node="{{waveshaperModel}}"
+        connection-bus="{{connectionOutput}}">>
+    </connector-output>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class Waveshaper {
+
+        beforeRegister() {
+          this.is = 'waveshaper-element';
+
+          this.properties = {
+            waveshaperModel: {
+              type: Object
+            },
+            connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {
+          this.removable = importRemovable.call(this, this.waveshaperModel);
+        }
+        detached() {}
+        attributeChanged() {}
+
+      }
+      Polymer(Waveshaper);
+
+    })();
+  </script>
+
+</dom-module>
