@@ -14,6 +14,9 @@
         border: 1px solid black;
         height: 100%;
       }
+      .waveshaper-selector {
+        height: 30px;
+      }
     </style>
 
     <connector-input
@@ -24,6 +27,7 @@
     <div class="waveshaper-container">
       <element-header label="Waveshaper" removable="{{removable}}"></element-header>
 
+      <multi-select class="waveshaper-selector" select-model="{{multiSelectModel}}"></multi-select>
 
     </div>
 
@@ -60,6 +64,7 @@
 
         ready() {}
         attached() {
+          this.multiSelectModel = buildMultiSelectModel.call(this);
           this.removable = importRemovable.call(this, this.waveshaperModel);
         }
         detached() {}
@@ -67,6 +72,28 @@
 
       }
       Polymer(Waveshaper);
+
+      function buildMultiSelectModel () {
+        return {
+          list: [
+            {
+              display: 'Square',
+              value: 'Square'
+            },
+            {
+              display: 'Sigmoid',
+              value: 'Sigmoid'
+            },
+            {
+              display: 'SigmoidLike',
+              value: 'SigmoidLike'
+            }
+          ],
+          callback: (selectionString) => {
+            this.waveshaperModel.setCarrierFunction(selectionString);
+          }
+        }
+      }
 
     })();
   </script>
