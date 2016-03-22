@@ -24,6 +24,7 @@ export default class Waveshaper extends BaseEffect {
 
   setCarrierFunction (functionKey) {
     let carrierFunction = CARRIER_FUNCTIONS[functionKey];
+    console.log('sampleRate:', this.audioContext.sampleRate);
     (carrierFunction) ?
       this.waveshaperNode.curve = createCurve(carrierFunction, this.audioContext.sampleRate, 50) :
       console.warn('Waveshkaper.setCarrierFunction error, invalid function key');
@@ -37,7 +38,7 @@ function createCurve (carrierFunction, sampleRate, multiplier) {
     //adjust x such that the curve is centered in its domain
     let x = i * 2 / sampleRate - 1;
     //sigmoid with fast dropoff, range is (-1, 1)
-    curve[i] = carrierFunction(x, multiplier);
+    curve[i] = carrierFunction(x, multiplier, sampleRate);
   }
   return curve;
 }
@@ -48,12 +49,36 @@ const CARRIER_FUNCTIONS = {
     return Math.pow(x, 2);
   },
 
+  Cubed: (x) => {
+    return Math.pow(x, 3);
+  },
+
+  Chebyshev2: (x) => {
+    return 2 * Math.pow(x, 2) - 1;
+  },
+
+  Chebyshev3: (x) => {
+    return 4 * Math.pow(x, 3) - 3 * x;
+  },
+
+  Chebyshev4: (x) => {
+    return 8 * Math.pow(x, 4) - 8 * Math.pow(x, 2) + 1;
+  },
+
   Sigmoid: (x) => {
     return 2 / (1 + Math.exp(-4 * x)) - 1;
   },
 
+  Sigmoid2: (x) => {
+    return 1.5 / (1 + Math.exp(-10 * x)) - 0.75;
+  },
+
   SigmoidLike: (x, multiplier) => {
     return ( 3 + multiplier ) * x * 20 * (Math.PI / 180) / ( Math.PI + multiplier * Math.abs(x) );
+  },
+
+  HardClip: (x, multiplier, sampleRate) => {
+    return (0.4 * x) / (Math.abs(x));
   }
 
 };

@@ -64,7 +64,7 @@
 
         ready() {}
         attached() {
-          this.multiSelectModel = buildMultiSelectModel.call(this);
+          this.multiSelectModel = buildMultiSelectModel.call(this, this.waveshaperModel);
           this.removable = importRemovable.call(this, this.waveshaperModel);
         }
         detached() {}
@@ -73,22 +73,14 @@
       }
       Polymer(Waveshaper);
 
-      function buildMultiSelectModel () {
+      function buildMultiSelectModel (waveshaperModel) {
         return {
-          list: [
-            {
-              display: 'Square',
-              value: 'Square'
-            },
-            {
-              display: 'Sigmoid',
-              value: 'Sigmoid'
-            },
-            {
-              display: 'SigmoidLike',
-              value: 'SigmoidLike'
+          list: waveshaperModel.getCarrierFunctions().map((waveFunction) => {
+            return {
+              display: waveFunction,
+              value: waveFunction
             }
-          ],
+          }),
           callback: (selectionString) => {
             this.waveshaperModel.setCarrierFunction(selectionString);
           }
