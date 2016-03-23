@@ -78,7 +78,7 @@ const CARRIER_FUNCTIONS = {
   },
 
   HardClip: (x, multiplier, sampleRate) => {
-    return (0.4 * x) / (Math.abs(x));
+    return (1 + 0.4 * x) / (1 + Math.abs(x));
   }
 
 };
