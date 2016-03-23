@@ -1,0 +1,89 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="sound-visualizer">
+  <template>
+    <style>
+      :host {
+        display: block;
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        border: 1px solid black;
+      }
+      canvas {
+        background-color: #ffffff;
+        width: 200px;
+        height: 100px;
+      }
+    </style>
+
+    <canvas></canvas>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class Visualizer {
+
+        beforeRegister() {
+          this.is = 'sound-visualizer';
+
+          this.properties = {
+            model: {
+              type: Object
+            }
+          };
+
+          this.listeners = {
+            //tap: '_onTap'
+          };
+        }
+
+        ready() {}
+        attached() {
+          this.cvs = this.$$('canvas');
+          this.cvs.width = 200;
+          this.cvs.height = 100;
+          this.g2d = this.cvs.getContext('2d');
+          this.g2d.halfHeight = this.cvs.height / 2;
+          this.g2d.strokeStyle = "black";
+          this.g2d.lineWidth = 2;
+          this.g2d.fillStyle = "white";
+
+          this._draw();
+        }
+        detached() {}
+        attributeChanged() {}
+
+        _onTap (event) {
+          this._draw();
+        }
+
+        _draw () {
+          let timeData = this.model.getTimeData();
+          let step = timeData.length / this.cvs.width;
+
+          this.g2d.clearRect(0, 0, this.cvs.width, this.cvs.height);
+          this.g2d.beginPath();
+          timeData.forEach((value, index) => {
+            let normalValue = (value / 256) * 100;
+            let x = step * index;
+            let y = (256 / this.cvs.height) + normalValue;
+            (index === 0) ?
+              this.g2d.moveTo(x, y) :
+              this.g2d.lineTo(x, y);
+          });
+          this.g2d.stroke();
+
+          requestAnimationFrame(this._draw.bind(this));
+        }
+
+      }
+
+      Polymer(Visualizer);
+    })();
+  </script>
+
+</dom-module>

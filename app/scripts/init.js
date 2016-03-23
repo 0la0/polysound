@@ -3,6 +3,7 @@ import Metronome from './audio/util/metronome.js';
 import Scheduler from './audio/util/scheduler.js';
 import InstrumentFactory from './audio/instruments/instrumentFactory.js';
 import EffectFactory from './audio/effects/effectFactory.js';
+import Visualizer from './audio/effects/visualizer.js';
 import buildMidiFactory from './midi/midiFactory.js';
 import Http from './util/http.js';
 
@@ -19,6 +20,7 @@ let instrumentFactory = new InstrumentFactory(audioGraph.getAudioContext());
 let sampleMap = new Map();
 let sampleList = [];
 let lastEqualizerList = buildLastEqualizers();
+let visualizer = new Visualizer(audioGraph.getAudioContext(), audioGraph.masterCompressor);
 
 let audio = {
   audioGraph: audioGraph,
@@ -26,7 +28,8 @@ let audio = {
   sampleMap: sampleMap,
   lastEqualizerList: lastEqualizerList,
   effectFactory: effectFactory,
-  instrumentFactory: instrumentFactory
+  instrumentFactory: instrumentFactory,
+  visualizer: visualizer
 };
 //window.audio = audio;
 
