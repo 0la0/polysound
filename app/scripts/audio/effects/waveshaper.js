@@ -24,7 +24,6 @@ export default class Waveshaper extends BaseEffect {
 
   setCarrierFunction (functionKey) {
     let carrierFunction = CARRIER_FUNCTIONS[functionKey];
-    console.log('sampleRate:', this.audioContext.sampleRate);
     (carrierFunction) ?
       this.waveshaperNode.curve = createCurve(carrierFunction, this.audioContext.sampleRate, 50) :
       console.warn('Waveshkaper.setCarrierFunction error, invalid function key');

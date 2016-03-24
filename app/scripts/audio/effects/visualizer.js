@@ -10,6 +10,7 @@ export default class Vizualizer extends BaseEffect {
 
     this.analyser.fftSize = 2048;
     this.timeDataArray = new Uint8Array(this.getBufferLength());
+    this.freqDataArray = new Uint8Array(this.getBufferLength());
   }
 
   connect () {
@@ -27,6 +28,11 @@ export default class Vizualizer extends BaseEffect {
   getTimeData () {
     this.analyser.getByteTimeDomainData(this.timeDataArray);
     return this.timeDataArray;
+  }
+
+  getFrequencyData () {
+    this.analyser.getByteFrequencyData(this.freqDataArray);
+    return this.freqDataArray;
   }
 
 }

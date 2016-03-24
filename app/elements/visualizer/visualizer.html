@@ -8,16 +8,22 @@
         position: fixed;
         right: 0;
         bottom: 0;
-        border: 1px solid black;
       }
-      canvas {
+      .visualizer {}
+      .visualizer-display {
+        display: block;
         background-color: #ffffff;
         width: 200px;
         height: 100px;
+        border: 1px solid black;
       }
     </style>
 
-    <canvas></canvas>
+    <div class="visualizer">
+      <canvas class="visualizer-display" id="timeDomainCanvas"></canvas>
+      <canvas class="visualizer-display" id="frequencyDomainCanvas"></canvas>
+    </div>
+
 
   </template>
 
@@ -43,14 +49,16 @@
 
         ready() {}
         attached() {
-          this.cvs = this.$$('canvas');
-          this.cvs.width = 200;
-          this.cvs.height = 100;
-          this.g2d = this.cvs.getContext('2d');
-          this.g2d.halfHeight = this.cvs.height / 2;
-          this.g2d.strokeStyle = "black";
-          this.g2d.lineWidth = 2;
-          this.g2d.fillStyle = "white";
+          this.width = 200;
+          this.height = 100;
+
+          this.$.timeDomainCanvas.width = this.width;
+          this.$.timeDomainCanvas.height = this.height;
+          this.g2dTime = getGraphicsContext(this.$.timeDomainCanvas, this.width, this.height);
+
+          this.$.frequencyDomainCanvas.width = this.width;
+          this.$.frequencyDomainCanvas.height = this.height;
+          this.g2dFreq = getGraphicsContext(this.$.frequencyDomainCanvas, this.width, this.height);
 
           this._draw();
         }
@@ -63,23 +71,41 @@
 
         _draw () {
           let timeData = this.model.getTimeData();
-          let step = timeData.length / this.cvs.width;
+          let freqData = this.model.getFrequencyData();
+          let step = timeData.length / this.width;
 
-          this.g2d.clearRect(0, 0, this.cvs.width, this.cvs.height);
-          this.g2d.beginPath();
+          this.g2dTime.clearRect(0, 0, this.width, this.height);
+          this.g2dTime.beginPath();
           timeData.forEach((value, index) => {
             let normalValue = (value / 256) * 100;
             let x = step * index;
-            let y = (256 / this.cvs.height) + normalValue;
+            let y = (256 / this.height) + normalValue;
             (index === 0) ?
-              this.g2d.moveTo(x, y) :
-              this.g2d.lineTo(x, y);
+              this.g2dTime.moveTo(x, y) :
+              this.g2dTime.lineTo(x, y);
           });
-          this.g2d.stroke();
+          this.g2dTime.stroke();
+
+          this.g2dFreq.clearRect(0, 0, this.width, this.height);
+          freqData.forEach((value, index) => {
+            let x = step * index;
+            let height = (value / 256) * this.height;
+            this.g2dFreq.fillRect(x, 0, step, height);
+          });
 
           requestAnimationFrame(this._draw.bind(this));
         }
 
+      }
+
+      function getGraphicsContext (canvasElement, width, height) {
+        let g2d = canvasElement.getContext('2d');
+        g2d.strokeStyle = "black";
+        g2d.lineWidth = 2;
+        g2d.fillStyle = "black";
+        g2d.translate(0, height);
+        g2d.scale(1, -1);
+        return g2d;
       }
 
       Polymer(Visualizer);
