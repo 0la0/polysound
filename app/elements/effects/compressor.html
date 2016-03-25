@@ -1,4 +1,5 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">\
+<link rel="import" href="../helpers/removable.html">
 
 <dom-module id="simple-compressor">
   <template>
@@ -136,7 +137,7 @@
 
         ready() {}
         attached() {
-          this.removable = removable.call(this);
+          this.removable = importRemovable.call(this, this.compressorModel);
         }
         detached() {}
         attributeChanged() {}
@@ -144,15 +145,6 @@
 
       Polymer(Compressor);
 
-      function removable () {
-        return {
-          callback: () => {
-            this.connectionInput.helpers.removeElement(this.compressorModel.input);
-            this.connectionOutput.helpers.removeElement(this.compressorModel.getOutput());
-            Polymer.dom(this).parentNode.removeChild(this);
-          }
-        }
-      }
 
     })();
   </script>

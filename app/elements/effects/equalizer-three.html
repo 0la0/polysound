@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
 
 <dom-module id="equalizer-three">
   <template>
@@ -116,7 +117,7 @@
             this.$$('element-header').removeCloseButton();
           }
           else {
-            this.removable = removable.call(this);
+            this.removable = importRemovable.call(this, this.equalizerModel);
           }
         }
         detached() {}
@@ -124,16 +125,6 @@
       }
 
       Polymer(Equalizer);
-
-      function removable () {
-        return {
-          callback: () => {
-            this.connectionInput.helpers.removeElement(this.equalizerModel.input);
-            this.connectionOutput.helpers.removeElement(this.equalizerModel.getOutput());
-            Polymer.dom(this).parentNode.removeChild(this);
-          }
-        }
-      }
 
     })();
   </script>

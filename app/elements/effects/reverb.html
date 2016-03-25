@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
 
 <dom-module id="simple-reverb">
   <template>
@@ -73,23 +74,13 @@
 
         ready() {}
         attached() {
-          this.removable = removable.call(this);
+          this.removable = importRemovable.call(this, this.equalizerModel);
         }
         detached() {}
         attributeChanged() {}
 
       }
       Polymer(SimpleReverb);
-
-      function removable () {
-        return {
-          callback: () => {
-            this.connectionInput.helpers.removeElement(this.reverbModel.input);
-            this.connectionOutput.helpers.removeElement(this.reverbModel.getOutput());
-            Polymer.dom(this).parentNode.removeChild(this);
-          }
-        }
-      }
 
     })();
   </script>

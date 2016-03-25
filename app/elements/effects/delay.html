@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
 
 <dom-module id="simple-delay">
   <template>
@@ -86,7 +87,7 @@
         ready() {}
         attached() {
           this.multiSelectModel = buildMultiSelectModel.call(this);
-          this.removable = removable.call(this);
+          this.removable = importRemovable.call(this, this.delayModel);
         }
         detached() {}
         attributeChanged() {}
@@ -112,16 +113,6 @@
           callback: (delayValue) => {
             //TODO: sync with actual tempo
             this.delayModel.setQuatization(120, delayValue);
-          }
-        }
-      }
-
-      function removable () {
-        return {
-          callback: () => {
-            this.connectionInput.helpers.removeElement(this.delayModel.input);
-            this.connectionOutput.helpers.removeElement(this.delayModel.getOutput());
-            Polymer.dom(this).parentNode.removeChild(this);
           }
         }
       }

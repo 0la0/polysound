@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
 
 <dom-module id="drone-filter">
   <template>
@@ -97,7 +98,7 @@
 
         ready() {}
         attached() {
-          this.removable = removable.call(this);
+          this.removable = importRemovable.call(this, this.filterModel);
         }
         detached() {}
         attributeChanged() {}
@@ -111,16 +112,6 @@
       }
 
       Polymer(DroneFilter);
-
-      function removable () {
-        return {
-          callback: () => {
-            this.connectionInput.helpers.removeElement(this.filterModel.input);
-            this.connectionOutput.helpers.removeElement(this.filterModel.getOutput());
-            Polymer.dom(this).parentNode.removeChild(this);
-          }
-        }
-      }
 
     })();
   </script>
