@@ -10,18 +10,33 @@
         bottom: 0;
       }
       .visualizer {}
-      .visualizer-display {
+      .visualizer__display {
+        display: none;
+      }
+      .visualizer__display--visible {
+        display: block;
+      }
+      .visualizer__graph {
         display: block;
         background-color: #ffffff;
         width: 200px;
         height: 100px;
         border: 1px solid black;
       }
+      .visualizer__toggle-button {
+        height: 20px;
+        width: 40px;
+        float: right;
+        margin-right: 20px;
+      }
     </style>
 
     <div class="visualizer">
-      <canvas class="visualizer-display" id="timeDomainCanvas"></canvas>
-      <canvas class="visualizer-display" id="frequencyDomainCanvas"></canvas>
+      <div class="visualizer__display" id="visualizerContainer">
+        <canvas class="visualizer__graph" id="timeDomainCanvas"></canvas>
+        <canvas class="visualizer__graph" id="frequencyDomainCanvas"></canvas>
+      </div>
+      <simple-button class="visualizer__toggle-button" button-model="{{toggleButtonModel}}"></simple-button>
     </div>
 
 
@@ -43,12 +58,17 @@
           };
 
           this.listeners = {
-            //tap: '_onTap'
+            'timeDomainCanvas.tap': '_onTimeCanvasTap',
+            'frequencyDomainCanvas.tap': '_onFreqCanvasTap'
           };
         }
 
         ready() {}
         attached() {
+          this.isOn = false;
+          this.timeIsOn = false;
+          this.freqIsOn = false;
+
           this.width = 200;
           this.height = 100;
 
@@ -60,12 +80,27 @@
           this.$.frequencyDomainCanvas.height = this.height;
           this.g2dFreq = getGraphicsContext(this.$.frequencyDomainCanvas, this.width, this.height);
 
-          this._draw();
+          this.toggleButtonModel = buildToggleButton.call(this);
         }
         detached() {}
         attributeChanged() {}
 
+        _onTimeCanvasTap () {
+          this.timeIsOn = !this.timeIsOn;
+        }
+
+        _onFreqCanvasTap () {
+          this.freqIsOn = !this.freqIsOn;
+        }
+
         _onTap (event) {
+          this._draw();
+        }
+
+        _turnOn () {
+          this.isOn = true;
+          this.timeIsOn = true;
+          this.freqIsOn = true;
           this._draw();
         }
 
@@ -74,26 +109,32 @@
           let freqData = this.model.getFrequencyData();
           let step = timeData.length / this.width;
 
-          this.g2dTime.clearRect(0, 0, this.width, this.height);
-          this.g2dTime.beginPath();
-          timeData.forEach((value, index) => {
-            let normalValue = (value / 256) * 100;
-            let x = step * index;
-            let y = (256 / this.height) + normalValue;
-            (index === 0) ?
-              this.g2dTime.moveTo(x, y) :
-              this.g2dTime.lineTo(x, y);
-          });
-          this.g2dTime.stroke();
+          if (this.timeIsOn) {
+            this.g2dTime.clearRect(0, 0, this.width, this.height);
+            this.g2dTime.beginPath();
+            timeData.forEach((value, index) => {
+              let normalValue = (value / 256) * 100;
+              let x = step * index;
+              let y = (256 / this.height) + normalValue;
+              (index === 0) ?
+                this.g2dTime.moveTo(x, y) :
+                this.g2dTime.lineTo(x, y);
+            });
+            this.g2dTime.stroke();
+          }
 
-          this.g2dFreq.clearRect(0, 0, this.width, this.height);
-          freqData.forEach((value, index) => {
-            let x = step * index;
-            let height = (value / 256) * this.height;
-            this.g2dFreq.fillRect(x, 0, step, height);
-          });
+          if (this.freqIsOn) {
+            this.g2dFreq.clearRect(0, 0, this.width, this.height);
+            freqData.forEach((value, index) => {
+              let x = step * index;
+              let height = (value / 256) * this.height;
+              this.g2dFreq.fillRect(x, 0, step, height);
+            });
+          }
 
-          requestAnimationFrame(this._draw.bind(this));
+          if (this.isOn) {
+            requestAnimationFrame(this._draw.bind(this));
+          }
         }
 
       }
@@ -106,6 +147,23 @@
         g2d.translate(0, height);
         g2d.scale(1, -1);
         return g2d;
+      }
+
+      function buildToggleButton () {
+        return {
+          callback: (isActive) => {
+            if (isActive) {
+              this.model.connect();
+              this.$.visualizerContainer.classList.add('visualizer__display--visible');
+              this._turnOn();
+            }
+            else {
+              this.model.disconnect();
+              this.$.visualizerContainer.classList.remove('visualizer__display--visible');
+              this.isOn = false;
+            }
+          }
+        };
       }
 
       Polymer(Visualizer);

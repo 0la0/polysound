@@ -6,9 +6,7 @@ export default class Vizualizer extends BaseEffect {
     super(audioContext);
     this.source = source;
     this.analyser = this.audioContext.createAnalyser();
-    this.connect();
-
-    this.analyser.fftSize = 2048;
+    this.analyser.fftSize = Math.pow(2, 11);
     this.timeDataArray = new Uint8Array(this.getBufferLength());
     this.freqDataArray = new Uint8Array(this.getBufferLength());
   }
