@@ -52,7 +52,6 @@
         }
 
         ready() {}
-
         attached() {
           this.svgElement = this.$$('svg');
           this.busModel.setHelperFunctions(this._viewModelHelpers());
@@ -61,9 +60,7 @@
             this.boundingClientRect = this.getBoundingClientRect();
           }, 0);
         }
-
         detached () {}
-
         attributeChanged () {}
 
         _viewModelHelpers () {
@@ -85,19 +82,14 @@
               setLinePosition(this.activeLine, line.p1.x, line.p1.y, line.p2.x, line.p2.y, xBuffer, yBuffer);
             },
             removeActiveLine: (line) => {
-              Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
-              Polymer.dom(this.svgElement).removeChild(this.activeLine.point2);
-              Polymer.dom(this.svgElement).removeChild(this.activeLine.line);
+              removeLine(this.svgElement, this.activeLine);
               this.activeLine = null;
             },
             finishLine: (line, connectionKey, inputNode, outputNode, connectorInput, connectorOutput) => {
               if (this.lineMap.has(connectionKey)) {
                 app.$.toast.text = 'Connection already exists.';
                 app.$.toast.show();
-
-                Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
-                Polymer.dom(this.svgElement).removeChild(this.activeLine.point2);
-                Polymer.dom(this.svgElement).removeChild(this.activeLine.line);
+                removeLine(this.svgElement, this.activeLine);
               }
               else {
                 this.activeLine.connectionKey = connectionKey;
@@ -214,11 +206,8 @@
           }
           else {
             //remove line and connections
-            Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
-            Polymer.dom(this.svgElement).removeChild(this.activeLine.point2);
-            Polymer.dom(this.svgElement).removeChild(this.activeLine.line);
-
-            var activeKey = this.activeLine.connectionKey;
+            let activeKey = this.activeLine.connectionKey;
+            removeLine(this.svgElement, this.activeLine);
             this.activeLine.inputNode.disconnect(this.activeLine.outputNode);
             this.activeLine = null;
             this.lineMap.delete(activeKey);
@@ -233,10 +222,13 @@
           }
         }
 
-
       }
 
-      Polymer(ConnectorBus);
+      function removeLine (parentElement, activeLine) {
+        Polymer.dom(parentElement).removeChild(activeLine.point1);
+        Polymer.dom(parentElement).removeChild(activeLine.point2);
+        Polymer.dom(parentElement).removeChild(activeLine.line);
+      }
 
       function setLinePosition (lineObj, x1, y1, x2, y2, xBuffer, yBuffer) {
         lineObj.point1.setAttribute('cx', x1 - xBuffer);
@@ -252,6 +244,7 @@
         lineObj.line.setAttribute('y2', y2 - yBuffer);
       }
 
+      Polymer(ConnectorBus);
     })();
   </script>
 

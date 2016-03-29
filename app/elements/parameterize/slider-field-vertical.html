@@ -111,8 +111,14 @@
           if (inputValue) {
             for (let i = 0; i < this.numSteps; i++) {
               let percentStep = i / this.numSteps;
-              let stepValue = evaluateInput(percentStep, inputValue);
-              this.values[i] = stepValue;
+
+              try {
+                let stepValue = evaluateInput(percentStep, inputValue);
+                this.values[i] = stepValue;
+              }
+              catch (error) {}
+
+
             }
           }
         }
