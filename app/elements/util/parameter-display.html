@@ -6,38 +6,76 @@
       :host {
         display: block;
       }
-      .parameter-display {
+      .parameter {
         display: flex;
-        flex-direction: row;
         flex-wrap: nowrap;
-        justify-content: flex-start;
+        justify-content: space-between;
         align-items: stretch;
-
-        min-height: 20px;
         height: 100%;
-        line-height: 30px;
+        width: 100%
       }
-      label {
+      .parameter--row {
+        flex-direction: row;
+        min-height: 20px;
+      }
+      .parameter--column {
+        flex-direction: column;
+      }
+
+      .parameter__envelope {}
+      .parameter__envelope--row {}
+      .parameter__envelope--column {}
+
+      .parameter__label {}
+      .parameter__label--row {
         width: 30%;
       }
-      slider-horizontal {
-        width: 50%;
+      .parameter__label--column {
+        /*height: 10%;*/
       }
-      value-display {
-        width: 20%;
+
+      .parameter__slider {}
+      .parameter__slider--row {
+        width: 50%;
+        height: 100%;
+      }
+      .parameter__slider--column {
+        width: 100%;
+        height: 90%;
+      }
+
+      .parameter__value {}
+      .parameter__value--row {
         max-width: 18%;
       }
+      .parameter__value--column {
+        height: 18px;
+      }
+
     </style>
 
-    <div class="parameter-display">
+    <div id="parameterDisplay" class="parameter">
 
-      <value-envelope bound-value="{{model}}"></value-envelope>
-      <label>[[label]]</label>
-      <slider-horizontal
+      <value-envelope
+        class="parameter__envelope"
+        bound-value="{{model}}"
+        direction$="[[displayDirection]]">
+      </value-envelope>
+
+      <label class="parameter__label">[[label]]</label>
+
+      <slider-bidirectional
+        class="parameter__slider"
         slider-value={{model}}
-        lower-bound="[[lowerBound]]" upper-bound="[[upperBound]]">
-      </slider-horizontal>
-      <value-display model="{{model}}"></value-display>
+        lower-bound="[[lowerBound]]"
+        upper-bound="[[upperBound]]"
+        direction$="[[displayDirection]]">
+      </slider-bidirectional>
+
+      <value-display
+        class="parameter__value"
+        model="{{model}}">
+      </value-display>
 
     </div>
 
@@ -65,13 +103,34 @@
             },
             label: {
               type: String
+            },
+            displayDirection: {
+              type: String,
+              value: 'row'
             }
           };
 
         }
 
         ready() {}
-        attached() {}
+        attached() {
+          if (this.displayDirection === 'column') {
+            this.$.parameterDisplay.classList.add('parameter--column');
+            this.$$('value-envelope').classList.add('parameter__envelope--column');
+            this.$$('label').classList.add('parameter__label--column');
+            this.$$('slider-bidirectional').classList.add('parameter__slider--column');
+            this.$$('value-display').classList.add('parameter__value--column');
+
+          }
+          else {
+            this.$.parameterDisplay.classList.add('parameter--row');
+            this.$$('value-envelope').classList.add('parameter__envelope--row');
+            this.$$('label').classList.add('parameter__label--row');
+            this.$$('slider-bidirectional').classList.add('parameter__slider--row');
+            this.$$('value-display').classList.add('parameter__value--row');
+          }
+
+        }
         detached() {}
         attributeChanged() {}
       }

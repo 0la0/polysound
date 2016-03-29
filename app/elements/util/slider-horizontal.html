@@ -62,6 +62,7 @@
 
         ready() {}
         attached() {
+          console.warn('deprecated element attached: slider-horizontal');
           this.valueRange = this.upperBound - this.lowerBound;
           this._valueChanged(this.sliderValue);
         }
