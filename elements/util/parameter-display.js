@@ -30,6 +30,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           },
           label: {
             type: String
+          },
+          displayDirection: {
+            type: String,
+            value: 'row'
           }
         };
       }
@@ -38,7 +42,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function ready() {}
     }, {
       key: 'attached',
-      value: function attached() {}
+      value: function attached() {
+        if (this.displayDirection === 'column') {
+          this.$.parameterDisplay.classList.add('parameter--column');
+          this.$$('value-envelope').classList.add('parameter__envelope--column');
+          this.$$('label').classList.add('parameter__label--column');
+          this.$$('slider-bidirectional').classList.add('parameter__slider--column');
+          this.$$('value-display').classList.add('parameter__value--column');
+        } else {
+          this.$.parameterDisplay.classList.add('parameter--row');
+          this.$$('value-envelope').classList.add('parameter__envelope--row');
+          this.$$('label').classList.add('parameter__label--row');
+          this.$$('slider-bidirectional').classList.add('parameter__slider--row');
+          this.$$('value-display').classList.add('parameter__value--row');
+        }
+      }
     }, {
       key: 'detached',
       value: function detached() {}

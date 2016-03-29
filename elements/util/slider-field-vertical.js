@@ -52,22 +52,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.g2d = this.cvs.getContext('2d');
         this.g2d.fillStyle = '#333';
         this.values = Array(this.numSteps).fill(this.boundValue); //TODO: fill with poperty value
-        this.resetBoundingClientRect();
 
         this.schedulable = buildSchedulable.call(this);
         this.renderHeight = 7;
         this.textArea = this.$$('textarea');
-      }
-    }, {
-      key: 'detached',
-      value: function detached() {}
-    }, {
-      key: 'attributeChanged',
-      value: function attributeChanged() {}
-    }, {
-      key: 'resetBoundingClientRect',
-      value: function resetBoundingClientRect() {
-        this.boundingClientRect = this.cvs.getBoundingClientRect();
+
         this.stepWidth = this.cvs.width / this.numSteps;
         if (this.g2d) {
           this.g2d.width = this.cvs.width;
@@ -75,6 +64,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
         this._renderAllBuckets();
       }
+    }, {
+      key: 'detached',
+      value: function detached() {}
+    }, {
+      key: 'attributeChanged',
+      value: function attributeChanged() {}
     }, {
       key: '_onScheduleChange',
       value: function _onScheduleChange(isScheduled) {
@@ -95,12 +90,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: '_userEvent',
       value: function _userEvent(event) {
-        var normalizedPositionX = event.detail.sourceEvent.pageX - this.boundingClientRect.left;
-        var normalX = normalizedPositionX / this.boundingClientRect.width;
+        var boundingClientRect = this.cvs.getBoundingClientRect();
+
+        var normalizedPositionX = event.detail.x - boundingClientRect.left;
+        var normalX = normalizedPositionX / boundingClientRect.width;
         normalX = Math.max(0, Math.min(normalX, 1));
 
-        var normalizedPositionY = event.detail.sourceEvent.pageY - this.boundingClientRect.top;
-        var normalY = normalizedPositionY / this.boundingClientRect.height;
+        var normalizedPositionY = event.detail.y - boundingClientRect.top;
+        var normalY = normalizedPositionY / boundingClientRect.height;
         normalY = Math.max(0, Math.min(normalY, 1));
 
         var stepBucket = Math.floor(normalX * this.numSteps);
@@ -175,13 +172,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     };
   }
 
+  //TODO: Error handing on caller and have this return an array
   function evaluateInput(percentStep, evalString) {
     try {
       var theta = percentStep * 2 * Math.PI;
       return eval(evalString);
     } catch (error) {
-      console.warn('evalInput error:', error);
-      return 0;
+      throw new Error('Evaluation Error');
     }
   }
 })();

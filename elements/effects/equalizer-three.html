@@ -1,4 +1,5 @@
 <html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
 
 </head><body><dom-module id="equalizer-three">
   <template>
@@ -39,29 +40,17 @@
 
       <div class="eq-channel__container">
 
-        <div class="eq-channel__column">
-          <p class="eq-label">lo</p>
-          <slider-vertical slider-value="{{equalizerModel.lo.gain.value}}" lower-bound="-40" upper-bound="40">
-          </slider-vertical>
-        </div>
+        <parameter-display class="eq-channel__column" model="{{equalizerModel.lo.gain.value}}" label="lo" lower-bound="-40" upper-bound="40" display-direction="column">
+        </parameter-display>
 
-        <div class="eq-channel__column">
-          <p class="eq-label">mid</p>
-          <slider-vertical slider-value="{{equalizerModel.mid.gain.value}}" lower-bound="-40" upper-bound="40">
-          </slider-vertical>
-        </div>
+        <parameter-display class="eq-channel__column" model="{{equalizerModel.mid.gain.value}}" label="mid" lower-bound="-40" upper-bound="40" display-direction="column">
+        </parameter-display>
 
-        <div class="eq-channel__column">
-          <p class="eq-label">hi</p>
-          <slider-vertical slider-value="{{equalizerModel.hi.gain.value}}" lower-bound="-40" upper-bound="40">
-          </slider-vertical>
-        </div>
+        <parameter-display class="eq-channel__column" model="{{equalizerModel.hi.gain.value}}" label="hi" lower-bound="-40" upper-bound="40" display-direction="column">
+        </parameter-display>
 
-        <div class="eq-channel__column">
-          <p class="eq-label">gain</p>
-          <slider-vertical slider-value="{{equalizerModel.mainGain.gain.value}}" lower-bound="0" upper-bound="1">
-          </slider-vertical>
-        </div>
+        <parameter-display class="eq-channel__column" model="{{equalizerModel.mainGain.gain.value}}" label="gain" lower-bound="0" upper-bound="1" display-direction="column">
+        </parameter-display>
 
       </div>
 

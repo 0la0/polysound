@@ -21,6 +21,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           boundValue: {
             type: Number,
             notify: true
+          },
+          direction: {
+            type: String
           }
         };
 
@@ -34,6 +37,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function attached() {
         this.onpenButtonModel = buildOnButtonModel.call(this);
         this.scheduleButtonModel = buildScheduleButtonModel.call(this);
+
+        if (this.direction === 'row') {
+          this.$.envelopeTrigger.style.setProperty('flex-direction', 'column');
+          this.$.envelopeContainer.classList.add('enveloper__container--horizontal');
+        } else {
+          this.$.envelopeContainer.classList.add('enveloper__container--vertical');
+        }
       }
     }, {
       key: 'detached',
@@ -54,9 +64,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return {
       callback: function callback(isOpen) {
         _this.$.envelopeContainer.classList.toggle('envelope__container--active');
-        if (isOpen) {
-          _this.$.sliderFieldVertical.resetBoundingClientRect();
-        }
       }
     };
   }

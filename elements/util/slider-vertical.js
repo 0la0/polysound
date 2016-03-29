@@ -45,6 +45,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attached',
       value: function attached() {
+        console.warn('deprecated element attached: slider-vertical');
         this.valueRange = this.upperBound - this.lowerBound;
         this._valueChanged(this.sliderValue);
       }

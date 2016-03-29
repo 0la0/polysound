@@ -38,7 +38,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'attached',
       value: function attached() {
         this.multiSelectModel = buildMultiSelectModel.call(this);
-        this.removable = removable.call(this);
+        this.removable = importRemovable.call(this, this.delayModel);
       }
     }, {
       key: 'detached',
@@ -70,18 +70,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       callback: function callback(delayValue) {
         //TODO: sync with actual tempo
         _this.delayModel.setQuatization(120, delayValue);
-      }
-    };
-  }
-
-  function removable() {
-    var _this2 = this;
-
-    return {
-      callback: function callback() {
-        _this2.connectionInput.helpers.removeElement(_this2.delayModel.input);
-        _this2.connectionOutput.helpers.removeElement(_this2.delayModel.getOutput());
-        Polymer.dom(_this2).parentNode.removeChild(_this2);
       }
     };
   }

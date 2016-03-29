@@ -1,0 +1,38 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
+
+</head><body><dom-module id="waveshaper-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 0 5px;
+        height: 100%;
+        background: #eee;
+      }
+      .waveshaper-container {
+        border: 1px solid black;
+        height: 100%;
+      }
+      .waveshaper-selector {
+        height: 30px;
+      }
+    </style>
+
+    <connector-input audio-node="{{waveshaperModel}}" connection-bus="{{connectionInput}}">&gt;
+    </connector-input>
+
+    <div class="waveshaper-container">
+      <element-header label="Waveshaper" removable="{{removable}}"></element-header>
+
+      <multi-select class="waveshaper-selector" select-model="{{multiSelectModel}}"></multi-select>
+
+    </div>
+
+    <connector-output audio-node="{{waveshaperModel}}" connection-bus="{{connectionOutput}}">&gt;
+    </connector-output>
+
+  </template>
+
+  </dom-module>
+<script src="waveshaper.js"></script></body></html>

@@ -43,7 +43,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attached',
       value: function attached() {
-        this.removable = removable.call(this);
+        this.removable = importRemovable.call(this, this.filterModel);
       }
     }, {
       key: 'detached',
@@ -64,16 +64,4 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   })();
 
   Polymer(DroneFilter);
-
-  function removable() {
-    var _this = this;
-
-    return {
-      callback: function callback() {
-        _this.connectionInput.helpers.removeElement(_this.filterModel.input);
-        _this.connectionOutput.helpers.removeElement(_this.filterModel.getOutput());
-        Polymer.dom(_this).parentNode.removeChild(_this);
-      }
-    };
-  }
 })();

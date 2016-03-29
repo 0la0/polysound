@@ -7,18 +7,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 (function () {
   'use strict';
 
-  var SimpleReverb = (function () {
-    function SimpleReverb() {
-      _classCallCheck(this, SimpleReverb);
+  var Waveshaper = (function () {
+    function Waveshaper() {
+      _classCallCheck(this, Waveshaper);
     }
 
-    _createClass(SimpleReverb, [{
+    _createClass(Waveshaper, [{
       key: 'beforeRegister',
       value: function beforeRegister() {
-        this.is = 'simple-reverb';
+        this.is = 'waveshaper-element';
 
         this.properties = {
-          reverbModel: {
+          waveshaperModel: {
             type: Object
           },
           connectionInput: {
@@ -37,7 +37,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attached',
       value: function attached() {
-        this.removable = importRemovable.call(this, this.equalizerModel);
+        this.multiSelectModel = buildMultiSelectModel.call(this, this.waveshaperModel);
+        this.removable = importRemovable.call(this, this.waveshaperModel);
       }
     }, {
       key: 'detached',
@@ -47,8 +48,24 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function attributeChanged() {}
     }]);
 
-    return SimpleReverb;
+    return Waveshaper;
   })();
 
-  Polymer(SimpleReverb);
+  Polymer(Waveshaper);
+
+  function buildMultiSelectModel(waveshaperModel) {
+    var _this = this;
+
+    return {
+      list: waveshaperModel.getCarrierFunctions().map(function (waveFunction) {
+        return {
+          display: waveFunction,
+          value: waveFunction
+        };
+      }),
+      callback: function callback(selectionString) {
+        _this.waveshaperModel.setCarrierFunction(selectionString);
+      }
+    };
+  }
 })();

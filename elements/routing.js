@@ -27,31 +27,18 @@ window.addEventListener('WebComponentsReady', function () {
   // page('/instruments/:id', function (data) {
   //   if (data.params && data.params.id) {
   //     var instrumentId = data.params.id;
-  //
   //     //look though instrument list to find instrument
   //
-  //     if (projectListHasId) {
+  //     if (instrumentList) {
   //       app.route = 'instruments/:id';
   //       app.params = data.params;
   //     }
-  //     else {
-  //       //if cant find project: page.redirect('/projects'); and do toast
-  //       app.route = 'home';
-  //     }
   //
-  //   }
-  //   else {
-  //     //if cant find project: page.redirect('/home'); and do toast
-  //     app.route = 'home';
   //   }
   // });
 
   // 404
-  page('*', function () {
-    // app.$.toast.text = 'Can\'t find: ' + window.location.href  + '. Redirected you to Home Page';
-    // app.$.toast.show();
-    // page.redirect(app.baseUrl);
-  });
+  page('*', function () {});
 
   // add #! before urls
   page({

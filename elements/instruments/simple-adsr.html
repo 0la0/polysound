@@ -9,24 +9,27 @@
         position: relative;
         width: 120px;
       }
-      .adsr {}
-      parameter-display {
-        height: 15px;
+      .adsr {
+        height: inherit;
+      }
+      .adsr-param-row {
+        height: 20px;
+        margin: 5px 0;
       }
     </style>
 
     <section class="adsr">
 
-      <parameter-display model="{{adsrModel.attack}}" label="A" lower-bound="0.001" upper-bound="1">
+      <parameter-display class="adsr-param-row" model="{{adsrModel.attack}}" label="A" lower-bound="0.001" upper-bound="1">
       </parameter-display>
 
-      <parameter-display model="{{adsrModel.decay}}" label="D" lower-bound="0.001" upper-bound="1">
+      <parameter-display class="adsr-param-row" model="{{adsrModel.decay}}" label="D" lower-bound="0.001" upper-bound="1">
       </parameter-display>
 
-      <parameter-display model="{{adsrModel.sustain}}" label="S" lower-bound="0.001" upper-bound="1">
+      <parameter-display class="adsr-param-row" model="{{adsrModel.sustain}}" label="S" lower-bound="0.001" upper-bound="1">
       </parameter-display>
 
-      <parameter-display model="{{adsrModel.release}}" label="R" lower-bound="0.001" upper-bound="1">
+      <parameter-display class="adsr-param-row" model="{{adsrModel.release}}" label="R" lower-bound="0.001" upper-bound="1">
       </parameter-display>
 
     </section>

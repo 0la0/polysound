@@ -37,7 +37,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attached',
       value: function attached() {
-        this.removable = removable.call(this);
+        this.removable = importRemovable.call(this, this.compressorModel);
       }
     }, {
       key: 'detached',
@@ -51,16 +51,4 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   })();
 
   Polymer(Compressor);
-
-  function removable() {
-    var _this = this;
-
-    return {
-      callback: function callback() {
-        _this.connectionInput.helpers.removeElement(_this.compressorModel.input);
-        _this.connectionOutput.helpers.removeElement(_this.compressorModel.getOutput());
-        Polymer.dom(_this).parentNode.removeChild(_this);
-      }
-    };
-  }
 })();

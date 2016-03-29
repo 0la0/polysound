@@ -42,7 +42,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           Polymer.dom(this.root).removeChild(outputElement);
           this.$$('element-header').removeCloseButton();
         } else {
-          this.removable = removable.call(this);
+          this.removable = importRemovable.call(this, this.equalizerModel);
         }
       }
     }, {
@@ -57,16 +57,4 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   })();
 
   Polymer(Equalizer);
-
-  function removable() {
-    var _this = this;
-
-    return {
-      callback: function callback() {
-        _this.connectionInput.helpers.removeElement(_this.equalizerModel.input);
-        _this.connectionOutput.helpers.removeElement(_this.equalizerModel.getOutput());
-        Polymer.dom(_this).parentNode.removeChild(_this);
-      }
-    };
-  }
 })();

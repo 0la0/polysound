@@ -20,6 +20,10 @@
         width: 60px;
         height: 30px;
       }
+      .grainulator-param-row {
+        height: 25px;
+        margin: 5px 0;
+      }
     </style>
 
     <div class="grainulator">
@@ -29,19 +33,19 @@
         <simple-button button-model="{{buttonModel}}"></simple-button>
       </div>
 
-      <parameter-display model="{{position}}" label="Position" lower-bound="0" upper-bound="1">
+      <parameter-display class="grainulator-param-row" model="{{position}}" label="Position" lower-bound="0" upper-bound="1">
       </parameter-display>
 
-      <parameter-display model="{{spread}}" label="Spread" lower-bound="0" upper-bound="1">
+      <parameter-display class="grainulator-param-row" model="{{spread}}" label="Spread" lower-bound="0" upper-bound="1">
       </parameter-display>
 
-      <parameter-display model="{{loopTime}}" label="Loop Time" lower-bound="0.01" upper-bound="1">
+      <parameter-display class="grainulator-param-row" model="{{loopTime}}" label="Loop T" lower-bound="0.01" upper-bound="1">
       </parameter-display>
 
-      <parameter-display model="{{numVoices}}" label="Voices" lower-bound="1" upper-bound="6">
+      <parameter-display class="grainulator-param-row" model="{{numVoices}}" label="Voices" lower-bound="1" upper-bound="6">
       </parameter-display>
 
-      <parameter-display model="{{pitch}}" label="Pitch" lower-bound="-12" upper-bound="12">
+      <parameter-display class="grainulator-param-row" model="{{pitch}}" label="Pitch" lower-bound="-12" upper-bound="12">
       </parameter-display>
 
     </div>

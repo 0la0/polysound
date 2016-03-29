@@ -49,7 +49,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           'Delay': 'delay',
           'Reverb': 'reverb',
           'Compressor': 'compressor',
-          'Drone Filter': 'drone'
+          'Drone Filter': 'drone',
+          'Waveshaper': 'waveshaper'
         };
         this.effectList = Object.keys(this.effectTable);
 
@@ -107,6 +108,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     drone: function drone(effectFactory) {
       var droneElement = document.createElement('drone-filter');
       droneElement.filterModel = effectFactory.createDroneFilter();
+      return droneElement;
+    },
+    waveshaper: function waveshaper(effectFactory) {
+      var droneElement = document.createElement('waveshaper-element');
+      droneElement.waveshaperModel = effectFactory.createWaveshaper();
       return droneElement;
     }
   };

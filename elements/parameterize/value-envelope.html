@@ -3,10 +3,9 @@
 </head><body><dom-module id="value-envelope">
   <template>
     <style>
-      :host {
-        display: block;
-      }
-      .envelope {
+      :host {}
+      .envelope {}
+      .envelope__trigger {
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
@@ -26,7 +25,12 @@
         border: 1px solid black;
         z-index: 2;
         box-shadow: 0 0 1px 1px black;
-        margin: -20px 0 0 8px;
+      }
+      .enveloper__container--horizontal {
+        margin: -15px 0 0 15px;
+      }
+      .enveloper__container--vertical {
+        margin: 5px 0 0 -5px;
       }
       .envelope__container--active {
         display: block;
@@ -35,12 +39,15 @@
 
 
     <div class="envelope">
-      <div class="envelope__button">
-        <simple-button class="envelope__button-open" button-model="{{onpenButtonModel}}"></simple-button>
-        <simple-button class="envelope__button-schedule" button-model="{{scheduleButtonModel}}"></simple-button>
+      <div id="envelopeTrigger" class="envelope__trigger">
+        <simple-button class="envelope__button envelope__button-open" button-model="{{onpenButtonModel}}">
+        </simple-button>
+        <simple-button class="envelope__button envelope__button-schedule" button-model="{{scheduleButtonModel}}">
+        </simple-button>
       </div>
-      <div class="envelope__container" id="envelopeContainer">
-        <slider-field-vertical bound-value="{{boundValue}}" is-scheduled="[[isScheduled]]" id="sliderFieldVertical"></slider-field-vertical>
+      <div id="envelopeContainer" class="envelope__container">
+        <slider-field-vertical id="sliderFieldVertical" bound-value="{{boundValue}}" is-scheduled="[[isScheduled]]">
+        </slider-field-vertical>
       </div>
     </div>
 
