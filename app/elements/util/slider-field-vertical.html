@@ -85,17 +85,11 @@
           this.g2d = this.cvs.getContext('2d');
           this.g2d.fillStyle = '#333';
           this.values = Array(this.numSteps).fill(this.boundValue); //TODO: fill with poperty value
-          this.resetBoundingClientRect();
 
           this.schedulable = buildSchedulable.call(this);
           this.renderHeight = 7;
           this.textArea = this.$$('textarea');
-        }
-        detached() {}
-        attributeChanged() {}
 
-        resetBoundingClientRect () {
-          this.boundingClientRect = this.cvs.getBoundingClientRect();
           this.stepWidth = this.cvs.width / this.numSteps;
           if (this.g2d) {
             this.g2d.width = this.cvs.width;
@@ -103,6 +97,8 @@
           }
           this._renderAllBuckets();
         }
+        detached() {}
+        attributeChanged() {}
 
         _onScheduleChange (isScheduled) {
           isScheduled ?
@@ -122,12 +118,14 @@
         }
 
         _userEvent (event) {
-          let normalizedPositionX = event.detail.sourceEvent.pageX - this.boundingClientRect.left;
-          let normalX = normalizedPositionX / this.boundingClientRect.width;
+          let boundingClientRect = this.cvs.getBoundingClientRect();
+
+          let normalizedPositionX = event.detail.x - boundingClientRect.left;
+          let normalX = normalizedPositionX / boundingClientRect.width;
           normalX = Math.max(0, Math.min(normalX, 1));
 
-          let normalizedPositionY = event.detail.sourceEvent.pageY - this.boundingClientRect.top;
-          let normalY = normalizedPositionY / this.boundingClientRect.height;
+          let normalizedPositionY = event.detail.y - boundingClientRect.top;
+          let normalY = normalizedPositionY / boundingClientRect.height;
           normalY = Math.max(0, Math.min(normalY, 1));
 
           let stepBucket = Math.floor(normalX * this.numSteps);
@@ -189,14 +187,14 @@
         }
       }
 
+      //TODO: Error handing on caller and have this return an array
       function evaluateInput (percentStep, evalString) {
         try {
           let theta = percentStep * 2 * Math.PI;
           return eval(evalString);
         }
         catch (error) {
-          console.warn('evalInput error:', error);
-          return 0;
+          throw new Error('Evaluation Error');
         }
       }
 

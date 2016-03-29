@@ -106,9 +106,6 @@
         return {
           callback: (isOpen) => {
             this.$.envelopeContainer.classList.toggle('envelope__container--active');
-            if (isOpen) {
-              this.$.sliderFieldVertical.resetBoundingClientRect();
-            }
           }
         };
       }
