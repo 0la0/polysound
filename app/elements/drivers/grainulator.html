@@ -54,7 +54,7 @@
         model="{{loopTime}}"
         label="Loop T"
         lower-bound="0.01"
-        upper-bound="1">
+        upper-bound="0.5">
       </parameter-display>
 
       <parameter-display
@@ -103,7 +103,7 @@
             },
             loopTime: {
               type: Number,
-              value: 0.5
+              value: 0.2
             },
             numVoices: {
               type: Number,
@@ -123,6 +123,8 @@
         attached() {
           this.isOn = false;
           this.buttonModel = buildButtonModel.call(this);
+          this.schedulable = buildSchedulable.call(this);
+          this.nextScheduledNote = 0;
         }
         detached() {}
         attributeChanged() {}
@@ -144,7 +146,41 @@
         }
 
       }
-      Polymer(CustomGrainulator);
+
+
+
+      function buildSchedulable () {
+        return {
+          processTick: (beatNumber, time) => {
+
+            let deltaTimeStep = app.audio.metronome.tempo / 60 / 16;
+            let nextTimeStep = time + deltaTimeStep;
+            let baseSchedule = this.nextScheduledNote || time;
+
+            this.instrumentSet.forEach((instrument) => {
+              let schedule = baseSchedule;
+              while (schedule < nextTimeStep) {
+                let position = getPosition(this.position, instrument.getDuration(), this.spread);
+                let pitch = Math.round(this.pitch);
+
+                for (let i = 0; i < this.numVoices; i++) {
+                  let voiceSchedule = schedule + (i * 0.001 * Math.random());
+                  instrument.play(pitch, voiceSchedule, position);
+                }
+
+                schedule += this.loopTime;
+              }
+              this.nextScheduledNote = schedule;
+            });
+
+          },
+          render: (beatNumber, lastBeatNumber) => {},
+          start: () => {},
+          stop: () => {
+            this.nextScheduledNote = 0;
+          }
+        }
+      }
 
       function getPosition (normalPosition, duration, spreadUpperBound) {
         let spread = getPosNeg() * spreadUpperBound * Math.random();
@@ -159,14 +195,18 @@
       function buildButtonModel () {
         return {
           callback: (isOn) => {
-            this.isOn = isOn;
-            if (isOn) {
-              this._grainLoop();
-            }
+            // this.isOn = isOn;
+            // if (isOn) {
+            //   this._grainLoop();
+            // }
+            (isOn) ?
+              app.scheduler.register(this.schedulable) :
+              app.scheduler.deregister(this.schedulable);
           }
         };
       }
 
+      Polymer(CustomGrainulator);
     })();
   </script>
 
