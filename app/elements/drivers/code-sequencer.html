@@ -70,6 +70,7 @@
             let deltaTimeStep = app.audio.metronome.tempo / 60 / 16;
 
             this.instrumentSet.forEach((instrument) => {
+              let play = instrument.play.bind(instrument);
               try {
                 eval(inputString);
               }
