@@ -60,31 +60,8 @@
         attached() {
           let parentContainer = this.$.container;
           let driverOutputContainer = this.$.driverOutputContainer;
-          let  driverElement;
-          if (this.driverType === 'sequencer') {
-            driverElement = DriverFactory.createSequencer(driverOutputContainer, this.connectionOutput);
-          }
-          else if (this.driverType === 'multiSequencer') {
-            const NUM_CHANNELS = 5;
-            driverElement = DriverFactory.createMultiSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
-          }
-          else if (this.driverType === 'grainulator') {
-            driverElement = DriverFactory.createGrainulator(driverOutputContainer, this.connectionOutput);
-          }
-          else if (this.driverType === 'apcSequencer') {
-            const NUM_CHANNELS = 5;
-            driverElement = DriverFactory.createApcSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
-          }
-          else if (this.driverType === 'hillclimber') {
-            const NUM_CHANNELS = 5;
-            driverElement = DriverFactory.createHillclimberSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
-          }
-          else if (this.driverType === 'launchpadSequencer') {
-            const NUM_CHANNELS = 5;
-            driverElement = DriverFactory.createLaunchpadSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
-          }
+          let driverElement = DriverFactory[this.driverType](driverOutputContainer, this.connectionOutput);
           driverElement.removable = buildRemovable.call(this);
-
           Polymer.dom(parentContainer).appendChild(driverElement);
         }
         detached() {}
@@ -110,7 +87,7 @@
 
       class DriverFactory {
 
-        static createSequencer (driverOutputContainer, connectionOutput) {
+        static sequencer (driverOutputContainer, connectionOutput) {
           let instrumentSet = new Set();
           let connectionModel = createConnection(instrumentSet);
 
@@ -125,7 +102,8 @@
           return samplerElement;
         }
 
-        static createMultiSequencer (numChannels, driverOutputContainer, connectionOutput) {
+        static multiSequencer (driverOutputContainer, connectionOutput) {
+          const numChannels = 5;
           let instrumentList = [];
           let connectionList = [];
 
@@ -148,7 +126,8 @@
           return samplerElement;
         }
 
-        static createApcSequencer (numChannels, driverOutputContainer, connectionOutput) {
+        static apcSequencer (driverOutputContainer, connectionOutput) {
+          const numChannels = 5;
           let instrumentList = [];
           let connectionList = [];
 
@@ -171,7 +150,8 @@
           return samplerElement;
         }
 
-        static createLaunchpadSequencer (numChannels, driverOutputContainer, connectionOutput) {
+        static launchpadSequencer (driverOutputContainer, connectionOutput) {
+          const numChannels = 5;
           let instrumentList = [];
           let connectionList = [];
 
@@ -194,7 +174,7 @@
           return samplerElement;
         }
 
-        static createGrainulator (driverOutputContainer, connectionOutput) {
+        static grainulator (driverOutputContainer, connectionOutput) {
           let instrumentSet = new Set();
           let connectionModel = createConnection(instrumentSet);
 
@@ -209,7 +189,8 @@
           return grainElement;
         }
 
-        static createHillclimberSequencer (numChannels, driverOutputContainer, connectionOutput) {
+        static hillclimber (driverOutputContainer, connectionOutput) {
+          const numChannels = 5;
           let instrumentList = [];
           let connectionList = [];
 
@@ -229,6 +210,21 @@
             driverOut.connectionBus = connectionOutput;
             Polymer.dom(driverOutputContainer).appendChild(driverOut);
           }
+          return samplerElement;
+        }
+
+        static codeSequencer (driverOutputContainer, connectionOutput) {
+          let instrumentSet = new Set();
+          let connectionModel = createConnection(instrumentSet);
+
+          let samplerElement = document.createElement('code-sequencer');
+          samplerElement.instrumentSet = instrumentSet;
+
+          let driverOut = document.createElement('driver-output');
+          driverOut.driverModel = connectionModel;
+          driverOut.connectionBus = connectionOutput;
+          Polymer.dom(driverOutputContainer).appendChild(driverOut);
+
           return samplerElement;
         }
 

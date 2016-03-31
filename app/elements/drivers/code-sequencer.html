@@ -1,0 +1,90 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="code-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .sequencer__input {
+        height: 100px;
+        resize: none;
+      }
+    </style>
+
+    <div class="matrix-list">
+      <element-header label="Code Sequencer" removable="{{removable}}"></element-header>
+
+      <textarea
+        id="inputTextArea"
+        class="sequencer__input"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"></textarea>
+
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class CodeSequencer {
+
+        beforeRegister() {
+          this.is = 'code-sequencer';
+
+          this.properties = {
+            instrumentList: {
+              type: Array
+            },
+            removable: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {
+          this.isReset = true;
+          this.schedulable = buildSchedulable.call(this);
+          app.scheduler.register(this.schedulable);
+        }
+
+        detached() {
+          app.scheduler.deregister(this.schedulable);
+        }
+        attributeChanged() {}
+      }
+
+
+      function buildSchedulable () {
+        return {
+          processTick: (beatNumber, time) => {
+            let i = beatNumber;
+            let inputString = this.$.inputTextArea.value;
+            let deltaTimeStep = app.audio.metronome.tempo / 60 / 16;
+
+            this.instrumentSet.forEach((instrument) => {
+              try {
+                eval(inputString);
+              }
+              catch (error) { console.warn(error); }
+            });
+          },
+          render: (beatNumber, lastBeatNumber) => {},
+          start: () => {},
+          stop: () => {}
+        }
+      }
+
+
+      Polymer(CodeSequencer);
+    })();
+  </script>
+
+</dom-module>
