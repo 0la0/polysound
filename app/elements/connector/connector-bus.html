@@ -126,7 +126,7 @@
 
                   instrumentSet.forEach((instrument) => {
                     if (instrument.input === nodeToRemove) {
-                      instrument.input.disconnect(value.outputNode);
+                      instrument.output.disconnect(value.outputNode);
                       Polymer.dom(this.svgElement).removeChild(value.line);
                       this.lineMap.delete(key);
                       hasLineToRemove = true;

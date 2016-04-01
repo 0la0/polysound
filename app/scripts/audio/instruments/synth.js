@@ -1,10 +1,9 @@
-import BaseInstrument from './baseInstrument.js';
-import adsrBuilder from '../util/adsr.js';
 
-export default class Synth extends BaseInstrument {
+export default class Synth {
 
-  constructor (audioContext) {
-    super(audioContext);
+  constructor (audioContext, semitoneRatio) {
+    this.audioContext = audioContext;
+    this.semitoneRatio = semitoneRatio;
     this.oscilators = {
       SINE: 'sine',
       SQUARE: 'square',
@@ -13,13 +12,9 @@ export default class Synth extends BaseInstrument {
     };
     this.setOscilator('SINE');
     this.baseFreq = 440;
-    this.continuousOsc = this.audioContext.createOscillator();
   }
 
-  play (pitch, schedule) {
-    let sampleLength = this.adsr.attack + this.adsr.sustain + this.adsr.release;
-    let adsrEnvelope = adsrBuilder(this.audioContext, this.input, schedule, this.adsr);
-
+  play (pitch, schedule, adsrEnvelope, sampleLength) {
     let osc = this.audioContext.createOscillator();
     osc.connect(adsrEnvelope);
     osc.type = this.activeOscilator;
@@ -30,22 +25,29 @@ export default class Synth extends BaseInstrument {
 
   setOscilator (type) {
     this.activeOscilator = this.oscilators[type] || this.oscilators.SINE;
+    if (this.continuousOsc) {
+      this.continuousOsc.type = this.activeOscilator;
+    }
   }
 
   setBaseFrequency (baseFrequency) {
     this.baseFreq = baseFrequency;
-    this.continuousOsc.frequency.value = this.baseFreq * Math.pow(this.semitoneRatio, 0);
+    if (this.continuousOsc) {
+      this.continuousOsc.frequency.value = this.baseFreq * Math.pow(this.semitoneRatio, 0);
+    }
   }
 
-  start () {
+  //TODO: implement attack and release on start / stop methods
+  start (output) {
     this.continuousOsc = this.audioContext.createOscillator();
-    this.continuousOsc.connect(this.input);
+    this.continuousOsc.connect(output);
     this.continuousOsc.type = this.activeOscilator;
     this.continuousOsc.frequency.value = this.baseFreq * Math.pow(this.semitoneRatio, 0);
     this.continuousOsc.start(0);
   }
 
-  stop () {
+  stop (output) {
+    this.continuousOsc.disconnect(output);
     this.continuousOsc.stop(0);
   }
 

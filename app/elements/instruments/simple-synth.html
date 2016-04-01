@@ -11,6 +11,7 @@
         margin: 0 5px;
         background: #eee;
         height: 100%;
+        font-size: 0.8rem;
       }
       .synth {
         height: inherit;
@@ -21,8 +22,9 @@
         flex-wrap: nowrap;
       }
       .synth-left {
-        width: 80px;
+        width: 100px;
         border-right: 1px solid black;
+        padding-right: 5px;
       }
       .synth-name {
         border-bottom: 1px solid black;
@@ -30,6 +32,12 @@
       .synth-button {
         width: 30px;
         height: 30px;
+      }
+      .synth-parameter-row {
+        width: 100%;
+        height: 20px;
+        margin-bottom: 5px;
+        border-top: 1px solid black;
       }
       .slider-container {
         height: 10px;
@@ -53,19 +61,74 @@
       <section class="synth-main">
 
         <section class="synth-left">
+
+          <!-- <template is="dom-repeat" items="{{synthModel.synthList}}" as="synth">
+            <div class="synth-individual">
+              <multi-select
+                class="synth-waveform-selector"
+                select-model="{{synth.multiSelect}}">
+              </multi-select>
+              <parameter-display
+                class="synth-parameter-row"
+                model="{{synth.baseFreq}}"
+                label="Freq"
+                lower-bound="220"
+                upper-bound="660">
+              </parameter-display>
+            </div>
+          </template> -->
+
+
+          <div class="synth-individual">
+            <multi-select
+              class="synth-waveform-selector"
+              select-model="[[synthSelect_0]]">
+            </multi-select>
+            <parameter-display
+              class="synth-parameter-row"
+              model="{{baseFrequency0}}"
+              label="Freq"
+              lower-bound="220"
+              upper-bound="660">
+            </parameter-display>
+          </div>
+
+          <div class="synth-individual">
+            <multi-select
+              class="synth-waveform-selector"
+              select-model="[[synthSelect_1]]">
+            </multi-select>
+            <parameter-display
+              class="synth-parameter-row"
+              model="{{baseFrequency1}}"
+              label="Freq"
+              lower-bound="220"
+              upper-bound="660">
+            </parameter-display>
+          </div>
+
+          <div class="synth-individual">
+            <multi-select
+              class="synth-waveform-selector"
+              select-model="[[synthSelect_2]]">
+            </multi-select>
+            <parameter-display
+              class="synth-parameter-row"
+              model="{{baseFrequency2}}"
+              label="Freq"
+              lower-bound="220"
+              upper-bound="660">
+            </parameter-display>
+          </div>
+
+        </section>
+
+
+        <section class="synth-right">
           <div class="synth-button">
             <simple-button button-model="{{buttonModel}}"></simple-button>
           </div>
-          <div class="slider-container">
-            <slider-horizontal
-              slider-value="{{baseFrequency}}"
-              lower-bound="220" upper-bound="660">
-          </slider-horizontal>
-        </section>
 
-        <section class="synth-right">
-          <multi-select class="synth-waveform-selector" select-model="{{multiSelectModel}}">
-          </multi-select>
           <simple-adsr adsr-model="{{synthModel.adsr}}"></simple-adsr>
         </section>
 
@@ -98,11 +161,23 @@
             connectionOutput: {
               type: Object
             },
-            baseFrequency: {
+            baseFrequency0: {
               type: Number,
               value: 440,
               notify: true,
-              observer: '_onBaseFrequencyChange'
+              observer: '_onBaseFrequencyChange0'
+            },
+            baseFrequency1: {
+              type: Number,
+              value: 440,
+              notify: true,
+              observer: '_onBaseFrequencyChange1'
+            },
+            baseFrequency2: {
+              type: Number,
+              value: 440,
+              notify: true,
+              observer: '_onBaseFrequencyChange2'
             }
           };
 
@@ -115,7 +190,10 @@
         ready() {}
         attached() {
           this.buttonModel = buildButtonModel.call(this);
-          this.multiSelectModel = buildMultiSelectModel.call(this);
+          this.synthSelect_0 = buildMultiSelectModel(0, this.synthModel);
+          this.synthSelect_1 = buildMultiSelectModel(1, this.synthModel);
+          this.synthSelect_2 = buildMultiSelectModel(2, this.synthModel);
+
           this.removable = importRemovable.call(this, this.synthModel);
         }
         detached() {}
@@ -128,16 +206,26 @@
           }
         }
 
-        _onBaseFrequencyChange (newValue) {
+        _onBaseFrequencyChange0 (newValue) {
+          this._setBaseFrequency(0, newValue);
+        }
+        _onBaseFrequencyChange1 (newValue) {
+          this._setBaseFrequency(1, newValue);
+        }
+        _onBaseFrequencyChange2 (newValue) {
+          this._setBaseFrequency(2, newValue);
+        }
+
+        _setBaseFrequency (index, newValue) {
           if (this.synthModel) {
-            this.synthModel.setBaseFrequency(newValue);
+            this.synthModel.synthList[index].setBaseFrequency(newValue);
           }
         }
 
       }
       Polymer(SimpleSynth);
 
-      function buildMultiSelectModel () {
+      function buildMultiSelectModel (synthIndex, synthModel) {
         return {
           list: [
             {
@@ -158,7 +246,7 @@
             }
           ],
           callback: (selectionString) => {
-            this.synthModel.setOscilator(selectionString);
+            synthModel.setOscilator(synthIndex, selectionString);
           }
         }
       }

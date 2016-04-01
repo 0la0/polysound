@@ -13,7 +13,7 @@ export default class WhiteNoise extends Sampler {
   start () {
     this.continuousBuffer = this.audioContext.createBufferSource();
     this.continuousBuffer.buffer = this.sample;
-    this.continuousBuffer.connect(this.input);
+    this.continuousBuffer.connect(this.output);
     this.continuousBuffer.detune.value = this.detuneValue;
     this.continuousBuffer.loop = true;
     this.continuousBuffer.start(0);
@@ -21,7 +21,7 @@ export default class WhiteNoise extends Sampler {
 
   stop () {
     this.continuousBuffer.stop(0);
-    this.continuousBuffer.disconnect(this.input);
+    this.continuousBuffer.disconnect(this.output);
     this.continuousBuffer = null;
   }
 
@@ -39,7 +39,7 @@ function createBuffer (audioContext) {
   let buffer = audioContext.createBuffer(2, frameCount, audioContext.sampleRate);
   let leftChannel = buffer.getChannelData(0);
   let rightChannel = buffer.getChannelData(1);
-  
+
   for (var i = 0; i < frameCount; i++) {
    leftChannel[i] = 2 * Math.random() - 1;
    rightChannel[i] = 2 * Math.random() - 1;

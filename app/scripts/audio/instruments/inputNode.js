@@ -19,7 +19,7 @@ export default class InputNode extends BaseInstrument {
     navigator.getUserMedia({audio: true},
       (audioStream) => {
         this.inputSource = this.audioContext.createMediaStreamSource(audioStream);
-        this.inputSource.connect(this.input);
+        this.inputSource.connect(this.output);
       },
       (error) => {
         console.log('Error: InputNode.getUserMedia:', error);
@@ -29,7 +29,7 @@ export default class InputNode extends BaseInstrument {
 
   turnOffInput () {
     if (!this.inputSource) { return ; }
-    this.inputSource.disconnect(this.input);
+    this.inputSource.disconnect(this.output);
     this.inputSource = null;
   }
 

@@ -4,7 +4,7 @@ export default class BaseInstrument {
 
   constructor (audioContext) {
     this.audioContext = audioContext;
-    this.input = this.audioContext.createGain();
+    this.output = this.audioContext.createGain();
     this.semitoneRatio = Math.pow(2, 1/12);
     this.uniqueId = generateUniqueId();
 
@@ -18,11 +18,11 @@ export default class BaseInstrument {
   }
 
   getOutput () {
-    return this.input;
+    return this.output;
   }
 
   connectTo (outputNode) {
-    this.input.connect(outputNode);
+    this.output.connect(outputNode);
   }
 
   setAttack (attack) {
