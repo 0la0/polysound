@@ -52,7 +52,8 @@
       <div id="envelopeContainer" class="envelope__container">
         <slider-field-vertical
           id="sliderFieldVertical"
-          bound-value="{{boundValue}}"
+          bound-value="{{boundValue}}",
+          modulatable="{{modulatable}}",
           is-scheduled="[[isScheduled]]">
         </slider-field-vertical>
       </div>
@@ -73,6 +74,9 @@
             boundValue: {
               type: Number,
               notify: true
+            },
+            modulatable: {
+              type: Object
             },
             direction: {
               type: String

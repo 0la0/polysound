@@ -24,20 +24,29 @@
         height: 100%;
         border: 1px solid black;
       }
-      .parameter-input {
+      .parameter-right {
         width: 47%;
         height: 100%;
+      }
+      .parameter-input {
         border: 1px solid black;
         resize: none;
+      }
+      .parameter-lfo {
+        width: 100%;
+        height: 100%;
       }
     </style>
 
     <div class="parameter-container">
       <canvas></canvas>
-      <textarea
-        class="parameter-input"
-        autocomplete="off" autocorrect="off"
-        autocapitalize="off" spellcheck="false"></textarea>
+      <div class="parameter-right">
+        <textarea
+          class="parameter-input"
+          autocomplete="off" autocorrect="off"
+          autocapitalize="off" spellcheck="false"></textarea>
+        <div id="lfoContainer" class="parameter-lfo"></div>
+      </div>
     </div>
 
   </template>
@@ -59,6 +68,9 @@
             boundValue: {
               type: Number,
               notify: true
+            },
+            modulatable: {
+              type: Object
             },
             isScheduled: {
               type: Boolean,
@@ -86,6 +98,7 @@
           this.g2d.fillStyle = '#333';
           this.values = Array(this.numSteps).fill(this.boundValue); //TODO: fill with poperty value
 
+
           this.schedulable = buildSchedulable.call(this);
           this.renderHeight = 7;
           this.textArea = this.$$('textarea');
@@ -96,6 +109,12 @@
             this.g2d.height = this.cvs.height;
           }
           this._renderAllBuckets();
+
+          if (this.modulatable) {
+            let lfoElement = document.createElement('lfo-parameter');
+            lfoElement.modulatable = this.modulatable;
+            this.$.lfoContainer.appendChild(lfoElement);
+          }
         }
         detached() {}
         attributeChanged() {}

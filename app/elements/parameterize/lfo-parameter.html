@@ -1,0 +1,129 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="lfo-parameter">
+  <template>
+    <style>
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .lfo {}
+      .lfo-row {
+        display: flex;
+        flex-direction: row;
+        flex-flow: nowrap;
+        justify-content: space-between;
+        height: 20px;
+      }
+    </style>
+
+    <multi-select
+      class=""
+      select-model="[[multiSelect]]">
+    </multi-select>
+
+    <div class="lfo-row">
+
+      <simple-button button-model="{{buttonModel}}"></simple-button>
+
+      <slider-bidirectional
+        class=""
+        slider-value={{lfo.osc.frequency.value}}
+        lower-bound="[[lowerBound]]"
+        upper-bound="[[upperBound]]"
+        direction="row">
+      </slider-bidirectional>
+
+      <value-display
+        class="parameter__value"
+        model="{{lfo.osc.frequency.value}}">
+      </value-display>
+
+      <value-display
+        class="parameter__value"
+        model="{{lfo.lfoGain.gain.value}}">
+      </value-display>
+
+    </div>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class Lfo {
+
+        beforeRegister() {
+          this.is = 'lfo-parameter';
+
+          this.properties = {
+            modulatable: {
+              type: Object
+            },
+            lowerBound: {
+              type: Number,
+              value: 0.1
+            },
+            upperBound: {
+              type: Number,
+              value: 10
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {
+          this.lfo = app.audio.effectFactory.createLfo();
+          this.lfo.setModulatable(this.modulatable);
+
+          this.multiSelect =  buildMultiSelectModel.call(this);
+          this.buttonModel = buildButtonModel.call(this);
+        }
+        detached() {}
+        attributeChanged() {}
+
+      }
+
+      function buildMultiSelectModel () {
+        return {
+          list: [
+            {
+              display: 'sin',
+              value: 'SINE'
+            },
+            {
+              display: 'squ',
+              value: 'SQUARE'
+            },
+            {
+              display: 'saw',
+              value: 'SAWTOOTH'
+            },
+            {
+              display: 'tri',
+              value: 'TRIANGLE'
+            }
+          ],
+          callback: (selectionString) => {
+            this.lfo.setOscilator(selectionString);
+          }
+        }
+      }
+
+      function buildButtonModel () {
+        return {
+          callback: (lfoIsOn) => {
+            lfoIsOn ? this.lfo.start() : this.lfo.stop();
+          }
+        };
+      }
+
+      Polymer(Lfo);
+    })();
+  </script>
+
+</dom-module>

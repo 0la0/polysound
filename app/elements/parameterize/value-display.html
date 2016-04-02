@@ -51,8 +51,8 @@
           }, true);
 
           this.$.numberInput.addEventListener('blur', (event) => {
-            let clampedValue = Math.max(0, Math.min(this.$.numberInput.value, 1));
-            this.model = parseFloat(clampedValue);
+            //let clampedValue = Math.max(0, Math.min(this.$.numberInput.value, 1));
+            this.model = parseFloat(this.$.numberInput.value);
           }, true);
         }
         detached() {}

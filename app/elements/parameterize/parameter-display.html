@@ -58,7 +58,8 @@
 
       <value-envelope
         class="parameter__envelope"
-        bound-value="{{model}}"
+        bound-value="{{model}}",
+        modulatable="{{modulatable}}",
         direction$="[[displayDirection]]">
       </value-envelope>
 
@@ -94,6 +95,9 @@
             model: {
               type: Number,
               notify: true
+            },
+            modulatable: {
+              type: Object
             },
             lowerBound: {
               type: Number

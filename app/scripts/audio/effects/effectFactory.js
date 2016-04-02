@@ -4,6 +4,7 @@ import Reverb from './reverb.js';
 import Compressor from './compressor.js';
 import DroneFilter from './droneFilter.js';
 import Waveshaper from './Waveshaper.js';
+import Lfo from './lfo.js';
 
 export default class EffectFactory {
 
@@ -41,6 +42,10 @@ export default class EffectFactory {
 
   createWaveshaper () {
     return new Waveshaper(this.audioContext);
+  }
+
+  createLfo () {
+    return new Lfo(this.audioContext);
   }
 
 }

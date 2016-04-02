@@ -87,6 +87,7 @@
             <parameter-display
               class="synth-parameter-row"
               model="{{baseFrequency0}}"
+              modulatable="{{synth1.frequency}}"
               label="Freq"
               lower-bound="220"
               upper-bound="660">
@@ -193,6 +194,8 @@
           this.synthSelect_0 = buildMultiSelectModel(0, this.synthModel);
           this.synthSelect_1 = buildMultiSelectModel(1, this.synthModel);
           this.synthSelect_2 = buildMultiSelectModel(2, this.synthModel);
+
+          this.synth1 = this.synthModel.synthList[0];
 
           this.removable = importRemovable.call(this, this.synthModel);
         }
