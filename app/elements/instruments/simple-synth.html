@@ -35,9 +35,10 @@
       }
       .synth-parameter-row {
         width: 100%;
-        height: 20px;
-        margin-bottom: 5px;
+        height: 12px;
+        margin-bottom: 8px;
         border-top: 1px solid black;
+        font-size: 0.7rem;
       }
       .slider-container {
         height: 10px;
@@ -46,7 +47,12 @@
 
       .synth-right {}
       .synth-waveform-selector {
-        line-height: 20px;
+        line-height: 8px;
+        font-size: 0.6rem;
+      }
+
+      parameter-display > .envelope__button.value-envelope {
+        height: 5px;
       }
     </style>
 
@@ -62,23 +68,6 @@
 
         <section class="synth-left">
 
-          <!-- <template is="dom-repeat" items="{{synthModel.synthList}}" as="synth">
-            <div class="synth-individual">
-              <multi-select
-                class="synth-waveform-selector"
-                select-model="{{synth.multiSelect}}">
-              </multi-select>
-              <parameter-display
-                class="synth-parameter-row"
-                model="{{synth.baseFreq}}"
-                label="Freq"
-                lower-bound="220"
-                upper-bound="660">
-              </parameter-display>
-            </div>
-          </template> -->
-
-
           <div class="synth-individual">
             <multi-select
               class="synth-waveform-selector"
@@ -87,10 +76,18 @@
             <parameter-display
               class="synth-parameter-row"
               model="{{baseFrequency0}}"
-              modulatable="{{synth1.frequency}}"
+              modulatable="{{synth0.synth.frequency}}"
               label="Freq"
-              lower-bound="220"
+              lower-bound="110"
               upper-bound="660">
+            </parameter-display>
+            <parameter-display
+              class="synth-parameter-row"
+              model="{{gain0}}"
+              modulatable="{{synth0.gain.gain}}"
+              label="Gain"
+              lower-bound="0"
+              upper-bound="1">
             </parameter-display>
           </div>
 
@@ -106,6 +103,14 @@
               lower-bound="220"
               upper-bound="660">
             </parameter-display>
+            <parameter-display
+              class="synth-parameter-row"
+              model="{{gain1}}"
+              modulatable="{{synth1.gain.gain}}"
+              label="Gain"
+              lower-bound="0"
+              upper-bound="1">
+            </parameter-display>
           </div>
 
           <div class="synth-individual">
@@ -119,6 +124,14 @@
               label="Freq"
               lower-bound="220"
               upper-bound="660">
+            </parameter-display>
+            <parameter-display
+              class="synth-parameter-row"
+              model="{{gain2}}"
+              modulatable="{{synth2.gain.gain}}"
+              label="Gain"
+              lower-bound="0"
+              upper-bound="1">
             </parameter-display>
           </div>
 
@@ -179,6 +192,24 @@
               value: 440,
               notify: true,
               observer: '_onBaseFrequencyChange2'
+            },
+            gain0: {
+              type: Number,
+              value: 0.5,
+              notify: true,
+              observer: '_onGainChange0'
+            },
+            gain1: {
+              type: Number,
+              value: 0.5,
+              notify: true,
+              observer: '_onGainChange1'
+            },
+            gain2: {
+              type: Number,
+              value: 0.5,
+              notify: true,
+              observer: '_onGainChange2'
             }
           };
 
@@ -195,7 +226,9 @@
           this.synthSelect_1 = buildMultiSelectModel(1, this.synthModel);
           this.synthSelect_2 = buildMultiSelectModel(2, this.synthModel);
 
-          this.synth1 = this.synthModel.synthList[0];
+          this.synth0 = this.synthModel.synthList[0];
+          this.synth1 = this.synthModel.synthList[1];
+          this.synth2 = this.synthModel.synthList[2];
 
           this.removable = importRemovable.call(this, this.synthModel);
         }
@@ -221,7 +254,25 @@
 
         _setBaseFrequency (index, newValue) {
           if (this.synthModel) {
-            this.synthModel.synthList[index].setBaseFrequency(newValue);
+            this.synthModel.synthList[index].synth.setBaseFrequency(newValue);
+          }
+        }
+
+        _onGainChange0 (newValue) {
+          this._setGain(0, newValue);
+        }
+
+        _onGainChange1 (newValue) {
+          this._setGain(1, newValue);
+        }
+
+        _onGainChange2 (newValue) {
+          this._setGain(2, newValue);
+        }
+
+        _setGain (index, newValue) {
+          if (this.synthModel) {
+            this.synthModel.synthList[index].gain.gain.value = newValue;
           }
         }
 
