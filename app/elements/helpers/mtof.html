@@ -1,0 +1,20 @@
+<script>
+
+function importMtof () {
+
+  class Converter {
+
+    static getFrequency (midiNote) {
+      return 440 * Math.pow(2, (midiNote - 69) / 12);
+    }
+
+    static getMidiNote (frequency) {
+      return 12 * Math.log2(frequency / 440) + 69;
+    }
+
+  }
+
+  return Converter;
+}
+
+</script>

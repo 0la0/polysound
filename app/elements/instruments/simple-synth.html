@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../helpers/removable.html">
+<link rel="import" href="../helpers/mtof.html">
 
 <dom-module id="simple-synth">
   <template>
@@ -45,14 +46,23 @@
         width: 95%;
       }
 
-      .synth-right {}
+      .synth-right {
+        width: 130px;
+      }
       .synth-waveform-selector {
         line-height: 8px;
         font-size: 0.6rem;
       }
 
-      parameter-display > .envelope__button.value-envelope {
-        height: 5px;
+      .synth-frequency {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+      }
+      .synth-frequency__label {}
+      .synth-frequency__value {
+        width: 40%;
       }
     </style>
 
@@ -78,8 +88,8 @@
               model="{{baseFrequency0}}"
               modulatable="{{synth0.synth.frequency}}"
               label="Freq"
-              lower-bound="110"
-              upper-bound="660">
+              lower-bound="-48"
+              upper-bound="48">
             </parameter-display>
             <parameter-display
               class="synth-parameter-row"
@@ -100,8 +110,8 @@
               class="synth-parameter-row"
               model="{{baseFrequency1}}"
               label="Freq"
-              lower-bound="220"
-              upper-bound="660">
+              lower-bound="-48"
+              upper-bound="48">
             </parameter-display>
             <parameter-display
               class="synth-parameter-row"
@@ -122,8 +132,8 @@
               class="synth-parameter-row"
               model="{{baseFrequency2}}"
               label="Freq"
-              lower-bound="220"
-              upper-bound="660">
+              lower-bound="-48"
+              upper-bound="48">
             </parameter-display>
             <parameter-display
               class="synth-parameter-row"
@@ -141,6 +151,14 @@
         <section class="synth-right">
           <div class="synth-button">
             <simple-button button-model="{{buttonModel}}"></simple-button>
+          </div>
+
+          <div class="synth-frequency">
+            <label class="synth-frequency__label">Base Freq</label>
+            <value-display
+              class="synth-frequency__value"
+              model="{{masterFrequency}}">
+            </value-display>
           </div>
 
           <simple-adsr adsr-model="{{synthModel.adsr}}"></simple-adsr>
@@ -177,19 +195,19 @@
             },
             baseFrequency0: {
               type: Number,
-              value: 440,
+              value: 0,
               notify: true,
               observer: '_onBaseFrequencyChange0'
             },
             baseFrequency1: {
               type: Number,
-              value: 440,
+              value: 0,
               notify: true,
               observer: '_onBaseFrequencyChange1'
             },
             baseFrequency2: {
               type: Number,
-              value: 440,
+              value: 0,
               notify: true,
               observer: '_onBaseFrequencyChange2'
             },
@@ -210,6 +228,12 @@
               value: 0.5,
               notify: true,
               observer: '_onGainChange2'
+            },
+            masterFrequency: {
+              type: Number,
+              value: 69,
+              notify: true,
+              observer: '_onMasterFrequencyChange'
             }
           };
 
@@ -231,6 +255,7 @@
           this.synth2 = this.synthModel.synthList[2];
 
           this.removable = importRemovable.call(this, this.synthModel);
+          this.mtof = importMtof();
         }
         detached() {}
         attributeChanged() {}
@@ -254,7 +279,9 @@
 
         _setBaseFrequency (index, newValue) {
           if (this.synthModel) {
-            this.synthModel.synthList[index].synth.setBaseFrequency(newValue);
+            let midiNote = this.masterFrequency + Math.round(newValue);
+            let frequency = this.mtof.getFrequency(midiNote);
+            this.synthModel.synthList[index].synth.setBaseFrequency(frequency);
           }
         }
 
@@ -274,6 +301,15 @@
           if (this.synthModel) {
             this.synthModel.synthList[index].gain.gain.value = newValue;
           }
+        }
+
+        _onMasterFrequencyChange (newValue) {
+          if (this.mtof) {
+            this._setBaseFrequency(0, this.baseFrequency0);
+            this._setBaseFrequency(1, this.baseFrequency1);
+            this._setBaseFrequency(2, this.baseFrequency2);
+          }
+
         }
 
       }
