@@ -5,6 +5,7 @@ import Compressor from './compressor.js';
 import DroneFilter from './droneFilter.js';
 import Waveshaper from './Waveshaper.js';
 import Lfo from './lfo.js';
+import Chorus from './chorus.js';
 
 export default class EffectFactory {
 
@@ -46,6 +47,10 @@ export default class EffectFactory {
 
   createLfo () {
     return new Lfo(this.audioContext);
+  }
+
+  createChorus () {
+    return new Chorus(this.audioContext);
   }
 
 }

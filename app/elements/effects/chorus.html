@@ -1,0 +1,104 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
+
+<dom-module id="simple-chorus">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 0 5px;
+        height: 100%;
+        background: #eee;
+      }
+      .chorus {
+        width: 120px;
+        height: 100%;
+        border: 1px solid black;
+      }
+      .chorus-param-row {
+        height: 20px;
+        line-height: 20px;
+        margin: 10px 0;
+        font-size: 0.6rem;
+      }
+    </style>
+
+    <connector-input
+        audio-node="{{chorusModel}}"
+        connection-bus="{{connectionInput}}">>
+    </connector-input>
+
+    <div class="chorus">
+
+      <element-header label="Chorus" removable="{{removable}}"></element-header>
+
+      <parameter-display
+        class="chorus-param-row"
+        model="{{chorusModel.input.delayTime.value}}"
+        label="Delay"
+        lower-bound="0"
+        upper-bound="1">
+      </parameter-display>
+
+      <parameter-display
+        class="chorus-param-row"
+        model="{{chorusModel.lfo.frequency.value}}"
+        label="Speed"
+        lower-bound="0.01"
+        upper-bound="20">
+      </parameter-display>
+
+      <parameter-display
+        class="chorus-param-row"
+        model="{{chorusModel.lfoGain.gain.value}}"
+        label="Depth"
+        lower-bound="0"
+        upper-bound="1">
+      </parameter-display>
+
+    </div>
+
+    <connector-output
+        audio-node="{{chorusModel}}"
+        connection-bus="{{connectionOutput}}">>
+    </connector-output>
+
+  </template>
+
+  <script>
+    (function() {
+      'use strict';
+
+      class SimpleChorus {
+
+        beforeRegister() {
+          this.is = 'simple-chorus';
+
+          this.properties = {
+            chorusModel: {
+              type: Object
+            },
+            connectionInput: {
+              type: Object
+            },
+            connectionOutput: {
+              type: Object
+            }
+          };
+
+          this.listeners = {};
+        }
+
+        ready() {}
+        attached() {
+          this.removable = importRemovable.call(this, this.chorusModel);
+        }
+        detached() {}
+        attributeChanged() {}
+      }
+
+      Polymer(SimpleChorus);
+    })();
+  </script>
+
+</dom-module>

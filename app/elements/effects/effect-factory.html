@@ -55,7 +55,8 @@
             'Reverb': 'reverb',
             'Compressor': 'compressor',
             'Drone Filter': 'drone',
-            'Waveshaper': 'waveshaper'
+            'Waveshaper': 'waveshaper',
+            'Chorus': 'chorus'
           };
           this.effectList = Object.keys(this.effectTable);
 
@@ -108,9 +109,14 @@
           return droneElement;
         },
         waveshaper: (effectFactory) => {
-          let droneElement = document.createElement('waveshaper-element');
-          droneElement.waveshaperModel = effectFactory.createWaveshaper();
-          return droneElement;
+          let waveshaperElement = document.createElement('waveshaper-element');
+          waveshaperElement.waveshaperModel = effectFactory.createWaveshaper();
+          return waveshaperElement;
+        },
+        chorus: (effectFactory) => {
+          let chorusElement = document.createElement('simple-chorus');
+          chorusElement.chorusModel = effectFactory.createChorus();
+          return chorusElement;
         }
       };
 
