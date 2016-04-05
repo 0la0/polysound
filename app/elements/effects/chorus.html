@@ -18,7 +18,7 @@
       .chorus-param-row {
         height: 20px;
         line-height: 20px;
-        margin: 10px 0;
+        margin: 8px 0;
         font-size: 0.6rem;
       }
     </style>
@@ -34,8 +34,16 @@
 
       <parameter-display
         class="chorus-param-row"
-        model="{{chorusModel.input.delayTime.value}}"
+        model="{{chorusModel.delayNode.delayTime.value}}"
         label="Delay"
+        lower-bound="0.01"
+        upper-bound="3">
+      </parameter-display>
+
+      <parameter-display
+        class="chorus-param-row"
+        model="{{chorusModel.feedbackGain.gain.value}}"
+        label="Fdbck"
         lower-bound="0"
         upper-bound="1">
       </parameter-display>
@@ -45,15 +53,23 @@
         model="{{chorusModel.lfo.frequency.value}}"
         label="Speed"
         lower-bound="0.01"
-        upper-bound="20">
+        upper-bound="10">
+      </parameter-display>
+
+      <parameter-display
+        class="chorus-param-row"
+        model="{{chorusModel.chorus.delayTime.value}}"
+        label="Delay"
+        lower-bound="0.005"
+        upper-bound="0.055">
       </parameter-display>
 
       <parameter-display
         class="chorus-param-row"
         model="{{chorusModel.lfoGain.gain.value}}"
         label="Depth"
-        lower-bound="0"
-        upper-bound="1">
+        lower-bound="0.0005"
+        upper-bound="0.005">
       </parameter-display>
 
     </div>
