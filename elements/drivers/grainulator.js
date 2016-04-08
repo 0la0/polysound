@@ -34,7 +34,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           },
           loopTime: {
             type: Number,
-            value: 0.5
+            value: 0.2
           },
           numVoices: {
             type: Number,
@@ -57,6 +57,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function attached() {
         this.isOn = false;
         this.buttonModel = buildButtonModel.call(this);
+        this.schedulable = buildSchedulable.call(this);
+        this.nextScheduledNote = 0;
       }
     }, {
       key: 'detached',
@@ -87,7 +89,39 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return CustomGrainulator;
   })();
 
-  Polymer(CustomGrainulator);
+  function buildSchedulable() {
+    var _this2 = this;
+
+    return {
+      processTick: function processTick(beatNumber, time) {
+
+        var deltaTimeStep = app.audio.metronome.tempo / 60 / 16;
+        var nextTimeStep = time + deltaTimeStep;
+        var baseSchedule = _this2.nextScheduledNote || time;
+
+        _this2.instrumentSet.forEach(function (instrument) {
+          var schedule = baseSchedule;
+          while (schedule < nextTimeStep) {
+            var position = getPosition(_this2.position, instrument.getDuration(), _this2.spread);
+            var pitch = Math.round(_this2.pitch);
+
+            for (var i = 0; i < _this2.numVoices; i++) {
+              var voiceSchedule = schedule + i * 0.001 * Math.random();
+              instrument.play(pitch, voiceSchedule, position);
+            }
+
+            schedule += _this2.loopTime;
+          }
+          _this2.nextScheduledNote = schedule;
+        });
+      },
+      render: function render(beatNumber, lastBeatNumber) {},
+      start: function start() {},
+      stop: function stop() {
+        _this2.nextScheduledNote = 0;
+      }
+    };
+  }
 
   function getPosition(normalPosition, duration, spreadUpperBound) {
     var spread = getPosNeg() * spreadUpperBound * Math.random();
@@ -100,15 +134,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   }
 
   function buildButtonModel() {
-    var _this2 = this;
+    var _this3 = this;
 
     return {
       callback: function callback(isOn) {
-        _this2.isOn = isOn;
-        if (isOn) {
-          _this2._grainLoop();
-        }
+        // this.isOn = isOn;
+        // if (isOn) {
+        //   this._grainLoop();
+        // }
+        isOn ? app.scheduler.register(_this3.schedulable) : app.scheduler.deregister(_this3.schedulable);
       }
     };
   }
+
+  Polymer(CustomGrainulator);
 })();

@@ -40,16 +40,16 @@
 
       <div class="eq-channel__container">
 
-        <parameter-display class="eq-channel__column" model="{{equalizerModel.lo.gain.value}}" label="lo" lower-bound="-40" upper-bound="40" display-direction="column">
+        <parameter-display class="eq-channel__column" model="{{equalizerModel.lo.gain.value}}" modulatable="{{equalizerModel.lo.gain}}" label="lo" lower-bound="-40" upper-bound="40" display-direction="column">
         </parameter-display>
 
-        <parameter-display class="eq-channel__column" model="{{equalizerModel.mid.gain.value}}" label="mid" lower-bound="-40" upper-bound="40" display-direction="column">
+        <parameter-display class="eq-channel__column" model="{{equalizerModel.mid.gain.value}}" modulatable="{{equalizerModel.lo.gain}}" label="mid" lower-bound="-40" upper-bound="40" display-direction="column">
         </parameter-display>
 
-        <parameter-display class="eq-channel__column" model="{{equalizerModel.hi.gain.value}}" label="hi" lower-bound="-40" upper-bound="40" display-direction="column">
+        <parameter-display class="eq-channel__column" model="{{equalizerModel.hi.gain.value}}" modulatable="{{equalizerModel.lo.gain}}" label="hi" lower-bound="-40" upper-bound="40" display-direction="column">
         </parameter-display>
 
-        <parameter-display class="eq-channel__column" model="{{equalizerModel.mainGain.gain.value}}" label="gain" lower-bound="0" upper-bound="1" display-direction="column">
+        <parameter-display class="eq-channel__column" model="{{equalizerModel.mainGain.gain.value}}" modulatable="{{equalizerModel.mainGain.gain}}" label="gain" lower-bound="0" upper-bound="1" display-direction="column">
         </parameter-display>
 
       </div>

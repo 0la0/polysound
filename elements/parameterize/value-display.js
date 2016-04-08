@@ -38,8 +38,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }, true);
 
         this.$.numberInput.addEventListener('blur', function (event) {
-          var clampedValue = Math.max(0, Math.min(_this.$.numberInput.value, 1));
-          _this.model = parseFloat(clampedValue);
+          //let clampedValue = Math.max(0, Math.min(this.$.numberInput.value, 1));
+          _this.model = parseFloat(_this.$.numberInput.value);
         }, true);
       }
     }, {

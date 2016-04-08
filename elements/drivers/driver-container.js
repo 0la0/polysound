@@ -39,26 +39,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function attached() {
         var parentContainer = this.$.container;
         var driverOutputContainer = this.$.driverOutputContainer;
-        var driverElement = undefined;
-        if (this.driverType === 'sequencer') {
-          driverElement = DriverFactory.createSequencer(driverOutputContainer, this.connectionOutput);
-        } else if (this.driverType === 'multiSequencer') {
-          var NUM_CHANNELS = 5;
-          driverElement = DriverFactory.createMultiSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
-        } else if (this.driverType === 'grainulator') {
-          driverElement = DriverFactory.createGrainulator(driverOutputContainer, this.connectionOutput);
-        } else if (this.driverType === 'apcSequencer') {
-          var NUM_CHANNELS = 5;
-          driverElement = DriverFactory.createApcSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
-        } else if (this.driverType === 'hillclimber') {
-          var NUM_CHANNELS = 5;
-          driverElement = DriverFactory.createHillclimberSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
-        } else if (this.driverType === 'launchpadSequencer') {
-          var NUM_CHANNELS = 5;
-          driverElement = DriverFactory.createLaunchpadSequencer(NUM_CHANNELS, driverOutputContainer, this.connectionOutput);
-        }
+        var driverElement = DriverFactory[this.driverType](driverOutputContainer, this.connectionOutput);
         driverElement.removable = buildRemovable.call(this);
-
         Polymer.dom(parentContainer).appendChild(driverElement);
       }
     }, {
@@ -96,8 +78,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }
 
     _createClass(DriverFactory, null, [{
-      key: 'createSequencer',
-      value: function createSequencer(driverOutputContainer, connectionOutput) {
+      key: 'sequencer',
+      value: function sequencer(driverOutputContainer, connectionOutput) {
         var instrumentSet = new Set();
         var connectionModel = createConnection(instrumentSet);
 
@@ -112,8 +94,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return samplerElement;
       }
     }, {
-      key: 'createMultiSequencer',
-      value: function createMultiSequencer(numChannels, driverOutputContainer, connectionOutput) {
+      key: 'multiSequencer',
+      value: function multiSequencer(driverOutputContainer, connectionOutput) {
+        var numChannels = 5;
         var instrumentList = [];
         var connectionList = [];
 
@@ -136,8 +119,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return samplerElement;
       }
     }, {
-      key: 'createApcSequencer',
-      value: function createApcSequencer(numChannels, driverOutputContainer, connectionOutput) {
+      key: 'apcSequencer',
+      value: function apcSequencer(driverOutputContainer, connectionOutput) {
+        var numChannels = 5;
         var instrumentList = [];
         var connectionList = [];
 
@@ -160,8 +144,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return samplerElement;
       }
     }, {
-      key: 'createLaunchpadSequencer',
-      value: function createLaunchpadSequencer(numChannels, driverOutputContainer, connectionOutput) {
+      key: 'launchpadSequencer',
+      value: function launchpadSequencer(driverOutputContainer, connectionOutput) {
+        var numChannels = 5;
         var instrumentList = [];
         var connectionList = [];
 
@@ -184,8 +169,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return samplerElement;
       }
     }, {
-      key: 'createGrainulator',
-      value: function createGrainulator(driverOutputContainer, connectionOutput) {
+      key: 'grainulator',
+      value: function grainulator(driverOutputContainer, connectionOutput) {
         var instrumentSet = new Set();
         var connectionModel = createConnection(instrumentSet);
 
@@ -200,8 +185,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         return grainElement;
       }
     }, {
-      key: 'createHillclimberSequencer',
-      value: function createHillclimberSequencer(numChannels, driverOutputContainer, connectionOutput) {
+      key: 'hillclimber',
+      value: function hillclimber(driverOutputContainer, connectionOutput) {
+        var numChannels = 5;
         var instrumentList = [];
         var connectionList = [];
 
@@ -221,6 +207,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           driverOut.connectionBus = connectionOutput;
           Polymer.dom(driverOutputContainer).appendChild(driverOut);
         }
+        return samplerElement;
+      }
+    }, {
+      key: 'codeSequencer',
+      value: function codeSequencer(driverOutputContainer, connectionOutput) {
+        var instrumentSet = new Set();
+        var connectionModel = createConnection(instrumentSet);
+
+        var samplerElement = document.createElement('code-sequencer');
+        samplerElement.instrumentSet = instrumentSet;
+
+        var driverOut = document.createElement('driver-output');
+        driverOut.driverModel = connectionModel;
+        driverOut.connectionBus = connectionOutput;
+        Polymer.dom(driverOutputContainer).appendChild(driverOut);
+
         return samplerElement;
       }
     }]);

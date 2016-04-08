@@ -39,7 +39,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           'Grainulator': 'grainulator',
           'APC Sequencer': 'apcSequencer',
           'Hillclimber': 'hillclimber',
-          'Launchpad Sequencer': 'launchpadSequencer'
+          'Launchpad Sequencer': 'launchpadSequencer',
+          'Code Sequencer': 'codeSequencer'
         };
         this.driverList = Object.keys(this.driverTable);
 

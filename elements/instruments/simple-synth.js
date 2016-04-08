@@ -27,11 +27,47 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           connectionOutput: {
             type: Object
           },
-          baseFrequency: {
+          baseFrequency0: {
             type: Number,
-            value: 440,
+            value: 0,
             notify: true,
-            observer: '_onBaseFrequencyChange'
+            observer: '_onBaseFrequencyChange0'
+          },
+          baseFrequency1: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: '_onBaseFrequencyChange1'
+          },
+          baseFrequency2: {
+            type: Number,
+            value: 0,
+            notify: true,
+            observer: '_onBaseFrequencyChange2'
+          },
+          gain0: {
+            type: Number,
+            value: 0.5,
+            notify: true,
+            observer: '_onGainChange0'
+          },
+          gain1: {
+            type: Number,
+            value: 0.5,
+            notify: true,
+            observer: '_onGainChange1'
+          },
+          gain2: {
+            type: Number,
+            value: 0.5,
+            notify: true,
+            observer: '_onGainChange2'
+          },
+          masterFrequency: {
+            type: Number,
+            value: 69,
+            notify: true,
+            observer: '_onMasterFrequencyChange'
           }
         };
 
@@ -46,8 +82,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: 'attached',
       value: function attached() {
         this.buttonModel = buildButtonModel.call(this);
-        this.multiSelectModel = buildMultiSelectModel.call(this);
+        this.synthSelect_0 = buildMultiSelectModel(0, this.synthModel);
+        this.synthSelect_1 = buildMultiSelectModel(1, this.synthModel);
+        this.synthSelect_2 = buildMultiSelectModel(2, this.synthModel);
+
+        this.synth0 = this.synthModel.synthList[0];
+        this.synth1 = this.synthModel.synthList[1];
+        this.synth2 = this.synthModel.synthList[2];
+
         this.removable = importRemovable.call(this, this.synthModel);
+        this.mtof = importMtof();
       }
     }, {
       key: 'detached',
@@ -64,10 +108,58 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         }
       }
     }, {
-      key: '_onBaseFrequencyChange',
-      value: function _onBaseFrequencyChange(newValue) {
+      key: '_onBaseFrequencyChange0',
+      value: function _onBaseFrequencyChange0(newValue) {
+        this._setBaseFrequency(0, newValue);
+      }
+    }, {
+      key: '_onBaseFrequencyChange1',
+      value: function _onBaseFrequencyChange1(newValue) {
+        this._setBaseFrequency(1, newValue);
+      }
+    }, {
+      key: '_onBaseFrequencyChange2',
+      value: function _onBaseFrequencyChange2(newValue) {
+        this._setBaseFrequency(2, newValue);
+      }
+    }, {
+      key: '_setBaseFrequency',
+      value: function _setBaseFrequency(index, newValue) {
         if (this.synthModel) {
-          this.synthModel.setBaseFrequency(newValue);
+          var midiNote = this.masterFrequency + Math.round(newValue);
+          var frequency = this.mtof.getFrequency(midiNote);
+          this.synthModel.synthList[index].synth.setBaseFrequency(frequency);
+        }
+      }
+    }, {
+      key: '_onGainChange0',
+      value: function _onGainChange0(newValue) {
+        this._setGain(0, newValue);
+      }
+    }, {
+      key: '_onGainChange1',
+      value: function _onGainChange1(newValue) {
+        this._setGain(1, newValue);
+      }
+    }, {
+      key: '_onGainChange2',
+      value: function _onGainChange2(newValue) {
+        this._setGain(2, newValue);
+      }
+    }, {
+      key: '_setGain',
+      value: function _setGain(index, newValue) {
+        if (this.synthModel) {
+          this.synthModel.synthList[index].gain.gain.value = newValue;
+        }
+      }
+    }, {
+      key: '_onMasterFrequencyChange',
+      value: function _onMasterFrequencyChange(newValue) {
+        if (this.mtof) {
+          this._setBaseFrequency(0, this.baseFrequency0);
+          this._setBaseFrequency(1, this.baseFrequency1);
+          this._setBaseFrequency(2, this.baseFrequency2);
         }
       }
     }]);
@@ -77,9 +169,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
   Polymer(SimpleSynth);
 
-  function buildMultiSelectModel() {
-    var _this = this;
-
+  function buildMultiSelectModel(synthIndex, synthModel) {
     return {
       list: [{
         display: 'sin',
@@ -95,17 +185,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         value: 'TRIANGLE'
       }],
       callback: function callback(selectionString) {
-        _this.synthModel.setOscilator(selectionString);
+        synthModel.setOscilator(synthIndex, selectionString);
       }
     };
   }
 
   function buildButtonModel() {
-    var _this2 = this;
+    var _this = this;
 
     return {
       callback: function callback(synthIsOn) {
-        synthIsOn ? _this2.synthModel.start() : _this2.synthModel.stop();
+        synthIsOn ? _this.synthModel.start() : _this.synthModel.stop();
       }
     };
   }

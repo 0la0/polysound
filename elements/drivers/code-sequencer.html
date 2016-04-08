@@ -1,0 +1,25 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="code-sequencer">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      .sequencer__input {
+        height: 100px;
+        resize: none;
+      }
+    </style>
+
+    <div class="matrix-list">
+      <element-header label="Code Sequencer" removable="{{removable}}"></element-header>
+
+      <textarea id="inputTextArea" class="sequencer__input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"></textarea>
+
+    </div>
+
+  </template>
+
+  </dom-module>
+<script src="code-sequencer.js"></script></body></html>

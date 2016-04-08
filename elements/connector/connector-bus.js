@@ -71,19 +71,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             setLinePosition(_this2.activeLine, line.p1.x, line.p1.y, line.p2.x, line.p2.y, xBuffer, yBuffer);
           },
           removeActiveLine: function removeActiveLine(line) {
-            Polymer.dom(_this2.svgElement).removeChild(_this2.activeLine.point1);
-            Polymer.dom(_this2.svgElement).removeChild(_this2.activeLine.point2);
-            Polymer.dom(_this2.svgElement).removeChild(_this2.activeLine.line);
+            removeLine(_this2.svgElement, _this2.activeLine);
             _this2.activeLine = null;
           },
           finishLine: function finishLine(line, connectionKey, inputNode, outputNode, connectorInput, connectorOutput) {
             if (_this2.lineMap.has(connectionKey)) {
               app.$.toast.text = 'Connection already exists.';
               app.$.toast.show();
-
-              Polymer.dom(_this2.svgElement).removeChild(_this2.activeLine.point1);
-              Polymer.dom(_this2.svgElement).removeChild(_this2.activeLine.point2);
-              Polymer.dom(_this2.svgElement).removeChild(_this2.activeLine.line);
+              removeLine(_this2.svgElement, _this2.activeLine);
             } else {
               _this2.activeLine.connectionKey = connectionKey;
               _this2.activeLine.inputNode = inputNode;
@@ -119,7 +114,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
                     instrumentSet.forEach(function (instrument) {
                       if (instrument.input === nodeToRemove) {
-                        instrument.input.disconnect(value.outputNode);
+                        instrument.output.disconnect(value.outputNode);
                         Polymer.dom(_this2.svgElement).removeChild(value.line);
                         _this2.lineMap.delete(key);
                         hasLineToRemove = true;
@@ -198,11 +193,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.activeLine = targetValue;
         } else {
           //remove line and connections
-          Polymer.dom(this.svgElement).removeChild(this.activeLine.point1);
-          Polymer.dom(this.svgElement).removeChild(this.activeLine.point2);
-          Polymer.dom(this.svgElement).removeChild(this.activeLine.line);
-
           var activeKey = this.activeLine.connectionKey;
+          removeLine(this.svgElement, this.activeLine);
           this.activeLine.inputNode.disconnect(this.activeLine.outputNode);
           this.activeLine = null;
           this.lineMap.delete(activeKey);
@@ -222,7 +214,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return ConnectorBus;
   })();
 
-  Polymer(ConnectorBus);
+  function removeLine(parentElement, activeLine) {
+    Polymer.dom(parentElement).removeChild(activeLine.point1);
+    Polymer.dom(parentElement).removeChild(activeLine.point2);
+    Polymer.dom(parentElement).removeChild(activeLine.line);
+  }
 
   function setLinePosition(lineObj, x1, y1, x2, y2, xBuffer, yBuffer) {
     lineObj.point1.setAttribute('cx', x1 - xBuffer);
@@ -237,4 +233,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     lineObj.line.setAttribute('x2', x2 - xBuffer);
     lineObj.line.setAttribute('y2', y2 - yBuffer);
   }
+
+  Polymer(ConnectorBus);
 })();

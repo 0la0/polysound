@@ -7,26 +7,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 (function () {
   'use strict';
 
-  var Envelope = (function () {
-    function Envelope() {
-      _classCallCheck(this, Envelope);
+  var CodeSequencer = (function () {
+    function CodeSequencer() {
+      _classCallCheck(this, CodeSequencer);
     }
 
-    _createClass(Envelope, [{
+    _createClass(CodeSequencer, [{
       key: 'beforeRegister',
       value: function beforeRegister() {
-        this.is = 'value-envelope';
+        this.is = 'code-sequencer';
 
         this.properties = {
-          boundValue: {
-            type: Number,
-            notify: true
+          instrumentList: {
+            type: Array
           },
-          modulatable: {
+          removable: {
             type: Object
-          },
-          direction: {
-            type: String
           }
         };
 
@@ -38,46 +34,46 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attached',
       value: function attached() {
-        this.onpenButtonModel = buildOnButtonModel.call(this);
-        this.scheduleButtonModel = buildScheduleButtonModel.call(this);
-
-        if (this.direction === 'row') {
-          this.$.envelopeTrigger.style.setProperty('flex-direction', 'column');
-          this.$.envelopeContainer.classList.add('enveloper__container--horizontal');
-        } else {
-          this.$.envelopeContainer.classList.add('enveloper__container--vertical');
-        }
+        this.isReset = true;
+        this.schedulable = buildSchedulable.call(this);
+        app.scheduler.register(this.schedulable);
       }
     }, {
       key: 'detached',
-      value: function detached() {}
+      value: function detached() {
+        app.scheduler.deregister(this.schedulable);
+      }
     }, {
       key: 'attributeChanged',
       value: function attributeChanged() {}
     }]);
 
-    return Envelope;
+    return CodeSequencer;
   })();
 
-  Polymer(Envelope);
-
-  function buildOnButtonModel() {
+  function buildSchedulable() {
     var _this = this;
 
     return {
-      callback: function callback(isOpen) {
-        _this.$.envelopeContainer.classList.toggle('envelope__container--active');
-      }
+      processTick: function processTick(beatNumber, time) {
+        var i = beatNumber;
+        var inputString = _this.$.inputTextArea.value;
+        var deltaTimeStep = app.audio.metronome.tempo / 60 / 16;
+
+        _this.instrumentSet.forEach(function (instrument) {
+          var play = instrument.play.bind(instrument);
+          try {
+            eval(inputString);
+          } catch (error) {
+            console.warn(error);
+          }
+        });
+      },
+      render: function render(beatNumber, lastBeatNumber) {},
+      start: function start() {},
+      stop: function stop() {}
     };
   }
 
-  function buildScheduleButtonModel() {
-    var _this2 = this;
-
-    return {
-      callback: function callback(isScheduled) {
-        _this2.isScheduled = isScheduled;
-      }
-    };
-  }
+  Polymer(CodeSequencer);
 })();

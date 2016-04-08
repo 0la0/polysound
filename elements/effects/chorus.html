@@ -1,0 +1,56 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../helpers/removable.html">
+
+</head><body><dom-module id="simple-chorus">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 0 5px;
+        height: 100%;
+        background: #eee;
+      }
+      .chorus {
+        width: 120px;
+        height: 100%;
+        border: 1px solid black;
+      }
+      .chorus-param-row {
+        height: 20px;
+        line-height: 20px;
+        margin: 8px 0;
+        font-size: 0.6rem;
+      }
+    </style>
+
+    <connector-input audio-node="{{chorusModel}}" connection-bus="{{connectionInput}}">&gt;
+    </connector-input>
+
+    <div class="chorus">
+
+      <element-header label="Chorus" removable="{{removable}}"></element-header>
+
+      <parameter-display class="chorus-param-row" model="{{chorusModel.delayNode.delayTime.value}}" label="Delay" lower-bound="0.01" upper-bound="3">
+      </parameter-display>
+
+      <parameter-display class="chorus-param-row" model="{{chorusModel.feedbackGain.gain.value}}" label="Fdbck" lower-bound="0" upper-bound="1">
+      </parameter-display>
+
+      <parameter-display class="chorus-param-row" model="{{chorusModel.lfo.frequency.value}}" label="Speed" lower-bound="0.01" upper-bound="10">
+      </parameter-display>
+
+      <parameter-display class="chorus-param-row" model="{{chorusModel.chorus.delayTime.value}}" label="Delay" lower-bound="0.005" upper-bound="0.055">
+      </parameter-display>
+
+      <parameter-display class="chorus-param-row" model="{{chorusModel.lfoGain.gain.value}}" label="Depth" lower-bound="0.0005" upper-bound="0.005">
+      </parameter-display>
+
+    </div>
+
+    <connector-output audio-node="{{chorusModel}}" connection-bus="{{connectionOutput}}">&gt;
+    </connector-output>
+
+  </template>
+
+  </dom-module>
+<script src="chorus.js"></script></body></html>

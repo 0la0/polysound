@@ -1,0 +1,42 @@
+<html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
+
+</head><body><dom-module id="lfo-parameter">
+  <template>
+    <style>
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+      .lfo {}
+      .lfo-row {
+        display: flex;
+        flex-direction: row;
+        flex-flow: nowrap;
+        justify-content: space-between;
+        height: 20px;
+      }
+    </style>
+
+    <multi-select class="" select-model="[[multiSelect]]">
+    </multi-select>
+
+    <div class="lfo-row">
+
+      <simple-button button-model="{{buttonModel}}"></simple-button>
+
+      <slider-bidirectional class="" slider-value="{{lfo.osc.frequency.value}}" lower-bound="[[lowerBound]]" upper-bound="[[upperBound]]" direction="row">
+      </slider-bidirectional>
+
+      <value-display class="parameter__value" model="{{lfo.osc.frequency.value}}">
+      </value-display>
+
+      <value-display class="parameter__value" model="{{lfo.lfoGain.gain.value}}">
+      </value-display>
+
+    </div>
+
+  </template>
+
+  </dom-module>
+<script src="lfo-parameter.js"></script></body></html>

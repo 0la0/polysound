@@ -26,6 +26,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             type: Number,
             notify: true
           },
+          modulatable: {
+            type: Object
+          },
           isScheduled: {
             type: Boolean,
             notify: true,
@@ -63,6 +66,12 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           this.g2d.height = this.cvs.height;
         }
         this._renderAllBuckets();
+
+        if (this.modulatable) {
+          var lfoElement = document.createElement('lfo-parameter');
+          lfoElement.modulatable = this.modulatable;
+          this.$.lfoContainer.appendChild(lfoElement);
+        }
       }
     }, {
       key: 'detached',
@@ -82,8 +91,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         if (inputValue) {
           for (var i = 0; i < this.numSteps; i++) {
             var percentStep = i / this.numSteps;
-            var stepValue = evaluateInput(percentStep, inputValue);
-            this.values[i] = stepValue;
+
+            try {
+              var stepValue = evaluateInput(percentStep, inputValue);
+              this.values[i] = stepValue;
+            } catch (error) {}
           }
         }
       }

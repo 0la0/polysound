@@ -16,7 +16,7 @@
       }
       .parameter--row {
         flex-direction: row;
-        min-height: 20px;
+        /*min-height: 20px;*/
       }
       .parameter--column {
         flex-direction: column;
@@ -56,7 +56,7 @@
 
     <div id="parameterDisplay" class="parameter">
 
-      <value-envelope class="parameter__envelope" bound-value="{{model}}" direction$="[[displayDirection]]">
+      <value-envelope class="parameter__envelope" bound-value="{{model}}" ,="" modulatable="{{modulatable}}" direction$="[[displayDirection]]">
       </value-envelope>
 
       <label class="parameter__label">[[label]]</label>

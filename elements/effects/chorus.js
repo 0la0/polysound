@@ -7,26 +7,25 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 (function () {
   'use strict';
 
-  var Envelope = (function () {
-    function Envelope() {
-      _classCallCheck(this, Envelope);
+  var SimpleChorus = (function () {
+    function SimpleChorus() {
+      _classCallCheck(this, SimpleChorus);
     }
 
-    _createClass(Envelope, [{
+    _createClass(SimpleChorus, [{
       key: 'beforeRegister',
       value: function beforeRegister() {
-        this.is = 'value-envelope';
+        this.is = 'simple-chorus';
 
         this.properties = {
-          boundValue: {
-            type: Number,
-            notify: true
-          },
-          modulatable: {
+          chorusModel: {
             type: Object
           },
-          direction: {
-            type: String
+          connectionInput: {
+            type: Object
+          },
+          connectionOutput: {
+            type: Object
           }
         };
 
@@ -38,15 +37,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attached',
       value: function attached() {
-        this.onpenButtonModel = buildOnButtonModel.call(this);
-        this.scheduleButtonModel = buildScheduleButtonModel.call(this);
-
-        if (this.direction === 'row') {
-          this.$.envelopeTrigger.style.setProperty('flex-direction', 'column');
-          this.$.envelopeContainer.classList.add('enveloper__container--horizontal');
-        } else {
-          this.$.envelopeContainer.classList.add('enveloper__container--vertical');
-        }
+        this.removable = importRemovable.call(this, this.chorusModel);
       }
     }, {
       key: 'detached',
@@ -56,28 +47,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function attributeChanged() {}
     }]);
 
-    return Envelope;
+    return SimpleChorus;
   })();
 
-  Polymer(Envelope);
-
-  function buildOnButtonModel() {
-    var _this = this;
-
-    return {
-      callback: function callback(isOpen) {
-        _this.$.envelopeContainer.classList.toggle('envelope__container--active');
-      }
-    };
-  }
-
-  function buildScheduleButtonModel() {
-    var _this2 = this;
-
-    return {
-      callback: function callback(isScheduled) {
-        _this2.isScheduled = isScheduled;
-      }
-    };
-  }
+  Polymer(SimpleChorus);
 })();

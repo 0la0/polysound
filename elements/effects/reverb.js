@@ -37,7 +37,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attached',
       value: function attached() {
-        this.removable = importRemovable.call(this, this.equalizerModel);
+        this.removable = importRemovable.call(this, this.reverbModel);
       }
     }, {
       key: 'detached',

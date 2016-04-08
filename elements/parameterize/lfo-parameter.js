@@ -7,26 +7,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 (function () {
   'use strict';
 
-  var Envelope = (function () {
-    function Envelope() {
-      _classCallCheck(this, Envelope);
+  var Lfo = (function () {
+    function Lfo() {
+      _classCallCheck(this, Lfo);
     }
 
-    _createClass(Envelope, [{
+    _createClass(Lfo, [{
       key: 'beforeRegister',
       value: function beforeRegister() {
-        this.is = 'value-envelope';
+        this.is = 'lfo-parameter';
 
         this.properties = {
-          boundValue: {
-            type: Number,
-            notify: true
-          },
           modulatable: {
             type: Object
           },
-          direction: {
-            type: String
+          lowerBound: {
+            type: Number,
+            value: 0.1
+          },
+          upperBound: {
+            type: Number,
+            value: 10
           }
         };
 
@@ -38,15 +39,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attached',
       value: function attached() {
-        this.onpenButtonModel = buildOnButtonModel.call(this);
-        this.scheduleButtonModel = buildScheduleButtonModel.call(this);
+        this.lfo = app.audio.effectFactory.createLfo();
+        this.lfo.setModulatable(this.modulatable);
 
-        if (this.direction === 'row') {
-          this.$.envelopeTrigger.style.setProperty('flex-direction', 'column');
-          this.$.envelopeContainer.classList.add('enveloper__container--horizontal');
-        } else {
-          this.$.envelopeContainer.classList.add('enveloper__container--vertical');
-        }
+        this.multiSelect = buildMultiSelectModel.call(this);
+        this.buttonModel = buildButtonModel.call(this);
       }
     }, {
       key: 'detached',
@@ -56,28 +53,41 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function attributeChanged() {}
     }]);
 
-    return Envelope;
+    return Lfo;
   })();
 
-  Polymer(Envelope);
-
-  function buildOnButtonModel() {
+  function buildMultiSelectModel() {
     var _this = this;
 
     return {
-      callback: function callback(isOpen) {
-        _this.$.envelopeContainer.classList.toggle('envelope__container--active');
+      list: [{
+        display: 'sin',
+        value: 'SINE'
+      }, {
+        display: 'squ',
+        value: 'SQUARE'
+      }, {
+        display: 'saw',
+        value: 'SAWTOOTH'
+      }, {
+        display: 'tri',
+        value: 'TRIANGLE'
+      }],
+      callback: function callback(selectionString) {
+        _this.lfo.setOscilator(selectionString);
       }
     };
   }
 
-  function buildScheduleButtonModel() {
+  function buildButtonModel() {
     var _this2 = this;
 
     return {
-      callback: function callback(isScheduled) {
-        _this2.isScheduled = isScheduled;
+      callback: function callback(lfoIsOn) {
+        lfoIsOn ? _this2.lfo.start() : _this2.lfo.stop();
       }
     };
   }
+
+  Polymer(Lfo);
 })();

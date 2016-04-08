@@ -22,6 +22,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             type: Number,
             notify: true
           },
+          modulatable: {
+            type: Object
+          },
           lowerBound: {
             type: Number
           },

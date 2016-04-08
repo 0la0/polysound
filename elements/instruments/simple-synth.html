@@ -1,5 +1,6 @@
 <html><head><link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../helpers/removable.html">
+<link rel="import" href="../helpers/mtof.html">
 
 </head><body><dom-module id="simple-synth">
   <template>
@@ -11,6 +12,7 @@
         margin: 0 5px;
         background: #eee;
         height: 100%;
+        font-size: 0.8rem;
       }
       .synth {
         height: inherit;
@@ -21,8 +23,9 @@
         flex-wrap: nowrap;
       }
       .synth-left {
-        width: 80px;
+        width: 100px;
         border-right: 1px solid black;
+        padding-right: 5px;
       }
       .synth-name {
         border-bottom: 1px solid black;
@@ -31,14 +34,35 @@
         width: 30px;
         height: 30px;
       }
+      .synth-parameter-row {
+        width: 100%;
+        height: 12px;
+        margin-bottom: 8px;
+        border-top: 1px solid black;
+        font-size: 0.7rem;
+      }
       .slider-container {
         height: 10px;
         width: 95%;
       }
 
-      .synth-right {}
+      .synth-right {
+        width: 130px;
+      }
       .synth-waveform-selector {
-        line-height: 20px;
+        line-height: 8px;
+        font-size: 0.6rem;
+      }
+
+      .synth-frequency {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+      }
+      .synth-frequency__label {}
+      .synth-frequency__value {
+        width: 40%;
       }
     </style>
 
@@ -51,17 +75,48 @@
       <section class="synth-main">
 
         <section class="synth-left">
+
+          <div class="synth-individual">
+            <multi-select class="synth-waveform-selector" select-model="[[synthSelect_0]]">
+            </multi-select>
+            <parameter-display class="synth-parameter-row" model="{{baseFrequency0}}" modulatable="{{synth0.synth.frequency}}" label="Freq" lower-bound="-48" upper-bound="48">
+            </parameter-display>
+            <parameter-display class="synth-parameter-row" model="{{gain0}}" modulatable="{{synth0.gain.gain}}" label="Gain" lower-bound="0" upper-bound="1">
+            </parameter-display>
+          </div>
+
+          <div class="synth-individual">
+            <multi-select class="synth-waveform-selector" select-model="[[synthSelect_1]]">
+            </multi-select>
+            <parameter-display class="synth-parameter-row" model="{{baseFrequency1}}" label="Freq" lower-bound="-48" upper-bound="48">
+            </parameter-display>
+            <parameter-display class="synth-parameter-row" model="{{gain1}}" modulatable="{{synth1.gain.gain}}" label="Gain" lower-bound="0" upper-bound="1">
+            </parameter-display>
+          </div>
+
+          <div class="synth-individual">
+            <multi-select class="synth-waveform-selector" select-model="[[synthSelect_2]]">
+            </multi-select>
+            <parameter-display class="synth-parameter-row" model="{{baseFrequency2}}" label="Freq" lower-bound="-48" upper-bound="48">
+            </parameter-display>
+            <parameter-display class="synth-parameter-row" model="{{gain2}}" modulatable="{{synth2.gain.gain}}" label="Gain" lower-bound="0" upper-bound="1">
+            </parameter-display>
+          </div>
+
+        </section>
+
+
+        <section class="synth-right">
           <div class="synth-button">
             <simple-button button-model="{{buttonModel}}"></simple-button>
           </div>
-          <div class="slider-container">
-            <slider-horizontal slider-value="{{baseFrequency}}" lower-bound="220" upper-bound="660">
-          </slider-horizontal>
-        </div></section>
 
-        <section class="synth-right">
-          <multi-select class="synth-waveform-selector" select-model="{{multiSelectModel}}">
-          </multi-select>
+          <div class="synth-frequency">
+            <label class="synth-frequency__label">Base Freq</label>
+            <value-display class="synth-frequency__value" model="{{masterFrequency}}">
+            </value-display>
+          </div>
+
           <simple-adsr adsr-model="{{synthModel.adsr}}"></simple-adsr>
         </section>
 
