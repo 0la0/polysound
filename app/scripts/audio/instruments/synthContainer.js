@@ -44,6 +44,10 @@ export default class SynthContainer extends BaseInstrument {
     });
   }
 
+  getDuration () {
+    return 0;
+  }
+
 }
 
 function createSynthNode (audioContext, semitoneRatio) {
