@@ -51,6 +51,14 @@
 
       <parameter-display
         class="grainulator-param-row"
+        model="{{scheduleScatter}}"
+        label="TimeScat"
+        lower-bound="0"
+        upper-bound="1">
+      </parameter-display>
+
+      <parameter-display
+        class="grainulator-param-row"
         model="{{loopTime}}"
         label="Loop T"
         lower-bound="0.01"
@@ -101,6 +109,10 @@
               type: Number,
               value: 0
             },
+            scheduleScatter: {
+              type: Number,
+              value: 0
+            },
             loopTime: {
               type: Number,
               value: 0.2
@@ -129,30 +141,31 @@
         detached() {}
         attributeChanged() {}
 
-        _grainLoop () {
-          this.instrumentSet.forEach((instrument) => {
-            for (let i = 0; i < this.numVoices; i++) {
-              let position = getPosition(this.position, instrument.getDuration(), this.spread);
-              let pitch = Math.round(this.pitch);
-              instrument.play(pitch, 0, position);
-            }
-          });
-
-          if (this.isOn) {
-            let timeOut = this.loopTime * 1000;
-            setTimeout(this._grainLoop.bind(this), timeOut);
-          }
-
-        }
+        // _grainLoop () {
+        //   this.instrumentSet.forEach((instrument) => {
+        //     for (let i = 0; i < this.numVoices; i++) {
+        //       let position = getPosition(this.position, instrument.getDuration(), this.spread);
+        //       let pitch = Math.round(this.pitch);
+        //       instrument.play(pitch, 0, position);
+        //     }
+        //   });
+        //
+        //   if (this.isOn) {
+        //     let timeOut = this.loopTime * 1000;
+        //     setTimeout(this._grainLoop.bind(this), timeOut);
+        //   }
+        //
+        // }
 
       }
 
-
+      function getPosNeg () {
+        return Math.random() < 0.5 ? -1 : 1;
+      }
 
       function buildSchedulable () {
         return {
           processTick: (beatNumber, time) => {
-
             let deltaTimeStep = app.audio.metronome.tempo / 60 / 16;
             let nextTimeStep = time + deltaTimeStep;
             let baseSchedule = this.nextScheduledNote || time;
@@ -164,7 +177,7 @@
                 let pitch = Math.round(this.pitch);
 
                 for (let i = 0; i < this.numVoices; i++) {
-                  let voiceSchedule = schedule + (i * 0.001 * Math.random());
+                  let voiceSchedule = schedule + getPosNeg() * (this.scheduleScatter * Math.random());
                   instrument.play(pitch, voiceSchedule, position);
                 }
 
