@@ -21,7 +21,7 @@
         height: 30px;
       }
       .grainulator-param-row {
-        height: 25px;
+        height: 20px;
         margin: 5px 0;
       }
     </style>
@@ -75,10 +75,26 @@
 
       <parameter-display
         class="grainulator-param-row"
+        model="{{voiceSpread}}"
+        label="V Spread"
+        lower-bound="0"
+        upper-bound="1">
+      </parameter-display>
+
+      <parameter-display
+        class="grainulator-param-row"
         model="{{pitch}}"
         label="Pitch"
         lower-bound="-12"
         upper-bound="12">
+      </parameter-display>
+
+      <parameter-display
+        class="grainulator-param-row"
+        model="{{playThreshold}}"
+        label="Thresh"
+        lower-bound="0"
+        upper-bound="1">
       </parameter-display>
 
     </div>
@@ -121,10 +137,18 @@
               type: Number,
               value: 1
             },
+            voiceSpread: {
+              type: Number,
+              value: 0
+            },
             pitch: {
               type: Number,
               value: 0,
               test: 0.5
+            },
+            playThreshold: {
+              type: Number,
+              value: 1
             }
           };
 
@@ -177,8 +201,12 @@
                 let pitch = Math.round(this.pitch);
 
                 for (let i = 0; i < this.numVoices; i++) {
-                  let voiceSchedule = schedule + getPosNeg() * (this.scheduleScatter * Math.random());
-                  instrument.play(pitch, voiceSchedule, position);
+                  let scatter = this.scheduleScatter * Math.random();
+                  let voiceSpread = this.voiceSpread * i;
+                  let playShedule = schedule + scatter + voiceSpread;
+                  if (Math.random() <= this.playThreshold) {
+                    instrument.play(pitch, playShedule, position);
+                  }
                 }
 
                 schedule += this.loopTime;
