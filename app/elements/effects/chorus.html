@@ -32,20 +32,20 @@
 
       <element-header label="Chorus" removable="{{removable}}"></element-header>
 
-      <parameter-display
+      <!-- <parameter-display
         class="chorus-param-row"
         model="{{chorusModel.delayNode.delayTime.value}}"
         label="Delay"
         lower-bound="0.01"
         upper-bound="3">
-      </parameter-display>
+      </parameter-display> -->
 
       <parameter-display
         class="chorus-param-row"
         model="{{chorusModel.feedbackGain.gain.value}}"
         label="Fdbck"
         lower-bound="0"
-        upper-bound="1">
+        upper-bound="0.5">
       </parameter-display>
 
       <parameter-display
@@ -56,13 +56,13 @@
         upper-bound="10">
       </parameter-display>
 
-      <parameter-display
+      <!-- <parameter-display
         class="chorus-param-row"
         model="{{chorusModel.chorus.delayTime.value}}"
         label="Delay"
         lower-bound="0.005"
         upper-bound="0.055">
-      </parameter-display>
+      </parameter-display> -->
 
       <parameter-display
         class="chorus-param-row"

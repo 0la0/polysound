@@ -10,17 +10,17 @@ export default class Chorus extends BaseEffect  {
     this.input = this.audioContext.createGain();
 
     this.delayNode = this.audioContext.createDelay();
-    this.delayNode.delayTime.value = 0.1; //delayTime
+    this.delayNode.delayTime.value = 0.12; //delayTime
 
     this.feedbackGain = this.audioContext.createGain();
-    this.feedbackGain.gain.value = 0.1; //feedback
+    this.feedbackGain.gain.value = 0.25; //feedback
 
     this.chorus = this.audioContext.createDelay();
-    this.chorus.delayTime.value = 0.03; //chorus delay
+    this.chorus.delayTime.value = 0.005; //chorus delay
 
     this.lfo = this.audioContext.createOscillator();
     this.lfo.type = 'sine';
-    this.lfo.frequency.value = 0.5; //chorus speed
+    this.lfo.frequency.value = 0.1; //chorus speed
 
     this.lfoGain = this.audioContext.createGain();
     this.lfoGain.gain.value = 0.003; //chorus depth
