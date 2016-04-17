@@ -16,13 +16,18 @@
       }
     </style>
 
-    <canvas></canvas>
+    <canvas id="cvs"></canvas>
 
   </template>
 
   <script>
     (function() {
       'use strict';
+
+      const WIDTH = 120;
+      const HEIGHT = 40;
+      const HALF_HEIGHT = HEIGHT / 2;
+      const RENDER_MAGNITUDE = 15;
 
       class SampleVisualizer {
 
@@ -32,40 +37,63 @@
           this.properties = {
             bufferSource: {
               type: Object
+            },
+            playback: {
+              type: Object
             }
           };
 
-          this.listeners = {};
+          this.listeners = {
+            'cvs.tap': '_onCanvasInteract',
+            'cvs.track': '_onCanvasInteract'
+          };
         }
 
         ready() {}
         attached() {
-          this.cvs = this.$$('canvas');
-          this.cvs.width = 120;
-          this.cvs.height = 40;
-          this.g2d = this.cvs.getContext('2d');
-          this.g2d.halfHeight = 20;
+          this.$.cvs.width = WIDTH;
+          this.$.cvs.height = HEIGHT;
+          this.g2d = this.$.cvs.getContext('2d');
           this.g2d.strokeStyle = "black";
           this.g2d.lineWidth = 2;
-          this.g2d.fillStyle = "white";
+          this.g2d.fillStyle = "grey";
+
+          this.playbackPosition = 0;
         }
         detached() {}
         attributeChanged() {}
 
         render () {
-          this.g2d.fillRect(0, 0, this.cvs.width, this.cvs.height);
           this.bufferSource.getWaveform(200, this._renderCallback.bind(this));
         }
 
+        _onCanvasInteract (event) {
+          let realPosition = event.detail.x - this.$.cvs.getBoundingClientRect().left;
+          let normalPosition = realPosition / WIDTH;
+          this.playbackPosition = Math.max(0, Math.min(normalPosition, 1));
+          this.playback.callback(this.playbackPosition);
+          this._renderSample();
+        }
+
         _renderCallback (freqList, min, max) {
-          let halfHeight = this.g2d.halfHeight;
+          this.freqList = freqList;
+          this._renderSample(freqList);
+        }
+
+        _renderSample () {
+          if (!this.freqList) { return; }
+          this.g2d.clearRect(0, 0, WIDTH, HEIGHT);
           this.g2d.beginPath();
-          this.g2d.moveTo(0, freqList[0] + halfHeight);
-          for (let i = 1; i < freqList.length; i++) {
-            let yValue = freqList[i] * 15 + halfHeight;
-            this.g2d.lineTo(i, yValue);
-          }
+          this.g2d.moveTo(0, this.freqList[0] + HALF_HEIGHT);
+
+          this.freqList.forEach((freqValue, index) => {
+            let yValue = freqValue * RENDER_MAGNITUDE + HALF_HEIGHT;
+            this.g2d.lineTo(index, yValue);
+          });
           this.g2d.stroke();
+
+          if (!this.playbackPosition) { return; }
+          this.g2d.fillRect(this.playbackPosition * WIDTH, 0, 2, HEIGHT);
         }
 
       }

@@ -31,9 +31,9 @@
         width: 30px;
         height: 30px;
       }
-      .slider-container {
-        height: 10px;
-        width: 95%;
+      .sampler-param-row {
+        height: 25px;
+        margin: 5px 0;
       }
       .sampler-right {}
     </style>
@@ -49,21 +49,31 @@
       <section class="sampler-main">
 
         <section class="sampler-left">
+
           <div class="sampler-button">
-            <simple-button button-model="{{triggerButtonModel}}" is-trigger="true"></simple-button>
+            <simple-button
+              button-model="{{triggerButtonModel}}"
+              is-trigger="true">
+            </simple-button>
           </div>
-          <div class="slider-container">
-            <slider-horizontal
-              slider-value="{{samplerModel.baseNote}}"
-              lower-bound="-12" upper-bound="12">
-            </slider-horizontal>
-          </div>
-          <sampler-loader parent-event-handler="{{samplerLoader}}">
-          </sampler-loader>
+
+          <parameter-display
+            class="sampler-param-row"
+            model="{{samplerModel.baseNote}}"
+            label="Pitch"
+            lower-bound="-24"
+            upper-bound="24">
+          </parameter-display>
+
+          <sampler-loader parent-event-handler="{{samplerLoader}}"></sampler-loader>
+
         </section>
 
         <section class="sampler-right">
-          <sample-visualizer buffer-source={{samplerModel}}></sample-visualizer>
+          <sample-visualizer
+            buffer-source={{samplerModel}}
+            playback="{{playback}}">
+          </sample-visualizer>
           <simple-adsr adsr-model="{{samplerModel.adsr}}"></simple-adsr>
         </section>
 
@@ -112,10 +122,13 @@
           };
           this.triggerButtonModel = buildButtonModel.call(this);
           this.removable = importRemovable.call(this, this.samplerModel);
+
+          this.playback = {
+            callback: (position) => { this.samplePosition = position; }
+          }
         }
         detached() {}
         attributeChanged() {}
-
       }
       Polymer(SimpleSampler);
 
@@ -124,7 +137,8 @@
         return {
           callback: (btnIsOn) => {
             if (btnIsOn) {
-              this.samplerModel.play(0, 0);
+              let position = this.samplePosition * this.samplerModel.getDuration();
+              this.samplerModel.play(0, 0, position);
             }
           }
         };
