@@ -36,14 +36,13 @@ export default class DroneFilter extends BaseEffect {
 }
 
 function createFilters (numFilters, baseFrequency, scale, audioContext) {
-  let filterArray = [];
-  for (let i = 0; i < numFilters; i++) {
-    var filter = audioContext.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.Q.value = 50;
-    filterArray.push(filter);
-  }
-  return filterArray;
+  return new Array(numFilters).fill(undefined)
+    .map((value, index) => {
+      let filter = audioContext.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.Q.value = 50;
+      return filter;
+    });
 }
 
 function getRandomFrequency (baseFrequency, scaleArray) {

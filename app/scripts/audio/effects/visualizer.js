@@ -9,6 +9,7 @@ export default class Vizualizer extends BaseEffect {
     this.analyser.fftSize = Math.pow(2, 11);
     this.timeDataArray = new Uint8Array(this.getBufferLength());
     this.freqDataArray = new Uint8Array(this.getBufferLength());
+    this.sampleRate = this.audioContext.sampleRate;
   }
 
   connect () {
@@ -31,6 +32,11 @@ export default class Vizualizer extends BaseEffect {
   getFrequencyData () {
     this.analyser.getByteFrequencyData(this.freqDataArray);
     return this.freqDataArray;
+  }
+
+  getHzPerBin () {
+    // note that the number of bins is half the fftSize
+    return this.sampleRate / this.analyser.fftSize;
   }
 
 }
