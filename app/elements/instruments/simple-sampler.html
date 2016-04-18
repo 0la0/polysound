@@ -11,6 +11,7 @@
         margin: 0 5px;
         background: #eee;
         height: 100%;
+        font-size: 0.8rem;
       }
       .sampler {
         height: inherit;
@@ -21,8 +22,8 @@
         flex-wrap: nowrap;
       }
       .sampler-left {
-        width: 80px;
-        border-right: 1px solid black;
+        width: 90px;
+        margin-right: 2px;
       }
       .sampler-name {
         border-bottom: 1px solid black;
@@ -30,9 +31,16 @@
       .sampler-button {
         width: 30px;
         height: 30px;
+        margin-bottom: 20px;
+      }
+      .sampler-label {
+        /*margin-top: 10px;*/
+      }
+      .sampler-selector {
+        width: 100%;
       }
       .sampler-param-row {
-        height: 25px;
+        height: 20px;
         margin: 5px 0;
       }
       .sampler-right {}
@@ -60,12 +68,21 @@
           <parameter-display
             class="sampler-param-row"
             model="{{samplerModel.baseNote}}"
-            label="Pitch"
+            label="P"
             lower-bound="-24"
             upper-bound="24">
           </parameter-display>
 
-          <sampler-loader parent-event-handler="{{samplerLoader}}"></sampler-loader>
+          <label class="sampler-label">Sample:</label>
+          <dropdown-element
+            id="sampleListDropdown"
+            class="sampler-selector"
+            list-data="[[dropdownListData]]"
+            callback-handler="[[dropdownCallbackHandler]]"
+            label="[[activeSampleLabel]]">
+          </dropdown-element>
+
+          <label>Length: {{samplerModel.bufferDuration}}</label>
 
         </section>
 
@@ -108,27 +125,41 @@
             }
           };
 
+          this.listeners = {
+            'sampleListDropdown.tap': '_handleDropdownClick'
+          };
+
         }
 
         ready() {}
         attached() {
           this.samplerVisualizer = this.$$('sample-visualizer');
-          this.samplerLoader = {
-            newSample: (samplePath) => {
-              let sample = app.audio.sampleMap.get(samplePath);
+          this.triggerButtonModel = buildButtonModel.call(this);
+          this.removable = importRemovable.call(this, this.samplerModel);
+
+          this.dropdownCallbackHandler = {
+            execute: (selectionString) => {
+              let sample = app.audio.sampleMap.get(selectionString);
+              this.activeSampleLabel = getSampleName(selectionString);
               this.samplerModel.setSample(sample);
               this.samplerVisualizer.render();
             }
           };
-          this.triggerButtonModel = buildButtonModel.call(this);
-          this.removable = importRemovable.call(this, this.samplerModel);
 
           this.playback = {
             callback: (position) => { this.samplePosition = position; }
-          }
+          };
         }
         detached() {}
         attributeChanged() {}
+
+        _handleDropdownClick (event) {
+          if (event.detail.sourceEvent.srcElement !== this.$.sampleListDropdown) {
+            //rehydrate list
+            this.dropdownListData = Array.from(app.audio.sampleMap.keys());
+          }
+        }
+
       }
       Polymer(SimpleSampler);
 
@@ -142,6 +173,12 @@
             }
           }
         };
+      }
+
+      function getSampleName (originalName) {
+        let tokens = originalName.split('/');
+        let name = tokens[1] || originalName;
+        return name.split('.')[0];
       }
 
     })();

@@ -10,8 +10,14 @@ export default class Sampler extends BaseInstrument {
   }
 
   setSample (sample) {
+    let source = this.audioContext.createBufferSource();
     this.sample = sample;
     this.hasSample = true;
+    source.buffer = this.sample;
+    this.bufferDuration = source.buffer.duration;
+    source = null;
+    console.log('this.bufferDuration', this.bufferDuration);
+    
   }
 
   play (pitch, schedule, samplePosition) {
