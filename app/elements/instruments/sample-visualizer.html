@@ -47,6 +47,12 @@
             'cvs.tap': '_onCanvasInteract',
             'cvs.track': '_onCanvasInteract'
           };
+
+          this.observers = [
+            '_adsrChange(bufferSource.adsr.attack)',
+            '_adsrChange(bufferSource.adsr.sustain)',
+            '_adsrChange(bufferSource.adsr.release)'
+          ];
         }
 
         ready() {}
@@ -67,6 +73,10 @@
           this.bufferSource.getWaveform(200, this._renderCallback.bind(this));
         }
 
+        _adsrChange (changeRecord) {
+          this._renderSample();
+        }
+
         _onCanvasInteract (event) {
           let realPosition = event.detail.x - this.$.cvs.getBoundingClientRect().left;
           let normalPosition = realPosition / WIDTH;
@@ -81,19 +91,34 @@
         }
 
         _renderSample () {
+          let playbackStart = (this.playbackPosition || 0) * WIDTH;
+          let secondMultiplier = (1 / this.bufferSource.bufferDuration) * WIDTH;
+          let sustainStart = playbackStart + secondMultiplier * this.bufferSource.adsr.attack;
+          let decayStart = sustainStart + secondMultiplier * this.bufferSource.adsr.sustain
+          let decayEnd = decayStart + secondMultiplier * this.bufferSource.adsr.release;
+
           if (!this.freqList) { return; }
+
+          //--- DRAW WAVEFORM ---//
           this.g2d.clearRect(0, 0, WIDTH, HEIGHT);
           this.g2d.beginPath();
           this.g2d.moveTo(0, this.freqList[0] + HALF_HEIGHT);
-
           this.freqList.forEach((freqValue, index) => {
             let yValue = freqValue * RENDER_MAGNITUDE + HALF_HEIGHT;
             this.g2d.lineTo(index, yValue);
           });
           this.g2d.stroke();
 
-          if (!this.playbackPosition) { return; }
-          this.g2d.fillRect(this.playbackPosition * WIDTH, 0, 2, HEIGHT);
+          //--- DRAW PLAY POSITION ---//
+          this.g2d.fillRect(playbackStart, 0, 2, HEIGHT);
+
+          //--- DRAW ENVELOPE ---//
+          this.g2d.beginPath();
+          this.g2d.moveTo(playbackStart, HEIGHT);
+          this.g2d.lineTo(sustainStart, 0);
+          this.g2d.lineTo(decayStart, 0);
+          this.g2d.lineTo(decayEnd, HEIGHT);
+          this.g2d.stroke();
         }
 
       }

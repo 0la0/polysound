@@ -7,6 +7,7 @@ export default class Sampler extends BaseInstrument {
     super (audioContext);
     this.hasSample = false;
     this.baseNote = 0;
+    this.bufferDuration = 0;
   }
 
   setSample (sample) {
@@ -15,9 +16,6 @@ export default class Sampler extends BaseInstrument {
     this.hasSample = true;
     source.buffer = this.sample;
     this.bufferDuration = source.buffer.duration;
-    source = null;
-    console.log('this.bufferDuration', this.bufferDuration);
-    
   }
 
   play (pitch, schedule, samplePosition) {
