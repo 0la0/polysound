@@ -32,6 +32,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             type: Number,
             value: 0
           },
+          scheduleScatter: {
+            type: Number,
+            value: 0
+          },
           loopTime: {
             type: Number,
             value: 0.2
@@ -40,10 +44,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             type: Number,
             value: 1
           },
+          voiceSpread: {
+            type: Number,
+            value: 0
+          },
           pitch: {
             type: Number,
             value: 0,
             test: 0.5
+          },
+          playThreshold: {
+            type: Number,
+            value: 1
           }
         };
 
@@ -66,59 +78,65 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attributeChanged',
       value: function attributeChanged() {}
-    }, {
-      key: '_grainLoop',
-      value: function _grainLoop() {
-        var _this = this;
 
-        this.instrumentSet.forEach(function (instrument) {
-          for (var i = 0; i < _this.numVoices; i++) {
-            var position = getPosition(_this.position, instrument.getDuration(), _this.spread);
-            var pitch = Math.round(_this.pitch);
-            instrument.play(pitch, 0, position);
-          }
-        });
+      // _grainLoop () {
+      //   this.instrumentSet.forEach((instrument) => {
+      //     for (let i = 0; i < this.numVoices; i++) {
+      //       let position = getPosition(this.position, instrument.getDuration(), this.spread);
+      //       let pitch = Math.round(this.pitch);
+      //       instrument.play(pitch, 0, position);
+      //     }
+      //   });
+      //
+      //   if (this.isOn) {
+      //     let timeOut = this.loopTime * 1000;
+      //     setTimeout(this._grainLoop.bind(this), timeOut);
+      //   }
+      //
+      // }
 
-        if (this.isOn) {
-          var timeOut = this.loopTime * 1000;
-          setTimeout(this._grainLoop.bind(this), timeOut);
-        }
-      }
     }]);
 
     return CustomGrainulator;
   })();
 
+  function getPosNeg() {
+    return Math.random() < 0.5 ? -1 : 1;
+  }
+
   function buildSchedulable() {
-    var _this2 = this;
+    var _this = this;
 
     return {
       processTick: function processTick(beatNumber, time) {
-
         var deltaTimeStep = app.audio.metronome.tempo / 60 / 16;
         var nextTimeStep = time + deltaTimeStep;
-        var baseSchedule = _this2.nextScheduledNote || time;
+        var baseSchedule = _this.nextScheduledNote || time;
 
-        _this2.instrumentSet.forEach(function (instrument) {
+        _this.instrumentSet.forEach(function (instrument) {
           var schedule = baseSchedule;
           while (schedule < nextTimeStep) {
-            var position = getPosition(_this2.position, instrument.getDuration(), _this2.spread);
-            var pitch = Math.round(_this2.pitch);
+            var position = getPosition(_this.position, instrument.getDuration(), _this.spread);
+            var pitch = Math.round(_this.pitch);
 
-            for (var i = 0; i < _this2.numVoices; i++) {
-              var voiceSchedule = schedule + i * 0.001 * Math.random();
-              instrument.play(pitch, voiceSchedule, position);
+            for (var i = 0; i < _this.numVoices; i++) {
+              var scatter = _this.scheduleScatter * Math.random();
+              var voiceSpread = _this.voiceSpread * i;
+              var playShedule = schedule + scatter + voiceSpread;
+              if (Math.random() <= _this.playThreshold) {
+                instrument.play(pitch, playShedule, position);
+              }
             }
 
-            schedule += _this2.loopTime;
+            schedule += _this.loopTime;
           }
-          _this2.nextScheduledNote = schedule;
+          _this.nextScheduledNote = schedule;
         });
       },
       render: function render(beatNumber, lastBeatNumber) {},
       start: function start() {},
       stop: function stop() {
-        _this2.nextScheduledNote = 0;
+        _this.nextScheduledNote = 0;
       }
     };
   }
@@ -134,7 +152,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   }
 
   function buildButtonModel() {
-    var _this3 = this;
+    var _this2 = this;
 
     return {
       callback: function callback(isOn) {
@@ -142,7 +160,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         // if (isOn) {
         //   this._grainLoop();
         // }
-        isOn ? app.scheduler.register(_this3.schedulable) : app.scheduler.deregister(_this3.schedulable);
+        isOn ? app.scheduler.register(_this2.schedulable) : app.scheduler.deregister(_this2.schedulable);
       }
     };
   }

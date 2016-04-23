@@ -7,6 +7,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 (function () {
   'use strict';
 
+  var WIDTH = 120;
+  var HEIGHT = 40;
+  var HALF_HEIGHT = HEIGHT / 2;
+  var RENDER_MAGNITUDE = 15;
+
   var SampleVisualizer = (function () {
     function SampleVisualizer() {
       _classCallCheck(this, SampleVisualizer);
@@ -20,10 +25,18 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.properties = {
           bufferSource: {
             type: Object
+          },
+          playback: {
+            type: Object
           }
         };
 
-        this.listeners = {};
+        this.listeners = {
+          'cvs.tap': '_onCanvasInteract',
+          'cvs.track': '_onCanvasInteract'
+        };
+
+        this.observers = ['_adsrChange(bufferSource.adsr.attack)', '_adsrChange(bufferSource.adsr.sustain)', '_adsrChange(bufferSource.adsr.release)'];
       }
     }, {
       key: 'ready',
@@ -31,14 +44,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attached',
       value: function attached() {
-        this.cvs = this.$$('canvas');
-        this.cvs.width = 120;
-        this.cvs.height = 40;
-        this.g2d = this.cvs.getContext('2d');
-        this.g2d.halfHeight = 20;
-        this.g2d.strokeStyle = "black";
+        this.$.cvs.width = WIDTH;
+        this.$.cvs.height = HEIGHT;
+        this.g2d = this.$.cvs.getContext('2d');
+        this.g2d.strokeStyle = 'black';
         this.g2d.lineWidth = 2;
-        this.g2d.fillStyle = "white";
+        this.g2d.fillStyle = 'rgba(127, 127, 127, 0.5)';
+        this.playbackPosition = 0;
       }
     }, {
       key: 'detached',
@@ -49,20 +61,68 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'render',
       value: function render() {
-        this.g2d.fillRect(0, 0, this.cvs.width, this.cvs.height);
         this.bufferSource.getWaveform(200, this._renderCallback.bind(this));
+      }
+    }, {
+      key: '_adsrChange',
+      value: function _adsrChange(changeRecord) {
+        this._renderSample();
+      }
+    }, {
+      key: '_onCanvasInteract',
+      value: function _onCanvasInteract(event) {
+        var realPosition = event.detail.x - this.$.cvs.getBoundingClientRect().left;
+        var normalPosition = realPosition / WIDTH;
+        this.playbackPosition = Math.max(0, Math.min(normalPosition, 1));
+        this.playback.callback(this.playbackPosition);
+        this._renderSample();
       }
     }, {
       key: '_renderCallback',
       value: function _renderCallback(freqList, min, max) {
-        var halfHeight = this.g2d.halfHeight;
-        this.g2d.beginPath();
-        this.g2d.moveTo(0, freqList[0] + halfHeight);
-        for (var i = 1; i < freqList.length; i++) {
-          var yValue = freqList[i] * 15 + halfHeight;
-          this.g2d.lineTo(i, yValue);
+        this.freqList = freqList;
+        this._renderSample(freqList);
+      }
+    }, {
+      key: '_renderSample',
+      value: function _renderSample() {
+        var _this = this;
+
+        var playbackStart = (this.playbackPosition || 0) * WIDTH;
+        var secondMultiplier = 1 / this.bufferSource.bufferDuration * WIDTH;
+        var sustainStart = playbackStart + secondMultiplier * this.bufferSource.adsr.attack;
+        var decayStart = sustainStart + secondMultiplier * this.bufferSource.adsr.sustain;
+        var decayEnd = decayStart + secondMultiplier * this.bufferSource.adsr.release;
+
+        if (!this.freqList) {
+          return;
         }
+
+        //--- DRAW WAVEFORM ---//
+        this.g2d.clearRect(0, 0, WIDTH, HEIGHT);
+        this.g2d.beginPath();
+        this.g2d.moveTo(0, this.freqList[0] + HALF_HEIGHT);
+        this.freqList.forEach(function (freqValue, index) {
+          var yValue = freqValue * RENDER_MAGNITUDE + HALF_HEIGHT;
+          _this.g2d.lineTo(index, yValue);
+        });
         this.g2d.stroke();
+
+        //--- FILL PRE-ATTACK REGION---//
+        this.g2d.beginPath();
+        this.g2d.moveTo(0, 0);
+        this.g2d.lineTo(0, HEIGHT);
+        this.g2d.lineTo(playbackStart, HEIGHT);
+        this.g2d.lineTo(sustainStart, 0);
+        this.g2d.fill();
+
+        //--- FILL POST-SUSTAIN REGION---//
+        this.g2d.beginPath();
+        this.g2d.moveTo(decayStart, 0);
+        this.g2d.lineTo(decayEnd, HEIGHT);
+        this.g2d.lineTo(WIDTH, HEIGHT);
+        this.g2d.lineTo(WIDTH, 0);
+        this.g2d.fill();
       }
     }]);
 

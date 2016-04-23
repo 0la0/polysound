@@ -30,17 +30,27 @@
 
       <element-header label="Chorus" removable="{{removable}}"></element-header>
 
-      <parameter-display class="chorus-param-row" model="{{chorusModel.delayNode.delayTime.value}}" label="Delay" lower-bound="0.01" upper-bound="3">
-      </parameter-display>
+      <!-- <parameter-display
+        class="chorus-param-row"
+        model="{{chorusModel.delayNode.delayTime.value}}"
+        label="Delay"
+        lower-bound="0.01"
+        upper-bound="3">
+      </parameter-display> -->
 
-      <parameter-display class="chorus-param-row" model="{{chorusModel.feedbackGain.gain.value}}" label="Fdbck" lower-bound="0" upper-bound="1">
+      <parameter-display class="chorus-param-row" model="{{chorusModel.feedbackGain.gain.value}}" label="Fdbck" lower-bound="0" upper-bound="0.5">
       </parameter-display>
 
       <parameter-display class="chorus-param-row" model="{{chorusModel.lfo.frequency.value}}" label="Speed" lower-bound="0.01" upper-bound="10">
       </parameter-display>
 
-      <parameter-display class="chorus-param-row" model="{{chorusModel.chorus.delayTime.value}}" label="Delay" lower-bound="0.005" upper-bound="0.055">
-      </parameter-display>
+      <!-- <parameter-display
+        class="chorus-param-row"
+        model="{{chorusModel.chorus.delayTime.value}}"
+        label="Delay"
+        lower-bound="0.005"
+        upper-bound="0.055">
+      </parameter-display> -->
 
       <parameter-display class="chorus-param-row" model="{{chorusModel.lfoGain.gain.value}}" label="Depth" lower-bound="0.0005" upper-bound="0.005">
       </parameter-display>

@@ -7,6 +7,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 (function () {
   'use strict';
 
+  var WIDTH = 200;
+  var HEIGHT = 100;
+  var MAX_BYTE = Math.pow(2, 8) - 1;
+
   var Visualizer = (function () {
     function Visualizer() {
       _classCallCheck(this, Visualizer);
@@ -38,16 +42,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         this.timeIsOn = false;
         this.freqIsOn = false;
 
-        this.width = 200;
-        this.height = 100;
+        this.$.timeDomainCanvas.width = WIDTH;
+        this.$.timeDomainCanvas.height = HEIGHT;
+        this.g2dTime = getGraphicsContext(this.$.timeDomainCanvas, WIDTH, HEIGHT);
 
-        this.$.timeDomainCanvas.width = this.width;
-        this.$.timeDomainCanvas.height = this.height;
-        this.g2dTime = getGraphicsContext(this.$.timeDomainCanvas, this.width, this.height);
-
-        this.$.frequencyDomainCanvas.width = this.width;
-        this.$.frequencyDomainCanvas.height = this.height;
-        this.g2dFreq = getGraphicsContext(this.$.frequencyDomainCanvas, this.width, this.height);
+        this.$.frequencyDomainCanvas.width = WIDTH;
+        this.$.frequencyDomainCanvas.height = HEIGHT;
+        this.g2dFreq = getGraphicsContext(this.$.frequencyDomainCanvas, WIDTH, HEIGHT);
 
         this.toggleButtonModel = buildToggleButton.call(this);
       }
@@ -87,25 +88,27 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
         var timeData = this.model.getTimeData();
         var freqData = this.model.getFrequencyData();
-        var step = timeData.length / this.width;
+        var bufferLength = this.model.getBufferLength();
+        var step = WIDTH / bufferLength;
+        //let hzPerBin = this.model.getHzPerBin();
 
         if (this.timeIsOn) {
-          this.g2dTime.clearRect(0, 0, this.width, this.height);
+          this.g2dTime.clearRect(0, 0, WIDTH, HEIGHT);
           this.g2dTime.beginPath();
           timeData.forEach(function (value, index) {
-            var normalValue = value / 256 * 100;
+            var normalValue = value / MAX_BYTE * 100;
             var x = step * index;
-            var y = 256 / _this.height + normalValue;
+            var y = MAX_BYTE / HEIGHT + normalValue;
             index === 0 ? _this.g2dTime.moveTo(x, y) : _this.g2dTime.lineTo(x, y);
           });
           this.g2dTime.stroke();
         }
 
         if (this.freqIsOn) {
-          this.g2dFreq.clearRect(0, 0, this.width, this.height);
+          this.g2dFreq.clearRect(0, 0, WIDTH, HEIGHT);
           freqData.forEach(function (value, index) {
             var x = step * index;
-            var height = value / 256 * _this.height;
+            var height = value / MAX_BYTE * HEIGHT;
             _this.g2dFreq.fillRect(x, 0, step, height);
           });
         }

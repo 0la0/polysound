@@ -28,6 +28,10 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
             type: Object
           }
         };
+
+        this.listeners = {
+          'sampleListDropdown.tap': '_handleDropdownClick'
+        };
       }
     }, {
       key: 'ready',
@@ -38,15 +42,23 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var _this = this;
 
         this.samplerVisualizer = this.$$('sample-visualizer');
-        this.samplerLoader = {
-          newSample: function newSample(samplePath) {
-            var sample = app.audio.sampleMap.get(samplePath);
+        this.triggerButtonModel = buildButtonModel.call(this);
+        this.removable = importRemovable.call(this, this.samplerModel);
+
+        this.dropdownCallbackHandler = {
+          execute: function execute(selectionString) {
+            var sample = app.audio.sampleMap.get(selectionString);
+            _this.activeSampleLabel = getSampleName(selectionString);
             _this.samplerModel.setSample(sample);
             _this.samplerVisualizer.render();
           }
         };
-        this.triggerButtonModel = buildButtonModel.call(this);
-        this.removable = importRemovable.call(this, this.samplerModel);
+
+        this.playback = {
+          callback: function callback(position) {
+            _this.samplePosition = position;
+          }
+        };
       }
     }, {
       key: 'detached',
@@ -54,6 +66,14 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }, {
       key: 'attributeChanged',
       value: function attributeChanged() {}
+    }, {
+      key: '_handleDropdownClick',
+      value: function _handleDropdownClick(event) {
+        if (event.detail.sourceEvent.srcElement !== this.$.sampleListDropdown) {
+          //rehydrate list
+          this.dropdownListData = Array.from(app.audio.sampleMap.keys());
+        }
+      }
     }]);
 
     return SimpleSampler;
@@ -67,9 +87,16 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return {
       callback: function callback(btnIsOn) {
         if (btnIsOn) {
-          _this2.samplerModel.play(0, 0);
+          var position = _this2.samplePosition * _this2.samplerModel.getDuration();
+          _this2.samplerModel.play(0, 0, position);
         }
       }
     };
+  }
+
+  function getSampleName(originalName) {
+    var tokens = originalName.split('/');
+    var name = tokens[1] || originalName;
+    return name.split('.')[0];
   }
 })();
