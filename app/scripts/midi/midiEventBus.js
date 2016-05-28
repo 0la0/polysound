@@ -15,16 +15,24 @@ class MidiEventBus {
     }
   }
 
-  onMessage (event) {
+  onMidiMessage (event) {
     let message = getObjectFromMessage(event.data);
-    let mapKey = `${message.status}_${message.note}`;
+    this.onMessage(message.command, message.status, message.note, message.value);
+  }
+
+  onWebSocketMessage (command, status, note, value) {
+    this.onMessage(command, status, note, value);
+  }
+
+  onMessage (command, status, note, value) {
+    let mapKey = `${status}_${note}`;
     if (this.activeListener) {
       this.listenerMap.set(mapKey, this.activeListener);
     }
     else {
       if (this.listenerMap.get(mapKey)) {
         this.listenerMap.get(mapKey)
-          .onMessage(message.command, message.status, message.note, message.value);
+          .onMessage(command, status, note, value);
       }
     }
   }

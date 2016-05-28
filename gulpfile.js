@@ -26,6 +26,7 @@ var crypto = require('crypto');
 
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
+var nodemon = require('gulp-nodemon');
 
 // var ghPages = require('gulp-gh-pages');
 
@@ -359,6 +360,13 @@ gulp.task('serve:dist', ['default'], function() {
   });
 });
 
+gulp.task('serve:wsServer', function(cb) {
+  runSequence(
+    'webSocketServer',
+    'serve',
+    cb);
+});
+
 // Build production files, the default task
 gulp.task('default', ['clean'], function(cb) {
   // Uncomment 'cache-config' if you are going to use service workers.
@@ -389,6 +397,13 @@ gulp.task('deploy-gh-pages', function() {
       branch: 'gh-pages'
     }), $.ghPages()));
 });
+
+gulp.task('webSocketServer', function () {
+  nodemon({
+    script: 'wsServer/index.js',
+    watch: 'wsServer'
+  })
+})
 
 // Load tasks for web-component-tester
 // Adds tasks for `gulp test:local` and `gulp test:remote`

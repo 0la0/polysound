@@ -6,6 +6,7 @@ import EffectFactory from './audio/effects/effectFactory.js';
 import Visualizer from './audio/effects/visualizer.js';
 import buildMidiFactory from './midi/midiFactory.js';
 import buildMidiEventBus from './midi/midiEventBus.js';
+import buildWebSocketClient from './midi/webSocketClient.js';
 import Http from './util/http.js';
 
 const CONFIG_FILE_PATH = 'config/example.json';
@@ -79,8 +80,12 @@ function loadConfigFiles (configFilePath, audioContext) {
 
 function searchForMidiDevices () {
     audio.midiDeviceFactory.getInputList().forEach((midiInput) => {
-      midiInput.onmidimessage = audio.midiEventBus.onMessage.bind(audio.midiEventBus);
+      midiInput.onmidimessage = audio.midiEventBus.onMidiMessage.bind(audio.midiEventBus);
     });
+}
+
+function requestWssConnection () {
+  buildWebSocketClient(location.hostname, 8080, audio.midiEventBus);
 }
 
 function init () {
@@ -89,6 +94,7 @@ function init () {
       audio.midiDeviceFactory = midiFactoryInstance;
     })
     .then(searchForMidiDevices)
+    .then(requestWssConnection)
     .catch(() => {midiFactory = {}});
 
   loadConfigFiles(CONFIG_FILE_PATH, audioGraph.getAudioContext());
