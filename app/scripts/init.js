@@ -5,6 +5,7 @@ import InstrumentFactory from './audio/instruments/instrumentFactory.js';
 import EffectFactory from './audio/effects/effectFactory.js';
 import Visualizer from './audio/effects/visualizer.js';
 import buildMidiFactory from './midi/midiFactory.js';
+import buildMidiEventBus from './midi/midiEventBus.js';
 import Http from './util/http.js';
 
 const CONFIG_FILE_PATH = 'config/example.json';
@@ -21,6 +22,7 @@ let sampleMap = new Map();
 let sampleList = [];
 let lastEqualizerList = buildLastEqualizers();
 let visualizer = new Visualizer(audioGraph.getAudioContext(), audioGraph.masterCompressor);
+let midiEventBus = new buildMidiEventBus();
 
 let audio = {
   audioGraph: audioGraph,
@@ -29,7 +31,8 @@ let audio = {
   lastEqualizerList: lastEqualizerList,
   effectFactory: effectFactory,
   instrumentFactory: instrumentFactory,
-  visualizer: visualizer
+  visualizer: visualizer,
+  midiEventBus: midiEventBus
 };
 //window.audio = audio;
 
@@ -74,11 +77,18 @@ function loadConfigFiles (configFilePath, audioContext) {
     });
 }
 
+function searchForMidiDevices () {
+    audio.midiDeviceFactory.getInputList().forEach((midiInput) => {
+      midiInput.onmidimessage = audio.midiEventBus.onMessage.bind(audio.midiEventBus);
+    });
+}
+
 function init () {
   buildMidiFactory()
     .then( (midiFactoryInstance) => {
       audio.midiDeviceFactory = midiFactoryInstance;
     })
+    .then(searchForMidiDevices)
     .catch(() => {midiFactory = {}});
 
   loadConfigFiles(CONFIG_FILE_PATH, audioGraph.getAudioContext());

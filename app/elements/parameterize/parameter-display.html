@@ -60,7 +60,8 @@
         class="parameter__envelope"
         bound-value="{{model}}",
         modulatable="{{modulatable}}",
-        direction$="[[displayDirection]]">
+        direction$="[[displayDirection]]"
+        midi-listener="{{midiListener}}">
       </value-envelope>
 
       <label class="parameter__label">[[label]]</label>
@@ -133,6 +134,14 @@
             this.$$('slider-bidirectional').classList.add('parameter__slider--row');
             this.$$('value-display').classList.add('parameter__value--row');
           }
+
+          this.midiListener = {
+            onMessage: (command, status, note, value) => {
+              let normalValue = value / 127;
+              let realValue = normalValue * (this.upperBound - this.lowerBound) + this.lowerBound;
+              this.model = realValue;
+            }
+          };
 
         }
         detached() {}
