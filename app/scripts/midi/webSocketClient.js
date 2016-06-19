@@ -14,7 +14,6 @@ function buildWebSocketClient (ipAddress, port, midiEventBus) {
   socket.onmessage = (event) => {
     try {
       let message = JSON.parse(event.data);
-      console.log('message:', message);
       midiEventBus.onWebSocketMessage(null, message.status, message.note, message.value);
     }
     catch (error) {
@@ -26,7 +25,7 @@ function buildWebSocketClient (ipAddress, port, midiEventBus) {
     console.log('WebSocket error:', event);
   };
 
-
+  return socket;
 }
 
 

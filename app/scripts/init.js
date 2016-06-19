@@ -24,6 +24,7 @@ let sampleList = [];
 let lastEqualizerList = buildLastEqualizers();
 let visualizer = new Visualizer(audioGraph.getAudioContext(), audioGraph.masterCompressor);
 let midiEventBus = new buildMidiEventBus();
+let webSocketClient = buildWebSocketClient(location.hostname, 8080, midiEventBus);
 
 let audio = {
   audioGraph: audioGraph,
@@ -33,7 +34,8 @@ let audio = {
   effectFactory: effectFactory,
   instrumentFactory: instrumentFactory,
   visualizer: visualizer,
-  midiEventBus: midiEventBus
+  midiEventBus: midiEventBus,
+  webSocketClient: webSocketClient
 };
 //window.audio = audio;
 
@@ -84,17 +86,12 @@ function searchForMidiDevices () {
     });
 }
 
-function requestWssConnection () {
-  buildWebSocketClient(location.hostname, 8080, audio.midiEventBus);
-}
-
 function init () {
   buildMidiFactory()
     .then( (midiFactoryInstance) => {
       audio.midiDeviceFactory = midiFactoryInstance;
     })
     .then(searchForMidiDevices)
-    .then(requestWssConnection)
     .catch(() => {midiFactory = {}});
 
   loadConfigFiles(CONFIG_FILE_PATH, audioGraph.getAudioContext());

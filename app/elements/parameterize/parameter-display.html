@@ -95,7 +95,8 @@
           this.properties = {
             model: {
               type: Number,
-              notify: true
+              notify: true,
+              observer: '_valueChanged'
             },
             modulatable: {
               type: Object
@@ -135,20 +136,55 @@
             this.$$('value-display').classList.add('parameter__value--row');
           }
 
-          this.midiListener = {
-            onMessage: (command, status, note, value) => {
-              let normalValue = value / 127;
-              let realValue = normalValue * (this.upperBound - this.lowerBound) + this.lowerBound;
-              this.model = realValue;
-            }
-          };
+          this.midiListener = buildMidiListener.call(this);
 
         }
         detached() {}
         attributeChanged() {}
+
+        //to bind an external application controler value
+        _valueChanged (newValue) {
+          // if (this.midiListener && this.midiListener.isRegistered) {
+          //   this.midiListener.sendMessage(newValue);
+          // }
+        }
+
+      }
+      Polymer(ParameterDisplay);
+
+      function buildMidiListener () {
+        let _status;
+        let _note;
+        let _lastValue;
+        let _midiListener = {
+          isRegistered: false,
+          setBoundMidiData: (command, status, note, value) => {
+            _status = status;
+            _note = note;
+          },
+          onMessage: (command, status, note, value) => {
+            let normalValue = value / 127;
+            let realValue = normalValue * (this.upperBound - this.lowerBound) + this.lowerBound;
+            _lastValue = realValue;
+            this.model = realValue;
+          },
+          sendMessage: (value) => {
+            if (value === _lastValue) { return; }
+            let realValue = Math.floor(value * 127);
+            let wsMessage = {
+              type: 'MESSAGE',
+              command: 0,
+              status: _status,
+              note: _note,
+              value: realValue
+            };
+            app.audio.webSocketClient.send(JSON.stringify(wsMessage));
+          }
+        };
+        return _midiListener;
       }
 
-      Polymer(ParameterDisplay);
+
     })();
   </script>
 

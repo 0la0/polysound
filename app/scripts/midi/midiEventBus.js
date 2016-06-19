@@ -28,9 +28,12 @@ class MidiEventBus {
     let mapKey = `${status}_${note}`;
     if (this.activeListener) {
       this.listenerMap.set(mapKey, this.activeListener);
+      this.activeListener.isRegistered = true;
+      this.activeListener.setBoundMidiData(command, status, note, value);
     }
     else {
       if (this.listenerMap.get(mapKey)) {
+        console.log('send to listener: ', command, status, note, value);
         this.listenerMap.get(mapKey)
           .onMessage(command, status, note, value);
       }
