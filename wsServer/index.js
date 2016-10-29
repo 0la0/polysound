@@ -1,7 +1,8 @@
 'use strict'
 
-let osc = require("osc");
+let osc = require('osc');
 let WebSocketServer = require('ws').Server;
+let oscMessageMap = require('./oscMessageMap');
 let wss = new WebSocketServer({ port: 8080 });
 let controllerConnections = [];
 let soundAppConnections = [];
@@ -82,17 +83,14 @@ function buildOscServer (port, onMessageCallback) {
     localPort: port
   });
 
-  oscServer.on("ready", () => {
-      console.log("UDP port open");
-  });
+  oscServer.on("ready", () => console.log("UDP port open"));
 
   oscServer.on('message', (oscMessage) => {
-      onMessageCallback(oscMessage);
+    console.log('onMessage', oscMessage);
+    onMessageCallback(oscMessage);
   });
 
-  oscServer.on('error', (err) => {
-      console.log(err);
-  });
+  oscServer.on('error', (err) => console.log(err));
 
   oscServer.open();
 
@@ -110,7 +108,8 @@ const oscMap = {
     status: 0,
     note: 1
   }
-}
+};
+
 
 function getMidiValue (normalValue) {
   return Math.floor(normalValue * 127);
@@ -118,7 +117,9 @@ function getMidiValue (normalValue) {
 
 //TODO: enforce specific format for osc address: command/status/note
 function mapOscToMidi (oscMessage) {
-  let midiNote = oscMap[oscMessage.address];
+  //let midiNote = oscMap[oscMessage.address];
+  let midiNote = oscMessageMap[oscMessage.address];
   midiNote.value = (midiNote) ? getMidiValue(oscMessage.args[0]) : 0;
+  console.log('midi note', midiNote);
   return midiNote;
 }
