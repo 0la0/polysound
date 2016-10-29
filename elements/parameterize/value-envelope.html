@@ -16,6 +16,9 @@
       }
       .envelope__button-open {}
       .envelope__button-schedule {}
+      .envelope__button-register {
+        height: 5px;
+      }
 
       .envelope__container {
         display: none;
@@ -43,6 +46,8 @@
         <simple-button class="envelope__button envelope__button-open" button-model="{{onpenButtonModel}}">
         </simple-button>
         <simple-button class="envelope__button envelope__button-schedule" button-model="{{scheduleButtonModel}}">
+        </simple-button>
+        <simple-button class="envelope__button envelope__button-register" button-model="{{registerButtonModel}}">
         </simple-button>
       </div>
       <div id="envelopeContainer" class="envelope__container">

@@ -1,13 +1,13 @@
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function () {
   'use strict';
 
-  var HillclimberElement = (function () {
+  var HillclimberElement = function () {
     function HillclimberElement() {
       _classCallCheck(this, HillclimberElement);
     }
@@ -110,7 +110,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }]);
 
     return HillclimberElement;
-  })();
+  }();
 
   Polymer(HillclimberElement);
 
@@ -176,7 +176,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     };
   }
 
-  var HillclimberDriver = (function () {
+  var HillclimberDriver = function () {
     function HillclimberDriver(goalStates) {
       _classCallCheck(this, HillclimberDriver);
 
@@ -219,7 +219,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }]);
 
     return HillclimberDriver;
-  })();
+  }();
 
   function generateRandomState(goalState) {
     var randomRestart = goalState.map(function (goalRow) {

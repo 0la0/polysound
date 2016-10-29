@@ -1,13 +1,13 @@
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function () {
   'use strict';
 
-  var Envelope = (function () {
+  var Envelope = function () {
     function Envelope() {
       _classCallCheck(this, Envelope);
     }
@@ -27,6 +27,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           },
           direction: {
             type: String
+          },
+          midiListener: {
+            type: Object
           }
         };
 
@@ -40,6 +43,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function attached() {
         this.onpenButtonModel = buildOnButtonModel.call(this);
         this.scheduleButtonModel = buildScheduleButtonModel.call(this);
+        this.registerButtonModel = buildRegisterButtonModel.call(this);
 
         if (this.direction === 'row') {
           this.$.envelopeTrigger.style.setProperty('flex-direction', 'column');
@@ -57,7 +61,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }]);
 
     return Envelope;
-  })();
+  }();
 
   Polymer(Envelope);
 
@@ -77,6 +81,20 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     return {
       callback: function callback(isScheduled) {
         _this2.isScheduled = isScheduled;
+      }
+    };
+  }
+
+  function buildRegisterButtonModel() {
+    var _this3 = this;
+
+    return {
+      callback: function callback(isListening) {
+        if (isListening) {
+          app.audio.midiEventBus.registerActiveListener(_this3.midiListener);
+        } else {
+          app.audio.midiEventBus.deregisterActiveListener(_this3.midiListener);
+        }
       }
     };
   }

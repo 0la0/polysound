@@ -1,13 +1,13 @@
 'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 (function () {
   'use strict';
 
-  var DriverContainer = (function () {
+  var DriverContainer = function () {
     function DriverContainer() {
       _classCallCheck(this, DriverContainer);
     }
@@ -52,7 +52,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }]);
 
     return DriverContainer;
-  })();
+  }();
 
   Polymer(DriverContainer);
 
@@ -72,7 +72,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     };
   }
 
-  var DriverFactory = (function () {
+  var DriverFactory = function () {
     function DriverFactory() {
       _classCallCheck(this, DriverFactory);
     }
@@ -110,9 +110,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var samplerElement = document.createElement('multi-sequencer');
         samplerElement.instrumentList = instrumentList;
 
-        for (var i = 0; i < numChannels; i++) {
+        for (var _i = 0; _i < numChannels; _i++) {
           var driverOut = document.createElement('driver-output');
-          driverOut.driverModel = connectionList[i];
+          driverOut.driverModel = connectionList[_i];
           driverOut.connectionBus = connectionOutput;
           Polymer.dom(driverOutputContainer).appendChild(driverOut);
         }
@@ -135,9 +135,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var samplerElement = document.createElement('apc-sequencer');
         samplerElement.instrumentList = instrumentList;
 
-        for (var i = 0; i < numChannels; i++) {
+        for (var _i2 = 0; _i2 < numChannels; _i2++) {
           var driverOut = document.createElement('driver-output');
-          driverOut.driverModel = connectionList[i];
+          driverOut.driverModel = connectionList[_i2];
           driverOut.connectionBus = connectionOutput;
           Polymer.dom(driverOutputContainer).appendChild(driverOut);
         }
@@ -160,9 +160,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var samplerElement = document.createElement('launchpad-sequencer');
         samplerElement.instrumentList = instrumentList;
 
-        for (var i = 0; i < numChannels; i++) {
+        for (var _i3 = 0; _i3 < numChannels; _i3++) {
           var driverOut = document.createElement('driver-output');
-          driverOut.driverModel = connectionList[i];
+          driverOut.driverModel = connectionList[_i3];
           driverOut.connectionBus = connectionOutput;
           Polymer.dom(driverOutputContainer).appendChild(driverOut);
         }
@@ -201,9 +201,9 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
         var samplerElement = document.createElement('hillclimber-sequencer');
         samplerElement.instrumentList = instrumentList;
 
-        for (var i = 0; i < numChannels; i++) {
+        for (var _i4 = 0; _i4 < numChannels; _i4++) {
           var driverOut = document.createElement('driver-output');
-          driverOut.driverModel = connectionList[i];
+          driverOut.driverModel = connectionList[_i4];
           driverOut.connectionBus = connectionOutput;
           Polymer.dom(driverOutputContainer).appendChild(driverOut);
         }
@@ -228,7 +228,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
     }]);
 
     return DriverFactory;
-  })();
+  }();
 
   function buildRemovable() {
     var _this = this;
